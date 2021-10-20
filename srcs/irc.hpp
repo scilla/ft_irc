@@ -14,7 +14,7 @@ class IRC
 		_password(psw),
 		_own(own)
 		{};
-		~IRC();
+		~IRC() {};
 
 	private:
 		bool			_own;
