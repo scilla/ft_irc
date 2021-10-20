@@ -1,0 +1,10 @@
+Protocolli -> https://datatracker.ietf.org/doc/html/rfc1459
+
+Socket (select) crash e chiusura
+
+
+https://pubs.opengroup.org/onlinepubs/7908799/xns/syssocket.h.html
+https://datatracker.ietf.org/doc/html/rfc1459
+http://beej.us/guide/bgnet/html/
+http://chi.cs.uchicago.edu/chirc/index.html
+https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select
