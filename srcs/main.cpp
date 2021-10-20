@@ -24,6 +24,8 @@ int main(int ac, char **av)
 	if(ac != 3 && ac != 4)
 	{
 		// error wrong arg
+		std::cout << "*** ERROR ***" << std::endl << "USAGE: ./ircserv [host:port_network:password_network] <port> <password>" << std::endl;
+		return 0;
 	}
 	if(ac == 4)
 	{
