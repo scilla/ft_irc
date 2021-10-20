@@ -28,16 +28,22 @@ int main(int ac, char **av)
 	if(ac == 4)
 	{
 		network = split_vct(av[1], ':');
-		network[3] = av[2];
-		network[4] = av[3];
+		network.push_back(av[2]);
+		network.push_back(av[3]);
 		IRC context((std::string)network[0].c_str(), atol(network[1].c_str()), (std::string)network[2].c_str(), atol(network[3].c_str()), (std::string)network[4].c_str(), false);
 	}
 	else
 	{
-		network[0] = av[1];
-		network[1] = av[2];
+		network.push_back(av[1]);
+		network.push_back(av[2]);
 		IRC context(0, 0, 0, atol(network[0].c_str()), (std::string)network[1].c_str(), true);
 	}
+
+	std::cout << "host				: " << network[0] << std::endl;
+	std::cout << "port_network		: " << network[1] << std::endl;
+	std::cout << "password_network	: " << network[2] << std::endl;
+	std::cout << "port				: " << network[3] << std::endl;
+	std::cout << "password			: " << network[4] << std::endl;
 
 
 }
