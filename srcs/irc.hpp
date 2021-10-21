@@ -2,6 +2,10 @@
 #define IRC_HPP
 
 #include <iostream>
+#include <map>
+#include <list>
+#include "USER.hpp"
+#include "CHANNEL.hpp"
 
 class IRC
 {
@@ -16,6 +20,16 @@ class IRC
 		{};
 		~IRC() {};
 
+		bool is_own();
+		std::string get_host();
+		size_t get_netPort();
+		std::string get_netPsw();
+		size_t get_port();
+		std::string get_psw();
+		std::map<size_t, USER> get_users();
+		std::list<CHANNEL> get_channels();
+
+
 	private:
 		bool			_own;
 		std::string		_host;
@@ -23,6 +37,9 @@ class IRC
 		std::string		_network_password;
 		size_t			_port;
 		std::string		_password;
+
+		std::map<size_t, USER> USER_MAP;
+		std::list<CHANNEL> CHANNEL_LIST;
 };
 
 

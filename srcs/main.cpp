@@ -4,6 +4,7 @@
 #include <cctype>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 
 void exit_err()
 {
@@ -28,9 +29,7 @@ std::vector<std::string> split_vct(std::string str, char delim)
 	std::string temp_str;
 	
 	while(std::getline(stream, temp_str, delim))
-	{
 		tmp_vct.push_back(temp_str);
-	}
 	return (tmp_vct);
 }
 
@@ -65,14 +64,18 @@ int main(int ac, char **av)
 	{
 		if(!isNumber(av[1]))
 			exit_err();
-		IRC context(0, 0, 0, atol(av[1]), av[2], true);
+		IRC context("OWN", -1, "OWN", atol(av[1]), av[2], true);
 	}
 
-	std::cout << "host				: " << network[0] << std::endl;
-	std::cout << "port_network		: " << network[1] << std::endl;
-	std::cout << "password_network	: " << network[2] << std::endl;
-	std::cout << "port				: " << network[3] << std::endl;
-	std::cout << "password			: " << network[4] << std::endl;
 
+
+	//debug
+	//std::cout << "host				: " << std::setw(10) << network[0] << std::endl;
+	//std::cout << "port_network			: " << std::setw(10) << network[1] << std::endl;
+	//std::cout << "password_network		: " << std::setw(10) << network[2] << std::endl;
+	//std::cout << "port				: " << std::setw(10) << network[3] << std::endl;
+	//std::cout << "password			: " << std::setw(10) << network[4] << std::endl;
+
+	
 
 }
