@@ -1,6 +1,8 @@
 #include "main.hpp"
 #include <vector>
 #include <iostream>
+#include <cctype>
+#include <algorithm>
 #include <sstream>
 
 void exit_err()
@@ -8,6 +10,15 @@ void exit_err()
 	std::cout << "*** ERROR ***" << std::endl << "USAGE: ./ircserv [host:port_network:password_network] <port> <password>" << std::endl;
 	std::cout << "USAGE: ./ircserv <port> <password>" << std::endl;
 	exit (-1);
+}
+
+bool isNumber(const char *str)
+{
+    for (int i = 0; str[i]; i++) {
+        if (std::isdigit(str[i]) == 0)
+			return false;
+    }
+    return true;
 }
 
 std::vector<std::string> split_vct(std::string str, char delim)
@@ -29,9 +40,9 @@ void check_args(char **av)
 	tmp = split_vct(av[1], ':');
 	if(tmp.size() != 3)
 		exit_err();
-	else if(!atol(tmp[1].c_str()))
+	else if(!isNumber(tmp[1].c_str()))
 		exit_err();
-	else if(!atol(av[2]))
+	else if(!isNumber(av[2]))
 		exit_err();
 }
 
@@ -52,7 +63,7 @@ int main(int ac, char **av)
 	}
 	else
 	{
-		if(!atol(av[1]))
+		if(!isNumber(av[1]))
 			exit_err();
 		IRC context(0, 0, 0, atol(av[1]), av[2], true);
 	}
