@@ -1,16 +1,17 @@
-#include "main.hpp"
 #include <vector>
 #include <iostream>
 #include <cctype>
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <sys/select.h>
+#include "irc.hpp"
 
 void exit_err()
 {
 	std::cout << "*** ERROR ***" << std::endl << "USAGE: ./ircserv [host:port_network:password_network] <port> <password>" << std::endl;
 	std::cout << "USAGE: ./ircserv <port> <password>" << std::endl;
-	exit (-1);
+	exit (1);
 }
 
 bool isNumber(const char *str)
@@ -49,25 +50,30 @@ void check_args(char **av)
 int main(int ac, char **av)
 {
 	std::vector<std::string> network;
+	IRC server;
 
-	if(ac != 3 && ac != 4)
+	if(ac != 3 && ac != 4) {
 		exit_err();
+		return 0;
+	}
 	if(ac == 4)
 	{
 		check_args(av);
 		network = split_vct(av[1], ':');
 		network.push_back(av[2]);
 		network.push_back(av[3]);
-		IRC context((std::string)network[0].c_str(), atol(network[1].c_str()), (std::string)network[2].c_str(), atol(network[3].c_str()), (std::string)network[4].c_str(), false);
-	}
+		IRC server((std::string)network[0].c_str(), atol(network[1].c_str()), (std::string)network[2].c_str(), atol(network[3].c_str()), (std::string)network[4].c_str(), false);
+	} 
 	else
 	{
-		if(!isNumber(av[1]))
+		if(!isNumber(av[1])) {
 			exit_err();
-		IRC context("OWN", -1, "OWN", atol(av[1]), av[2], true);
+			return 0;
+		}
+		IRC server("OWN", -1, "OWN", atol(av[1]), av[2], true);
 	}
 
-
+	server.start();
 
 	//debug
 	//std::cout << "host				: " << std::setw(10) << network[0] << std::endl;

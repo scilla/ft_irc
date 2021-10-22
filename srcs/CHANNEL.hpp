@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <list>
+#include <set>
 #include "user.hpp"
 
 class Channel
@@ -19,4 +20,4 @@ class Channel
 
 };
 
-#endif CHANNEL_HPP
+#endif // CHANNEL_HPP
