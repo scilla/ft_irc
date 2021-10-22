@@ -8,11 +8,11 @@
 class Channel
 {
 	private:
-		size_t _id;
-		std::string _name;
-		std::string psw;
-
-		std::map<size_t, User> USE_RGH; //mappa con user right come key e utente corrispondende
+		size_t					_id;
+		std::string				_name;
+		std::string				psw;
+		std::map<size_t, User>	USE_RGH; //mappa con user right come key e utente corrispondende
+		std::set<User>			banned_users;
 	public:
 		Channel();
 		~Channel();
