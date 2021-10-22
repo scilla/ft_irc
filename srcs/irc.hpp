@@ -4,8 +4,8 @@
 #include <iostream>
 #include <map>
 #include <list>
-#include "USER.hpp"
-#include "CHANNEL.hpp"
+#include "user.hpp"
+#include "channel.hpp"
 
 class IRC
 {
@@ -26,9 +26,8 @@ class IRC
 		std::string get_netPsw();
 		size_t get_port();
 		std::string get_psw();
-		std::map<size_t, USER> get_users();
-		std::list<CHANNEL> get_channels();
-
+		std::map<size_t, User> get_users();
+		std::list<Channel> get_channels();
 
 	private:
 		bool			_own;
@@ -38,8 +37,8 @@ class IRC
 		size_t			_port;
 		std::string		_password;
 
-		std::map<size_t, USER> USER_MAP;
-		std::map<std::string, CHANNEL> CHANNEL_MAP;
+		std::map<size_t, User> USER_MAP;
+		std::map<std::string, Channel> CHANNEL_MAP;
 };
 
 

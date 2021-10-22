@@ -75,7 +75,4 @@ int main(int ac, char **av)
 	//std::cout << "password_network		: " << std::setw(10) << network[2] << std::endl;
 	//std::cout << "port				: " << std::setw(10) << network[3] << std::endl;
 	//std::cout << "password			: " << std::setw(10) << network[4] << std::endl;
-
-	
-
 }

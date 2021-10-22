@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <list>
-#include "USER.hpp"
+#include "user.hpp"
 
 class Channel
 {
@@ -12,7 +12,7 @@ class Channel
 		std::string _name;
 		std::string psw;
 
-		std::list<USER> USR_LIST;
+		std::map<size_t, User> USE_RGH; //mappa con user right come key e utente corrispondende
 	public:
 		Channel();
 		~Channel();
