@@ -1,26 +1,26 @@
-#include "USER.hpp"
+#include "user.hpp"
 
-USER::USER(size_t id, std::string nick, std::string psw): 
+User::User(size_t id, std::string nick, std::string psw): 
 _id(id),
 _nick(nick),
 _psw(psw)
 {}
 
-USER::~USER() {}
+User::~User() {}
 
-std::string USER::get_nick() {
+std::string User::get_nick() {
 	return(_nick);
 }
 
-std::string USER::get_psw() {
+std::string User::get_psw() {
 	return(_psw);
 }
 
-void USER::set_nick(std::string nick) {
+void User::set_nick(std::string nick) {
 	_nick = nick;
 }
 
-void USER::set_pwd(std::string psw) {
+void User::set_pwd(std::string psw) {
 	_psw = psw;
 }
 

@@ -5,7 +5,7 @@
 #include <list>
 #include "USER.hpp"
 
-class CHANNEL
+class Channel
 {
 	private:
 		size_t _id;
@@ -14,8 +14,8 @@ class CHANNEL
 
 		std::list<USER> USR_LIST;
 	public:
-		CHANNEL();
-		~CHANNEL();
+		Channel();
+		~Channel();
 
 };
 
