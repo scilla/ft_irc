@@ -39,7 +39,7 @@ class IRC
 		std::string		_password;
 
 		std::map<size_t, USER> USER_MAP;
-		std::list<CHANNEL> CHANNEL_LIST;
+		std::map<std::string, CHANNEL> CHANNEL_MAP;
 };
 
 
