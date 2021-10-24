@@ -1,10 +1,11 @@
+
 #pragma once
 
 #include <unistd.h>
 #include "Server.hpp"
 
 
-class RunServer: public Server
+class RunLocal: public Server
 {
 private:
 	char buff[30000];
@@ -12,49 +13,46 @@ private:
 	void accepter();
 	void handler();
 	void responder();
+	std::string psw;
 public:
-	RunServer();
-	~RunServer();
+	RunLocal(size_t port, std::string psw);
+	~RunLocal();
 	void launch();
 };
 
 
-RunServer::RunServer(): Server(AF_INET, SOCK_STREAM, 0, 8081, INADDR_ANY, 10) {
+RunLocal::RunLocal(size_t port, std::string psw): Server(AF_INET, SOCK_STREAM, 0, port, INADDR_ANY, 10496) {
+	this->psw = psw;
 	launch();
 }
 	
-RunServer::~RunServer() {}
+RunLocal::~RunLocal() {}
 
-void RunServer::accepter(){
-
+void RunLocal::accepter(){
 	struct sockaddr_in remote = getServerSocket()->getRemote();
 	int remoteLen = sizeof(remote);
 	newSocket = accept(getServerSocket()->getSocket(), (struct sockaddr *)&remote, (socklen_t * )&remoteLen);
-	while(recv(newSocket, buff, 800000, 0)){
-		handler();
-		//responder();
-		bzero(buff, sizeof(buff));
-	}
+	read(newSocket, buff, sizeof(buff));
 
 }
 
-void RunServer::handler(){
+void RunLocal::handler(){
 	std::cout<< buff << std::endl;
 }
 
-void RunServer::responder(){
+void RunLocal::responder(){
 
-	std::string message("CAP * LS :");
+	std::string message("Hello from server");
 	write(newSocket, message.c_str(), message.length());
-	//close(newSocket);
+	close(newSocket);
 }
 
-void RunServer::launch(){
+void RunLocal::launch(){
 	while(true){
 		std::cout << "------------WAITING-------------" << std::endl;
 		accepter();
-		//handler();
-		//responder();
+		handler();
+		responder();
 		std::cout << "------------DONE-----------" << std::endl;
 
 	}

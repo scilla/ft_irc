@@ -2,5 +2,5 @@
 #include "Server.hpp"
 
 int main(){
-    FT::RunServer serv;
+    RunServer serv;
 }
