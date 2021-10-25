@@ -4,7 +4,7 @@
 #include <iostream>
 #include <list>
 #include <set>
-#include "user.hpp"
+#include "USER.hpp"
 
 class Channel
 {
@@ -19,5 +19,8 @@ class Channel
 		~Channel();
 
 };
+
+Channel::Channel() {};
+Channel::~Channel() {};
 
 #endif // CHANNEL_HPP

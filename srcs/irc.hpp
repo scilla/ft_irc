@@ -4,15 +4,19 @@
 #include <iostream>
 #include <map>
 #include <list>
-#include "user.hpp"
-#include "channel.hpp"
+#include "USER.hpp"
+#include <sys/types.h>
+#include "CHANNEL.hpp"
+#include "netinet/in.h"
 #include <sys/select.h>
 #include <sys/socket.h>
+#include "networking/server/RunLocal.hpp"
+
 
 class IRC
 {
 	public:
-		IRC();
+		IRC() {};
 		IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
 		_host(host),
 		_network_port(net_pt),
@@ -31,14 +35,14 @@ class IRC
 		std::map<size_t, User>	get_users();
 		std::list<Channel>		get_channels();
 
-		void					start(std::string, std::string, std::string, std::string, std::string);
+		void					start();
 	private:
 		bool			_own;
 		std::string		_host;
 		size_t			_network_port;
-		std::string		_network_password;
-		size_t			_port;
-		std::string		_password;
+		std::string		_network_password;		
+		size_t			_port;					//local server port
+		std::string		_password;				//local server psw
 		fd_set 			readfds;
 		fd_set 			writefds;
 
@@ -50,11 +54,9 @@ std::string IRC::get_psw() {
 	return this->_password;
 }
 
-void IRC::start(std::string port, std::string pass, std::string remotehost = "", std::string remoteport = "", std::string remotepass = "") {
-	int	s_fd;
-	std::string hostnet, pass, port, remoteport, remotepass;
-
-	s_fd = socket(AF_INET, SOCK_STREAM, 0);
+void IRC::start() {
+	RunLocal LocalServer(_port, _password);
+	
 	
 }
 #endif /* IRC_HPP */
