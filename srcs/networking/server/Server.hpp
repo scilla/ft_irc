@@ -8,7 +8,7 @@ class Server
 {
 private:
     virtual void accepter() = 0;
-    virtual void handler() = 0;
+    virtual void handler(int) = 0;
     virtual void responder() = 0;
 protected:
     ListeningSocket * socket;
