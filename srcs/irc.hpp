@@ -13,6 +13,7 @@
 #include "networking/server/Server.hpp"
 #include <unistd.h>
 #include <vector>
+#include <set>
 
 class IRC: public Server
 {
@@ -47,8 +48,8 @@ class IRC: public Server
 		std::string		_password;				//local server psw
 		// fd_set 			*readfds;
 		// fd_set 			*writefds;
-		std::vector<int>	readfds;
-		std::vector<int>	writefds;
+		std::set<int>	readfds;
+		std::set<int>	writefds;
 
 		char buff[500];
 		int newSocket;
@@ -69,8 +70,15 @@ void IRC::accepter(){
 }
 
 void IRC::handler(int connected_fd){
-	read(connected_fd, buff, sizeof(buff));
+	recv(connected_fd, buff, 500, 0);
+	if(!buff[0])
+	{
+		close(connected_fd); std::cout << "closed connection \n";
+		readfds.erase(readfds.find(connected_fd));
+		return ;
+	}
 	std::cout<< buff << std::endl;
+	bzero(buff, sizeof(buff));
 }
 
 void IRC::responder() {
@@ -91,7 +99,7 @@ void IRC::launch() {
 		max = getServerSocket()->getSocket() + 1;
 		FD_ZERO(&fds);
 		FD_SET(getServerSocket()->getSocket(), &fds);
-		for(std::vector<int>::iterator it = readfds.begin(); it != readfds.end(); it++) {
+		for(std::set<int>::iterator it = readfds.begin(); it != readfds.end(); it++) {
 			FD_SET(*it, &fds);
 			if (*it >= max)
 				max = *it + 1;
@@ -101,11 +109,9 @@ void IRC::launch() {
 		if(FD_ISSET(getServerSocket()->getSocket(), &fds)){
 			newSocket = accept(getServerSocket()->getSocket(), (struct sockaddr *)&remote, (socklen_t * )&remoteLen);
 			std::cout << "new connection accepted\n"; 
-			readfds.push_back(newSocket);
-			//handler(newSocket);
+			readfds.insert(newSocket);
 		}
-		//std::cout << "new data from old connection\n";
-		for(std::vector<int>::iterator it = readfds.begin(); it != readfds.end(); it++)
+		for(std::set<int>::iterator it = readfds.begin(); it != readfds.end(); it++)
 		{
 			if(FD_ISSET(*it, &fds))
 				handler(*it);
