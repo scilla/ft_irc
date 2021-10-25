@@ -79,6 +79,8 @@ void IRC::handler(int connected_fd){
 	}
 	std::cout<< buff << std::endl;
 	bzero(buff, sizeof(buff));
+	std::string message("PONG :1.2.3.4\n");
+	write(connected_fd, message.c_str(), message.length());
 }
 
 void IRC::responder() {
