@@ -7,14 +7,15 @@
 class Server
 {
 private:
-    ListeningSocket * socket;
     virtual void accepter() = 0;
     virtual void handler() = 0;
     virtual void responder() = 0;
+protected:
+    ListeningSocket * socket;
 public:
     Server();
     Server(int domain, int service, int protocol, int serverPort, u_long interface, int backlog);
-    ~Server();
+   	virtual ~Server();
     virtual void launch() = 0;
     ListeningSocket * getServerSocket();
 };

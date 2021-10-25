@@ -8,7 +8,7 @@
 class RunLocal: public Server
 {
 private:
-	char buff[30000];
+	char buff[500];
 	int newSocket;
 	void accepter();
 	void handler();
@@ -44,7 +44,7 @@ void RunLocal::responder(){
 
 	std::string message("Hello from server");
 	write(newSocket, message.c_str(), message.length());
-	close(newSocket);
+	//close(newSocket);
 }
 
 void RunLocal::launch(){

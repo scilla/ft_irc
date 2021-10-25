@@ -50,7 +50,12 @@ void check_args(char **av)
 int main(int ac, char **av)
 {
 	std::vector<std::string> network;
-	IRC server;
+	bool type_bool;
+	std::string n_host;
+	size_t 		n_port;
+	std::string n_psw;
+	size_t		l_port;
+	std::string	l_psw;
 
 	if(ac != 3 && ac != 4) {
 		exit_err();
@@ -62,17 +67,29 @@ int main(int ac, char **av)
 		network = split_vct(av[1], ':');
 		network.push_back(av[2]);
 		network.push_back(av[3]);
-		IRC server((std::string)network[0].c_str(), atol(network[1].c_str()), (std::string)network[2].c_str(), atol(network[3].c_str()), (std::string)network[4].c_str(), false);
+		n_host = (std::string)network[0].c_str();
+		n_port = atol(network[1].c_str());
+		n_psw = (std::string)network[2].c_str();
+		l_port = atol(network[3].c_str());
+		l_psw = (std::string)network[4].c_str();
+		type_bool = false;
+		//IRC server((std::string)network[0].c_str(), atol(network[1].c_str()), (std::string)network[2].c_str(), atol(network[3].c_str()), (std::string)network[4].c_str(), false);
 	} 
 	else
 	{
+		n_host = "OWN";
+		n_port = -1;
+		n_psw = "OWN";
+		l_port = atol(av[1]);
+		l_psw = av[2];
+		type_bool = true;
 		if(!isNumber(av[1])) {
 			exit_err();
 			return 0;
 		}
-		IRC server("OWN", -1, "OWN", atol(av[1]), av[2], true);
 	}
 
+	IRC server(n_host, n_port, n_psw, l_port, l_psw, type_bool);
 	server.start();
 
 	//debug

@@ -16,6 +16,7 @@ class Socket
         u_long interface;
     public:
         Socket();
+		~Socket() {};
         Socket(int domain, int service, int protocol, int serverPort, u_long interface);
         virtual int netConnection(int hSocket, struct sockaddr_in remote) = 0;
         void testConnection(int toTest);

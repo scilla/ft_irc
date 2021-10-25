@@ -18,12 +18,12 @@ class IRC
 	public:
 		IRC() {};
 		IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
+		_own(own),
 		_host(host),
 		_network_port(net_pt),
 		_network_password(net_psw),
 		_port(pt),
-		_password(psw),
-		_own(own)
+		_password(psw)
 		{};
 		~IRC() {};
 
@@ -43,8 +43,8 @@ class IRC
 		std::string		_network_password;		
 		size_t			_port;					//local server port
 		std::string		_password;				//local server psw
-		fd_set 			readfds;
-		fd_set 			writefds;
+		fd_set 			*readfds;
+		fd_set 			*writefds;
 
 		std::map<size_t, User> 			USER_MAP;
 		std::map<std::string, Channel> 	CHANNEL_MAP;

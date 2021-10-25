@@ -9,7 +9,7 @@ class ListeningSocket: public BindingSocket
 	    int listening;
 	public:
 	    ListeningSocket(int domain, int service, int protocol, int serverPort, u_long interface, int backlog);
-	    ~ListeningSocket();
+	    virtual ~ListeningSocket();
 	    void startListening();
 	    int getListening();
 	    int getBacklog();
