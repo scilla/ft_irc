@@ -3,7 +3,7 @@ OBJ				= $(SRCS:.cpp=.o)
 
 CC				= clang++
 RM				= rm -f
-CFLAGS			= -std=c++98 -Wall -Wextra -Werror
+CFLAGS			= -std=c++98 -g # -Wall -Wextra -Werror
 NAME			= ircserv
 
 %.o:			%.cpp

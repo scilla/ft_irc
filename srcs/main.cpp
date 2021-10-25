@@ -90,7 +90,7 @@ int main(int ac, char **av)
 	}
 
 	IRC server(n_host, n_port, n_psw, l_port, l_psw, type_bool);
-	server.start();
+	server.launch();
 
 	//debug
 	//std::cout << "host				: " << std::setw(10) << network[0] << std::endl;

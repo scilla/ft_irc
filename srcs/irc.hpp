@@ -10,10 +10,11 @@
 #include "netinet/in.h"
 #include <sys/select.h>
 #include <sys/socket.h>
-#include "networking/server/RunLocal.hpp"
+#include "networking/server/Server.hpp"
+#include <unistd.h>
+#include <vector>
 
-
-class IRC
+class IRC: public Server
 {
 	public:
 		IRC() {};
@@ -23,7 +24,8 @@ class IRC
 		_network_port(net_pt),
 		_network_password(net_psw),
 		_port(pt),
-		_password(psw)
+		_password(psw),
+		Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
 		{};
 		~IRC() {};
 
@@ -35,7 +37,7 @@ class IRC
 		std::map<size_t, User>	get_users();
 		std::list<Channel>		get_channels();
 
-		void					start();
+		void					launch();
 	private:
 		bool			_own;
 		std::string		_host;
@@ -43,8 +45,17 @@ class IRC
 		std::string		_network_password;		
 		size_t			_port;					//local server port
 		std::string		_password;				//local server psw
-		fd_set 			*readfds;
-		fd_set 			*writefds;
+		// fd_set 			*readfds;
+		// fd_set 			*writefds;
+		std::vector<int>	readfds;
+		std::vector<int>	writefds;
+
+		char buff[500];
+		int newSocket;
+		void accepter();
+		void handler();
+		void responder();
+		std::string psw;
 
 		std::map<size_t, User> 			USER_MAP;
 		std::map<std::string, Channel> 	CHANNEL_MAP;
@@ -54,9 +65,31 @@ std::string IRC::get_psw() {
 	return this->_password;
 }
 
-void IRC::start() {
-	RunLocal LocalServer(_port, _password);
-	
-	
+void IRC::accepter(){
+	struct sockaddr_in remote = getServerSocket()->getRemote();
+	int remoteLen = sizeof(remote);
+	newSocket = accept(getServerSocket()->getSocket(), (struct sockaddr *)&remote, (socklen_t * )&remoteLen);
+	read(newSocket, buff, sizeof(buff));
+
+}
+
+void IRC::handler(){
+	std::cout<< buff << std::endl;
+}
+
+void IRC::responder() {
+	std::string message("Hello from server");
+	write(newSocket, message.c_str(), message.length());
+	//close(newSocket);
+}
+void IRC::launch() {
+	while(true){
+		std::cout << "------------WAITING-------------" << std::endl;
+		accepter();
+		handler();
+		responder();
+		std::cout << "------------DONE-----------" << std::endl;
+
+	}
 }
 #endif /* IRC_HPP */
