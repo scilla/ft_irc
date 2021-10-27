@@ -11,34 +11,34 @@ typedef struct s_Roles {
 
 enum USER_STATE {
 	INIT,
-	REGISTERED, 
-
+	REGISTERED
 };
 
 class User
 {
 	private:
-		size_t 					_id;
+		const size_t 			_id;
 		std::string 			_nick; //max 9 chars
 		std::string 			_username;
-		//std::string 			_psw;
 		//std::map<int, Roles>	channels;
 		int						_fdread;
 		int						_fdwrite;
+		USER_STATE				_state;
+		int						_last_activity;
 	public:
-		User(size_t id, std::string nick, std::string psw);
+		User(size_t id);
 		~User();
 		std::string get_nick() const;
+		std::string get_username() const;
 		std::string get_psw() const;
 		void set_nick(std::string nick);
-		void set_pwd(std::string psw);
+		void set_username(std::string nick);
 		int						get_roles;
 };
 
-User::User(size_t id, std::string nick, std::string username) : _id(id),
-														   _nick(nick),
-														   _username(username)
+User::User(size_t id) : _id(id), _state(INIT)
 {
+	std::cout<< "New user created, fd: " << id << std::endl;
 }
 
 User::~User() {}

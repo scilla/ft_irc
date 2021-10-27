@@ -20,6 +20,8 @@
 #define ERR_NICKNAMEINUSE		"433\n"
 // #define ERR_NICKCOLLISION		"436\n"
 #define ERR_NOLOGIN				"444\n"
+#define ERR_NEEDMOREPARAMS		"461\n"
+#define ERR_PASSWDMISMATCH		"464\n"
 
 class IRC: public Server
 {
@@ -41,8 +43,9 @@ class IRC: public Server
 		// std::string 			get_netPsw();
 		// size_t 					get_port();
 		bool 					check_psw(std::string psw);
-		User					get_user(std::string nickname);
-		User					get_user(size_t fd);
+		User*					get_user(std::string nickname);
+		User*					get_user(int fd);
+		bool					is_user(int fd);
 		std::list<Channel>		get_channels();
 		Channel					get_channel(std::string channelname);
 
@@ -63,7 +66,7 @@ class IRC: public Server
 		int newSocket;
 		void accepter();
 		void handler(int connected_fd);
-		void responder();
+		void responder(std::string, int);
 		std::string psw;
 
 		std::map<size_t, User> 			USER_MAP;
@@ -74,7 +77,25 @@ class IRC: public Server
 void IRC::accepter(){
 }
 
-void IRC::handler(int connected_fd){
+bool IRC::check_psw(std::string psw) {
+	for (int i = 0; i < psw.length(); i++) {
+		printf("%d ", psw[i]);
+	}
+	std::cout << "\nsent: " << psw << "|\npass: " << _password << "|" << std::endl;
+	for (int i = 0; i < _password.length(); i++) {
+		printf("%d ", _password[i]);
+	}
+	printf("\n");
+	return ((psw == _password) ? true : false);
+}
+
+User* IRC::get_user(int fd) {
+	return NULL;
+}
+
+void IRC::handler(int connected_fd) {
+	std::string replyMessage;
+	User*	current_user = get_user(connected_fd);
 	recv(connected_fd, buff, 500, 0);
 	if(!buff[0])
 	{
@@ -82,20 +103,37 @@ void IRC::handler(int connected_fd){
 		readfds.erase(readfds.find(connected_fd));
 		return ;
 	}
-	// std::string messageFromClient;
+	// write(connected_fd, replyMessage.c_str(), replyMessage.length());
+	std::string messageFromClient(buff);
 	std::cout<< ">> " << buff << " <<" << std::endl;
-	// messageFromClient.
+	// if (messageFromClient.substr(0, 4) == "PING") {
+	// 	replyMessage = "PONG :";
+	// 	replyMessage.append(5, )
+	// }
+	// replyMessage = "PONG :";
+	if (!current_user) {
+		if (messageFromClient.substr(0, 6) != "PASS :") {
+			std::cout<< "User sent no pass" << std::endl;
+			responder(ERR_NEEDMOREPARAMS, connected_fd);
+			return;
+		}
+		if (!check_psw(messageFromClient.substr(6, messageFromClient.find("\x0d") - 6))) {
+			std::cout<< "User sent wrong pass" << std::endl;
+			responder(ERR_PASSWDMISMATCH, connected_fd);
+			return;
+		}
+		USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
+	} 
+	
 	bzero(buff, sizeof(buff));
 
-	std::string message(ERR_NICKNAMEINUSE);
-	write(connected_fd, message.c_str(), message.length());
 }
 
-void IRC::responder() {
-	std::string message("Hello from server");
-	write(newSocket, message.c_str(), message.length());
+void IRC::responder(std::string message, int fd) {
+	write(fd, message.c_str(), message.length());
 	//close(newSocket);
 }
+
 void IRC::launch() {
 	struct sockaddr_in remote = getServerSocket()->getRemote();
 	int remoteLen = sizeof(remote);
