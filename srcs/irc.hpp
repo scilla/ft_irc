@@ -30,13 +30,15 @@ class IRC: public Server
 		{};
 		~IRC() {};
 
-		bool 					is_own();
-		size_t 					get_netPort();
-		std::string 			get_netPsw();
-		size_t 					get_port();
-		std::string 			get_psw();
-		std::map<size_t, User>	get_users();
+		// bool 					is_own();
+		// size_t 					get_netPort();
+		// std::string 			get_netPsw();
+		// size_t 					get_port();
+		bool 					check_psw(std::string psw);
+		User					get_user(std::string nickname);
+		User					get_user(size_t fd);
 		std::list<Channel>		get_channels();
+		Channel					get_channel(std::string channelname);
 
 		void					launch();
 	private:
@@ -59,12 +61,9 @@ class IRC: public Server
 		std::string psw;
 
 		std::map<size_t, User> 			USER_MAP;
+		std::map<std::string, size_t> 	FD_MAP;
 		std::map<std::string, Channel> 	CHANNEL_MAP;
 };
-
-std::string IRC::get_psw() {
-	return this->_password;
-}
 
 void IRC::accepter(){
 }
@@ -77,10 +76,11 @@ void IRC::handler(int connected_fd){
 		readfds.erase(readfds.find(connected_fd));
 		return ;
 	}
-	std::cout<< buff << std::endl;
+	std::cout<< ">> " << buff << " <<" << std::endl;
 	bzero(buff, sizeof(buff));
-	std::string message("PONG :1.2.3.4\n");
+	std::string message("433");
 	write(connected_fd, message.c_str(), message.length());
+	//send(connected_fd, &433, 4);
 }
 
 void IRC::responder() {

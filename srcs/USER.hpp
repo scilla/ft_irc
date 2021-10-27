@@ -9,12 +9,19 @@ typedef struct s_Roles {
 	bool admin;
 } Roles;
 
+enum USER_STATE {
+	INIT,
+	REGISTERED, 
+
+};
+
 class User
 {
 	private:
 		size_t 					_id;
 		std::string 			_nick; //max 9 chars
-		std::string 			_psw;
+		std::string 			_username;
+		//std::string 			_psw;
 		//std::map<int, Roles>	channels;
 		int						_fdread;
 		int						_fdwrite;
@@ -28,9 +35,9 @@ class User
 		int						get_roles;
 };
 
-User::User(size_t id, std::string nick, std::string psw) : _id(id),
+User::User(size_t id, std::string nick, std::string username) : _id(id),
 														   _nick(nick),
-														   _psw(psw)
+														   _username(username)
 {
 }
 
@@ -41,19 +48,10 @@ std::string User::get_nick() const
 	return (_nick);
 }
 
-std::string User::get_psw() const
-{
-	return (_psw);
-}
 
 void User::set_nick(std::string nick)
 {
 	_nick = nick;
-}
-
-void User::set_pwd(std::string psw)
-{
-	_psw = psw;
 }
 
 #endif
