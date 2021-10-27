@@ -15,6 +15,12 @@
 #include <vector>
 #include <set>
 
+#define ERR_NONICKNAMEGIVEN		"431\n"
+#define ERR_ERRONEUSNICKNAME	"432\n"
+#define ERR_NICKNAMEINUSE		"433\n"
+// #define ERR_NICKCOLLISION		"436\n"
+#define ERR_NOLOGIN				"444\n"
+
 class IRC: public Server
 {
 	public:
@@ -76,11 +82,13 @@ void IRC::handler(int connected_fd){
 		readfds.erase(readfds.find(connected_fd));
 		return ;
 	}
+	// std::string messageFromClient;
 	std::cout<< ">> " << buff << " <<" << std::endl;
+	// messageFromClient.
 	bzero(buff, sizeof(buff));
-	std::string message("433");
+
+	std::string message(ERR_NICKNAMEINUSE);
 	write(connected_fd, message.c_str(), message.length());
-	//send(connected_fd, &433, 4);
 }
 
 void IRC::responder() {
