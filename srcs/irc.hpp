@@ -50,6 +50,7 @@ class IRC: public Server
 		Channel					get_channel(std::string channelname);
 
 		void					launch();
+		void					abort_connection(int disconnected_fd);
 	private:
 		bool			_own;
 		std::string		_host;
@@ -93,16 +94,21 @@ User* IRC::get_user(int fd) {
 	return NULL;
 }
 
+void	IRC::abort_connection(int disconnected_fd){
+
+	if(!buff[0])
+	{
+		close(disconnected_fd); std::cout << "closed connection \n";
+		readfds.erase(readfds.find(disconnected_fd));
+		return ;
+	}
+}
+
 void IRC::handler(int connected_fd) {
 	std::string replyMessage;
 	User*	current_user = get_user(connected_fd);
 	recv(connected_fd, buff, 500, 0);
-	if(!buff[0])
-	{
-		close(connected_fd); std::cout << "closed connection \n";
-		readfds.erase(readfds.find(connected_fd));
-		return ;
-	}
+	abort_connection(connected_fd);
 	// write(connected_fd, replyMessage.c_str(), replyMessage.length());
 	std::string messageFromClient(buff);
 	std::cout<< ">> " << buff << " <<" << std::endl;
@@ -119,7 +125,8 @@ void IRC::handler(int connected_fd) {
 		}
 		if (!check_psw(messageFromClient.substr(6, messageFromClient.find("\x0d") - 6))) {
 			std::cout<< "User sent wrong pass" << std::endl;
-			responder(ERR_PASSWDMISMATCH, connected_fd);
+			bzero(buff, sizeof(buff));
+			abort_connection(connected_fd);
 			return;
 		}
 		USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
