@@ -51,6 +51,7 @@ class IRC: public Server
 
 		void					launch();
 		void					abort_connection(int disconnected_fd);
+		void					user_creator();
 	private:
 		bool			_own;
 		std::string		_host;
@@ -91,7 +92,12 @@ bool IRC::check_psw(std::string psw) {
 }
 
 User* IRC::get_user(int fd) {
-	return NULL;
+	std::map<size_t, User>::iterator found;
+
+	found = USER_MAP.find(fd);
+	if(found != USER_MAP.end())
+		return(&found.operator*().second);
+	return(NULL);
 }
 
 void	IRC::abort_connection(int disconnected_fd){
@@ -104,19 +110,15 @@ void	IRC::abort_connection(int disconnected_fd){
 	}
 }
 
+
+
 void IRC::handler(int connected_fd) {
 	std::string replyMessage;
 	User*	current_user = get_user(connected_fd);
 	recv(connected_fd, buff, 500, 0);
 	abort_connection(connected_fd);
-	// write(connected_fd, replyMessage.c_str(), replyMessage.length());
 	std::string messageFromClient(buff);
 	std::cout<< ">> " << buff << " <<" << std::endl;
-	// if (messageFromClient.substr(0, 4) == "PING") {
-	// 	replyMessage = "PONG :";
-	// 	replyMessage.append(5, )
-	// }
-	// replyMessage = "PONG :";
 	if (!current_user) {
 		if (messageFromClient.substr(0, 6) != "PASS :") {
 			std::cout<< "User sent no pass" << std::endl;
@@ -130,10 +132,8 @@ void IRC::handler(int connected_fd) {
 			return;
 		}
 		USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
-	} 
-	
+	}
 	bzero(buff, sizeof(buff));
-
 }
 
 void IRC::responder(std::string message, int fd) {
