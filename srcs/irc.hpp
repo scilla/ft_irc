@@ -26,16 +26,8 @@
 class IRC: public Server
 {
 	public:
-		IRC() {};
-		IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
-		_own(own),
-		_host(host),
-		_network_port(net_pt),
-		_network_password(net_psw),
-		_port(pt),
-		_password(psw),
-		Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
-		{};
+		//IRC() {};
+		IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own);
 		~IRC() {};
 
 		// bool 					is_own();
@@ -52,6 +44,10 @@ class IRC: public Server
 		void					launch();
 		void					abort_connection(int disconnected_fd);
 		void					user_creator();
+
+
+		void parse(std::string raw);
+		//void elab_parsed(std::vector<std::string> parsed);
 	private:
 		bool			_own;
 		std::string		_host;
@@ -74,7 +70,27 @@ class IRC: public Server
 		std::map<size_t, User> 			USER_MAP;
 		std::map<std::string, size_t> 	FD_MAP;
 		std::map<std::string, Channel> 	CHANNEL_MAP;
+		std::map<std::string, void(IRC::*)(std::vector<std::string>)> CMD_MAP;
+
+
+		//commands
+		void userCmd(std::vector<std::string>);
+		void passCmd(std::vector<std::string>);
+		void nickCmd(std::vector<std::string>);
+		void joinCmd(std::vector<std::string>);
 };
+
+IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
+		_own(own),
+		_host(host),
+		_network_port(net_pt),
+		_network_password(net_psw),
+		_port(pt),
+		_password(psw),
+		Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
+		{
+			CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
+		};
 
 void IRC::accepter(){
 }
@@ -110,7 +126,30 @@ void	IRC::abort_connection(int disconnected_fd){
 	}
 }
 
+void IRC::parse(std::string raw)
+{
+	std::vector<std::string>	parsed;
+	std::string tmp = raw;
+	int args  = 0;
+	int prev_pos = 0;
 
+	for(int i = 0; tmp[i]; i++)
+	{
+		if(isspace(tmp[i]))
+		{
+			if(prev_pos != i)
+				parsed[args] = tmp.substr(prev_pos, i);
+			prev_pos = i + 1;
+			args++;
+		}
+	}
+	//elab_parsed(parsed);
+}
+
+//void elab_parsed(std::vector<std::string> parsed)
+//{
+//	
+//}
 
 void IRC::handler(int connected_fd) {
 	std::string replyMessage;
