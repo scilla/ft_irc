@@ -9,10 +9,12 @@ typedef struct s_Roles {
 	bool admin;
 } Roles;
 
-enum USER_STATE {
-	INIT,
-	REGISTERED
-};
+typedef struct s_state{
+	bool pass;
+	bool nick;
+	bool user;
+}				t_state;
+
 
 class User
 {
@@ -23,7 +25,6 @@ class User
 		//std::map<int, Roles>	channels;
 		int						_fdread;
 		int						_fdwrite;
-		USER_STATE				_state;
 		int						_last_activity;
 	public:
 		User(size_t id);
@@ -34,9 +35,10 @@ class User
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
 		int						get_roles;
+		t_state					_state;
 };
 
-User::User(size_t id) : _id(id), _state(INIT)
+User::User(size_t id) : _id(id), _state((t_state){true, false, false})
 {
 	std::cout<< "New user created, fd: " << id << std::endl;
 }
@@ -52,6 +54,11 @@ std::string User::get_nick() const
 void User::set_nick(std::string nick)
 {
 	_nick = nick;
+}
+
+void User::set_username(std::string user)
+{
+	_username = user;
 }
 
 #endif

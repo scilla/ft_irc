@@ -59,6 +59,9 @@ class IRC: public Server
 		// fd_set 			*writefds;
 		std::set<int>	readfds;
 		std::set<int>	writefds;
+		int				connected_fd;
+		User*			current_user;
+
 
 		char buff[500];
 		int newSocket;
@@ -70,14 +73,14 @@ class IRC: public Server
 		std::map<size_t, User> 			USER_MAP;
 		std::map<std::string, size_t> 	FD_MAP;
 		std::map<std::string, Channel> 	CHANNEL_MAP;
-		std::map<std::string, void(IRC::*)(std::vector<std::string>)> CMD_MAP;
+		std::map<std::string, int(IRC::*)(std::vector<std::string>)> CMD_MAP;
 
 
 		//commands
-		void userCmd(std::vector<std::string>);
-		void passCmd(std::vector<std::string>);
-		void nickCmd(std::vector<std::string>);
-		void joinCmd(std::vector<std::string>);
+		int userCmd(std::vector<std::string>);
+		int passCmd(std::vector<std::string>);
+		int nickCmd(std::vector<std::string>);
+		int joinCmd(std::vector<std::string>);
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
@@ -89,7 +92,7 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 		_password(psw),
 		Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
 		{
-			CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
+			//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
 		};
 
 void IRC::accepter(){
@@ -125,6 +128,12 @@ void	IRC::abort_connection(int disconnected_fd){
 		return ;
 	}
 }
+/*
+PASS ciao
+NICK vaffa
+
+PASS, ciao, NICK, vaffa
+*/
 
 void IRC::parse(std::string raw)
 {
@@ -132,17 +141,60 @@ void IRC::parse(std::string raw)
 	std::string tmp = raw;
 	int args  = 0;
 	int prev_pos = 0;
+	int start;
+	int stop;
 
-	for(int i = 0; tmp[i]; i++)
+	start = 0;
+	while (start < raw.size())
+	{
+		stop = raw.find(" ", start);
+		if (stop == -1)
+			stop = raw.size();
+		if (start < stop) {
+			std::cout << "found this parse: " << raw.substr(start, stop) << std::endl;
+			parsed.push_back(raw.substr(start, stop));
+		}
+		start = stop + 1;
+	}
+	if (!parsed.size())
+		return;
+/*
+	for(int i = 0; i < tmp.size() ; i++)
 	{
 		if(isspace(tmp[i]))
 		{
 			if(prev_pos != i)
-				parsed[args] = tmp.substr(prev_pos, i);
-			prev_pos = i + 1;
-			args++;
+				parsed.push_back(tmp.substr(prev_pos, i));
+			prev_pos = i;
 		}
 	}
+	*/
+
+	for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
+	{
+		std::cout << *it << " " << std::endl;
+		//for(int i = 0; (*it).c_str()[i] != 0; i ++)
+		//	std::cout << (int)(*it).c_str()[i] << std::endl;
+	}
+	current_user = get_user(connected_fd);
+	std::pair<std::map<size_t, User>::iterator, bool> res;
+	if (!current_user) {
+		if(passCmd(parsed))
+			return ;
+		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
+		current_user = &res.first.operator*().second;
+	}
+	if(!current_user->_state.nick)
+	{
+		if(!nickCmd(parsed))
+			return;
+	}
+	if(!current_user->_state.user)
+	{
+		if(!userCmd(parsed))
+			return;
+	}
+
 	//elab_parsed(parsed);
 }
 
@@ -152,25 +204,28 @@ void IRC::parse(std::string raw)
 //}
 
 void IRC::handler(int connected_fd) {
+	int start;
+	int stop_r;
+	int stop_n;
+	int stop;
 	std::string replyMessage;
-	User*	current_user = get_user(connected_fd);
 	recv(connected_fd, buff, 500, 0);
 	abort_connection(connected_fd);
 	std::string messageFromClient(buff);
 	std::cout<< ">> " << buff << " <<" << std::endl;
-	if (!current_user) {
-		if (messageFromClient.substr(0, 6) != "PASS :") {
-			std::cout<< "User sent no pass" << std::endl;
-			responder(ERR_NEEDMOREPARAMS, connected_fd);
-			return;
+	start = 0;
+	if(messageFromClient.size()) {
+		while (start < messageFromClient.size())
+		{
+			stop_r = messageFromClient.find("\r", start);
+			stop_n = messageFromClient.find("\n", start);
+			stop = stop_r < stop_n ? stop_r : stop_n;
+			if (start + 1 < stop) {
+				std::cout << "found this: " << messageFromClient.substr(start, stop) << std::endl;
+				parse(messageFromClient.substr(start, stop));
+			}
+			start = stop + 1;
 		}
-		if (!check_psw(messageFromClient.substr(6, messageFromClient.find("\x0d") - 6))) {
-			std::cout<< "User sent wrong pass" << std::endl;
-			bzero(buff, sizeof(buff));
-			abort_connection(connected_fd);
-			return;
-		}
-		USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
 	}
 	bzero(buff, sizeof(buff));
 }
@@ -209,7 +264,8 @@ void IRC::launch() {
 		{
 			if(FD_ISSET(*it, &fds))
 			{
-				handler(*it);
+				connected_fd = *it;
+				handler(connected_fd);
 				break;
 			}
 		}

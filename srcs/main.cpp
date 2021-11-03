@@ -5,7 +5,7 @@
 #include <sstream>
 #include <iomanip>
 #include <sys/select.h>
-#include "irc.hpp"
+#include "commands.hpp"
 
 void exit_err()
 {

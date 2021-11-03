@@ -69,7 +69,7 @@ void Parser::parse(std::string raw)
 	int args  = 0;
 	int prev_pos = 0;
 
-	for(int i = 0; tmp[i]: i++)
+	for(int i = 0; tmp[i]; i++)
 	{
 		if(isspace(tmp[i]))
 		{
