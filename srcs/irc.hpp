@@ -165,16 +165,17 @@ void IRC::parse(std::string raw)
 			return ;
 		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
 		current_user = &res.first.operator*().second;
+		return ;
 	}
 	if(!current_user->_state.nick)
 	{
-		if(nickCmd(parsed))
-			return;
+		nickCmd(parsed);
+		return;
 	}
 	if(!current_user->_state.user)
 	{
-		if(userCmd(parsed))
-			return;
+		userCmd(parsed);
+		return;
 	}
 	//elab_parsed(parsed);
 }
