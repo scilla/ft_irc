@@ -15,7 +15,9 @@
 #include "networking/server/Server.hpp"
 #include <unistd.h>
 #include <vector>
+#include <strings.h>
 #include <set>
+#include "errors.hpp"
 #include <fstream>
 #include "utils.hpp"
 
@@ -27,6 +29,8 @@
 #define ERR_NOLOGIN				"444\n"
 #define ERR_NEEDMOREPARAMS		"461\n"
 #define ERR_PASSWDMISMATCH		"464\n"
+
+
 
 class IRC: public Server
 {
@@ -47,6 +51,7 @@ class IRC: public Server
 		Channel					get_channel(std::string channelname);
 
 		void					launch();
+		void					print_prompt(int sig, std::string msg);
 		void					abort_connection(int disconnected_fd);
 		void					user_creator();
 		void					user_logged();
@@ -67,6 +72,7 @@ class IRC: public Server
 		std::set<int>	writefds;
 		int				connected_fd;
 		User*			current_user;
+		struct sockaddr_in remote;
 
 
 		char buff[500];
@@ -74,6 +80,7 @@ class IRC: public Server
 		void accepter();
 		void handler(int connected_fd);
 		void responder(std::string, int);
+		std::string receiver();
 		std::string psw;
 
 		std::map<size_t, User> 			USER_MAP;
@@ -137,7 +144,12 @@ void	IRC::abort_connection(int disconnected_fd){
 
 void IRC::user_logged()
 {
-	responder(" ", connected_fd);
+	std::string message(RPL_WELCOME);
+	message.append(" ");
+	message.append(current_user->get_nick());
+	message.append(" :Hi welcome to IRC\n");
+
+	responder(message, connected_fd);
 }
 
 void IRC::parse(std::string raw)
@@ -186,20 +198,11 @@ void IRC::parse(std::string raw)
 		return;
 	}
 
-	//elab_parsed(parsed);
 }
 
-//void elab_parsed(std::vector<std::string> parsed)
-//{
-//	
-//}
 
 void IRC::handler(int connected_fd) {
-	std::string replyMessage;
-	recv(connected_fd, buff, 500, 0);
-	abort_connection(connected_fd);
-	std::string messageFromClient(buff);
-	std::cout<< ">> " << buff << " <<" << std::endl;
+	std::string messageFromClient = receiver();
 	std::string token;
 	replace_substr(messageFromClient, "\r\n");
 	std::stringstream tokenStream(messageFromClient);
@@ -210,16 +213,35 @@ void IRC::handler(int connected_fd) {
 	bzero(buff, sizeof(buff));
 }
 
+std::string IRC::receiver()
+{
+	recv(connected_fd, buff, 500, 0);
+	abort_connection(connected_fd);
+	std::string messageFromClient(buff);
+	print_prompt(1, messageFromClient);
+	return(messageFromClient);
+}
+
 void IRC::responder(std::string message, int fd) {
 	write(fd, message.c_str(), message.length());
-	std::cout << "sent to: " << fd << " message: " << message << std::endl;
-	//close(newSocket);
+	print_prompt(0, message);
+}
+
+void IRC::print_prompt(int sig, std::string message) //sig == 0 sending; sig == 1 reciving
+{
+	struct in_addr ipAddr;
+	char str[INET_ADDRSTRLEN];
+
+	ipAddr = remote.sin_addr;
+	if(!sig)
+		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " ⬅️  " << message << std::endl;
+	else
+		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " ➡️  " << message << std::endl;;
+
 }
 
 void IRC::launch() {
-	struct sockaddr_in remote = getServerSocket()->getRemote();
-	struct in_addr ipAddr;
-	char str[INET_ADDRSTRLEN];
+	remote = getServerSocket()->getRemote();
 	int remoteLen = sizeof(remote);
 	struct timeval timeout;
 	timeout.tv_usec = 100;
@@ -240,8 +262,6 @@ void IRC::launch() {
 		select(max, &fds, NULL, NULL, &timeout);
 		if(FD_ISSET(getServerSocket()->getSocket(), &fds)){
 			newSocket = accept(getServerSocket()->getSocket(), (struct sockaddr *)&remote, (socklen_t * )&remoteLen);
-			ipAddr = remote.sin_addr;
-			std::cout << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << std::endl;
 			std::cout << "new connection accepted\n"; 
 			readfds.insert(newSocket);
 		}
