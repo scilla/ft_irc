@@ -16,6 +16,7 @@
 #include <vector>
 #include <set>
 #include <fstream>
+#include "utils.hpp"
 
 
 #define ERR_NONICKNAMEGIVEN		"431\n"
@@ -145,24 +146,11 @@ void IRC::parse(std::string raw)
 	std::vector<std::string> tokens;
 	std::string token;
 	std::stringstream tokenStream(raw);
-	while (std::getline(tokenStream, token, '\r'))
+	while (std::getline(tokenStream, token, ' '))
 	{
-		tokens.push_back(token);
+		parsed.push_back(token);
 	}
-	for(std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); it++)
-	{
-		while(start < it.base()->size()) {
-			stop = it.base()->find(" ", start);
-			if (stop == -1)
-				stop = it.base()->size();
-			if (start < stop) {
-				std::cout << "found this parse: " << it.base()->substr(start, stop) << std::endl;
-				parsed.push_back(it.base()->substr(start, stop));
-			}
-			start = stop + 1;
-		}
-	}
-	if (!parsed.size())
+	if (!(parsed.size()))
 		return;
 	for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
 	{
@@ -180,15 +168,14 @@ void IRC::parse(std::string raw)
 	}
 	if(!current_user->_state.nick)
 	{
-		if(!nickCmd(parsed))
+		if(nickCmd(parsed))
 			return;
 	}
 	if(!current_user->_state.user)
 	{
-		if(!userCmd(parsed))
+		if(userCmd(parsed))
 			return;
 	}
-
 	//elab_parsed(parsed);
 }
 
@@ -203,7 +190,13 @@ void IRC::handler(int connected_fd) {
 	abort_connection(connected_fd);
 	std::string messageFromClient(buff);
 	std::cout<< ">> " << buff << " <<" << std::endl;
-	parse(messageFromClient);
+	std::string token;
+	replace_substr(messageFromClient, "\r\n");
+	std::stringstream tokenStream(messageFromClient);
+	while (std::getline(tokenStream, token))
+	{
+		parse(token);
+	}
 	bzero(buff, sizeof(buff));
 }
 

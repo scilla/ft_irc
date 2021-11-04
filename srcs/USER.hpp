@@ -53,11 +53,13 @@ std::string User::get_nick() const
 
 void User::set_nick(std::string nick)
 {
+	_state.nick = true;
 	_nick = nick;
 }
 
 void User::set_username(std::string user)
 {
+	_state.user = true;
 	_username = user;
 }
 

@@ -6,9 +6,10 @@
 
 int IRC::passCmd(std::vector<std::string> parsed)
 {
-	if (parsed[0].compare("PASS")) {
+	if (!parsed[0].compare("PASS") && parsed.size() < 2) {
 		std::cout<< "User sent no pass" << std::endl;
 		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		abort_connection(connected_fd);
 		return (1);
 	}
 	if(parsed[1].compare(":" + this->_password) && parsed[1].compare(this->_password))
@@ -24,7 +25,7 @@ int IRC::passCmd(std::vector<std::string> parsed)
 
 int IRC::nickCmd(std::vector<std::string> parsed)
 {
-	if(parsed[0].compare("NICK"))
+	if(!parsed[0].compare("NICK"))
 	{
 		std::cout<< "USER SENT NICK" << std::endl;
 		if(parsed.size() < 2){
@@ -50,7 +51,7 @@ int IRC::nickCmd(std::vector<std::string> parsed)
 
 int IRC::userCmd(std::vector<std::string> parsed)
 {
-	if(parsed[0].compare("USER"))
+	if(!parsed[0].compare("USER"))
 	{
 		std::cout<< "USER SENT USER" << std::endl;
 		if(parsed.size() < 2){
