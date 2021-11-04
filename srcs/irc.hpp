@@ -2,6 +2,7 @@
 #define IRC_HPP
 
 #include <iostream>
+#include <string>
 #include <map>
 #include <list>
 #include "USER.hpp"
@@ -14,6 +15,8 @@
 #include <unistd.h>
 #include <vector>
 #include <set>
+#include <fstream>
+
 
 #define ERR_NONICKNAMEGIVEN		"431\n"
 #define ERR_ERRONEUSNICKNAME	"432\n"
@@ -128,12 +131,6 @@ void	IRC::abort_connection(int disconnected_fd){
 		return ;
 	}
 }
-/*
-PASS ciao
-NICK vaffa
-
-PASS, ciao, NICK, vaffa
-*/
 
 void IRC::parse(std::string raw)
 {
@@ -145,31 +142,28 @@ void IRC::parse(std::string raw)
 	int stop;
 
 	start = 0;
-	while (start < raw.size())
+	std::vector<std::string> tokens;
+	std::string token;
+	std::stringstream tokenStream(raw);
+	while (std::getline(tokenStream, token, '\r'))
 	{
-		stop = raw.find(" ", start);
-		if (stop == -1)
-			stop = raw.size();
-		if (start < stop) {
-			std::cout << "found this parse: " << raw.substr(start, stop) << std::endl;
-			parsed.push_back(raw.substr(start, stop));
+		tokens.push_back(token);
+	}
+	for(std::vector<std::string>::iterator it = tokens.begin(); it != tokens.end(); it++)
+	{
+		while(start < it.base()->size()) {
+			stop = it.base()->find(" ", start);
+			if (stop == -1)
+				stop = it.base()->size();
+			if (start < stop) {
+				std::cout << "found this parse: " << it.base()->substr(start, stop) << std::endl;
+				parsed.push_back(it.base()->substr(start, stop));
+			}
+			start = stop + 1;
 		}
-		start = stop + 1;
 	}
 	if (!parsed.size())
 		return;
-/*
-	for(int i = 0; i < tmp.size() ; i++)
-	{
-		if(isspace(tmp[i]))
-		{
-			if(prev_pos != i)
-				parsed.push_back(tmp.substr(prev_pos, i));
-			prev_pos = i;
-		}
-	}
-	*/
-
 	for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
 	{
 		std::cout << *it << " " << std::endl;
@@ -204,29 +198,12 @@ void IRC::parse(std::string raw)
 //}
 
 void IRC::handler(int connected_fd) {
-	int start;
-	int stop_r;
-	int stop_n;
-	int stop;
 	std::string replyMessage;
 	recv(connected_fd, buff, 500, 0);
 	abort_connection(connected_fd);
 	std::string messageFromClient(buff);
 	std::cout<< ">> " << buff << " <<" << std::endl;
-	start = 0;
-	if(messageFromClient.size()) {
-		while (start < messageFromClient.size())
-		{
-			stop_r = messageFromClient.find("\r", start);
-			stop_n = messageFromClient.find("\n", start);
-			stop = stop_r < stop_n ? stop_r : stop_n;
-			if (start + 1 < stop) {
-				std::cout << "found this: " << messageFromClient.substr(start, stop) << std::endl;
-				parse(messageFromClient.substr(start, stop));
-			}
-			start = stop + 1;
-		}
-	}
+	parse(messageFromClient);
 	bzero(buff, sizeof(buff));
 }
 
