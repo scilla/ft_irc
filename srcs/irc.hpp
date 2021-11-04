@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include "CHANNEL.hpp"
 #include "netinet/in.h"
+#include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include "networking/server/Server.hpp"
@@ -136,12 +137,7 @@ void	IRC::abort_connection(int disconnected_fd){
 
 void IRC::user_logged()
 {
-	responder(":e4r8p1.42roma.it 001 Nickname :Hi, welcome to IRC \
-\n:e4r8p1.42roma.it 002 Nickname :Your host is e4r8p1.42roma.it, running version miniircd-2.1 \
-\n:e4r8p1.42roma.it 003 Nickname :This server was created sometime \
-\n:e4r8p1.42roma.it 004 Nickname e4r8p1.42roma.it miniircd-2.1 o o \
-\n:e4r8p1.42roma.it 251 Nickname :There are 1 users and 0 services on 1 server \
-\n:e4r8p1.42roma.it 422 Nickname :MOTD File is missing", connected_fd);
+	responder(" ", connected_fd);
 }
 
 void IRC::parse(std::string raw)
@@ -222,6 +218,8 @@ void IRC::responder(std::string message, int fd) {
 
 void IRC::launch() {
 	struct sockaddr_in remote = getServerSocket()->getRemote();
+	struct in_addr ipAddr;
+	char str[INET_ADDRSTRLEN];
 	int remoteLen = sizeof(remote);
 	struct timeval timeout;
 	timeout.tv_usec = 100;
@@ -242,6 +240,8 @@ void IRC::launch() {
 		select(max, &fds, NULL, NULL, &timeout);
 		if(FD_ISSET(getServerSocket()->getSocket(), &fds)){
 			newSocket = accept(getServerSocket()->getSocket(), (struct sockaddr *)&remote, (socklen_t * )&remoteLen);
+			ipAddr = remote.sin_addr;
+			std::cout << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << std::endl;
 			std::cout << "new connection accepted\n"; 
 			readfds.insert(newSocket);
 		}
