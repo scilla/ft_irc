@@ -8,3 +8,12 @@ https://datatracker.ietf.org/doc/html/rfc1459
 http://beej.us/guide/bgnet/html/
 http://chi.cs.uchicago.edu/chirc/index.html
 https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select
+
+
+:e4r8p1.42roma.it 001 Nickname :Hi, welcome to IRC
+:e4r8p1.42roma.it 002 Nickname :Your host is e4r8p1.42roma.it, running version miniircd-2.1
+:e4r8p1.42roma.it 003 Nickname :This server was created sometime
+:e4r8p1.42roma.it 004 Nickname e4r8p1.42roma.it miniircd-2.1 o o
+
+:e4r8p1.42roma.it 251 Nickname :There are 1 users and 0 services on 1 server
+:e4r8p1.42roma.it 422 Nickname :MOTD File is missing

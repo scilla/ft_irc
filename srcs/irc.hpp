@@ -48,6 +48,7 @@ class IRC: public Server
 		void					launch();
 		void					abort_connection(int disconnected_fd);
 		void					user_creator();
+		void					user_logged();
 
 
 		void parse(std::string raw);
@@ -133,6 +134,16 @@ void	IRC::abort_connection(int disconnected_fd){
 	}
 }
 
+void IRC::user_logged()
+{
+	responder(":e4r8p1.42roma.it 001 Nickname :Hi, welcome to IRC \
+\n:e4r8p1.42roma.it 002 Nickname :Your host is e4r8p1.42roma.it, running version miniircd-2.1 \
+\n:e4r8p1.42roma.it 003 Nickname :This server was created sometime \
+\n:e4r8p1.42roma.it 004 Nickname e4r8p1.42roma.it miniircd-2.1 o o \
+\n:e4r8p1.42roma.it 251 Nickname :There are 1 users and 0 services on 1 server \
+\n:e4r8p1.42roma.it 422 Nickname :MOTD File is missing", connected_fd);
+}
+
 void IRC::parse(std::string raw)
 {
 	std::vector<std::string>	parsed;
@@ -174,9 +185,11 @@ void IRC::parse(std::string raw)
 	}
 	if(!current_user->_state.user)
 	{
-		userCmd(parsed);
+		if(!userCmd(parsed))
+			user_logged();
 		return;
 	}
+
 	//elab_parsed(parsed);
 }
 
@@ -203,6 +216,7 @@ void IRC::handler(int connected_fd) {
 
 void IRC::responder(std::string message, int fd) {
 	write(fd, message.c_str(), message.length());
+	std::cout << "sent to: " << fd << " message: " << message << std::endl;
 	//close(newSocket);
 }
 
