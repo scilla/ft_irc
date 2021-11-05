@@ -14,9 +14,12 @@ class Channel
 		std::string				psw;
 		std::map<size_t, User>	USE_RGH; //mappa con user right come key e utente corrispondende
 		std::set<User>			banned_users;
+		std::set<User>			admin_users;
 	public:
 		Channel();
 		~Channel();
+
+		bool isAdmin(User);
 
 };
 
