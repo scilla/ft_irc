@@ -163,6 +163,30 @@ void IRC::user_logged()
 	message.append( inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
 	message.append(", running version ft_irc-0.1");
 	responder(message, connected_fd);
+	message.clear();
+	message.append(RPL_CREATED);
+	message.append(" ");
+	message.append(current_user->get_nick());
+	message.append( " :This server was created sometime");
+	responder(message, connected_fd);
+	message.clear();
+	message.append(RPL_MYINFO);
+	message.append(" ");
+	message.append(current_user->get_nick());
+	message.append(" ");
+	message.append( inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
+	message.append("ft_irc-0.1 o o");
+	responder(message, connected_fd);
+	message.clear();
+	message.append(RPL_LUSERCLIENT);
+	message.append(" ");
+	message.append(current_user->get_nick());
+	message.append(": there are ");
+	std::stringstream tmp;
+	tmp << USER_MAP.size();
+	message.append(tmp.str());
+	message.append(" users online, *services and servers to be done*");
+	responder(message, connected_fd);
 }
 
 void IRC::parse(std::string raw)
@@ -237,6 +261,7 @@ std::string IRC::receiver()
 
 void IRC::responder(std::string message, int fd) {
 	write(fd, message.c_str(), message.length());
+	write(fd, "\n", 1);
 	print_prompt(0, message);
 }
 
