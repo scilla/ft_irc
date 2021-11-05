@@ -57,7 +57,7 @@ class IRC: public Server
 		void					print_prompt(int sig, std::string msg);
 		void					abort_connection(int disconnected_fd);
 		int						initializer(std::vector<std::string> parsed);
-		void					commandSelector(std::vector<std::string> parsed);
+		void					commandSelector(std::string parsed);
 
 		void					user_creator();
 		void					user_logged();
@@ -101,8 +101,8 @@ class IRC: public Server
 		int userCmd(std::vector<std::string>);
 		int passCmd(std::vector<std::string>);
 		int nickCmd(std::vector<std::string>);
-		int joinCmd(std::vector<std::string>);
-		int pongCmd(std::vector<std::string>);
+		int joinCmd(std::string);
+		int pongCmd(std::string);
 
 };
 
@@ -195,9 +195,20 @@ void IRC::user_logged()
 	responder(message, connected_fd);
 }
 
+std::vector<std::string> splitter(std::string raw, char sep) {
+	std::vector<std::string>	parsed;
+	std::string					token;
+	std::stringstream			tokenStream(raw);
+
+	while (std::getline(tokenStream, token, sep))
+		parsed.push_back(token);
+	return parsed;
+}
+
 void IRC::parse(std::string raw)
 {
 	std::vector<std::string>	parsed;
+	std::string					command;
 	std::string tmp = raw;
 	int args  = 0;
 	int prev_pos = 0;
@@ -208,10 +219,7 @@ void IRC::parse(std::string raw)
 	std::vector<std::string> tokens;
 	std::string token;
 	std::stringstream tokenStream(raw);
-	while (std::getline(tokenStream, token, ' '))
-	{
-		parsed.push_back(token);
-	}
+	parsed = splitter(raw, ' ');
 	if (!(parsed.size()))
 		return;
 	for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
@@ -222,7 +230,7 @@ void IRC::parse(std::string raw)
 	}
 	if(initializer(parsed))
 		return;
-	commandSelector(parsed);
+	commandSelector(raw);
 }
 
 
@@ -264,9 +272,9 @@ void IRC::print_prompt(int sig, std::string message) //sig == 0 sending; sig == 
 	//getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
 	
 	if(!sig)
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << str <<" ⬅️  " << message << std::endl;
+		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " << " << message << std::endl;
 	else
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " ➡️  " << message << std::endl;;
+		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " >> " << message << std::endl;;
 
 }
 

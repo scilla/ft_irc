@@ -32,13 +32,20 @@ int IRC::initializer(std::vector<std::string> parsed)
 	return 0;
 }
 
-void	IRC::commandSelector(std::vector<std::string> parsed)
+void	IRC::commandSelector(std::string raw)
 {
-	if(parsed[0].compare("PONG"))
-		pongCmd(parsed);
-	else if(parsed[0].compare("JOIN"))
-		joinCmd(parsed);
-	else if(parsed[0].compare("NICK"))
+	std::vector<std::string>	parsed;
+	std::string					command;
+	std::string					params;
+
+	parsed = splitter(raw, ' ');
+	command = parsed[0];
+	params = raw.substr(parsed.size() + 1, raw.size());
+	if(command.compare("PONG"))
+		pongCmd(params);
+	else if(command.compare("JOIN"))
+		joinCmd(params);
+	else if(command.compare("NICK"))
 		nickCmd(parsed);
 	//else if(parsed[0].compare("PRIVMSG"))
 	//	privmsgCmd(parsed);
@@ -52,7 +59,8 @@ void	IRC::commandSelector(std::vector<std::string> parsed)
 
 int IRC::passCmd(std::vector<std::string> parsed)
 {
-	if (!parsed[0].compare("PASS") && parsed.size() < 2) {
+
+	if ((!parsed[0].compare("PASS") && parsed.size() < 2) || (parsed[0].compare("PASS"))){
 		std::cout<< "User sent no pass" << std::endl;
 		responder(ERR_NEEDMOREPARAMS, connected_fd);
 		abort_connection(connected_fd);
@@ -103,8 +111,9 @@ int IRC::userCmd(std::vector<std::string> parsed)
 	return 0;
 }
 
-int IRC::pongCmd(std::vector<std::string> parsed)
+int IRC::pongCmd(std::string raw)
 {
+	std::vector<std::string> parsed = splitter(raw, ' ');
 	std::string message("PONG ");
 
 	message.append(parsed[2] + " ");
@@ -113,7 +122,7 @@ int IRC::pongCmd(std::vector<std::string> parsed)
 	return 0;
 }
 
-int IRC::joinCmd(std::vector<std::string> parsed)
+int IRC::joinCmd(std::string parsed)
 {
 	return 0;
 }
