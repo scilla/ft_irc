@@ -20,6 +20,9 @@
 #include "errors.hpp"
 #include <fstream>
 #include "utils.hpp"
+#include <netdb.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 #define ERR_NONICKNAMEGIVEN		"431\n"
@@ -63,7 +66,7 @@ class IRC: public Server
 		bool			_own;
 		std::string		_host;
 		size_t			_network_port;
-		std::string		_network_password;		
+		std::string		_network_password;
 		size_t			_port;					//local server port
 		std::string		_password;				//local server psw
 		// fd_set 			*readfds;
@@ -73,6 +76,7 @@ class IRC: public Server
 		int				connected_fd;
 		User*			current_user;
 		struct sockaddr_in remote;
+		char			hostname[_SC_HOST_NAME_MAX];
 
 
 		char buff[500];
@@ -144,11 +148,20 @@ void	IRC::abort_connection(int disconnected_fd){
 
 void IRC::user_logged()
 {
+	char str[100];
+
 	std::string message(RPL_WELCOME);
 	message.append(" ");
 	message.append(current_user->get_nick());
-	message.append(" :Hi welcome to IRC\n");
-
+	message.append(" :Hi welcome to IRC");
+	responder(message, connected_fd);
+	message.clear();
+	message.append(RPL_YOURHOST);
+	message.append(" ");
+	message.append(current_user->get_nick());
+	message.append(" :Your host is ");
+	message.append( inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
+	message.append(", running version ft_irc-0.1");
 	responder(message, connected_fd);
 }
 
@@ -227,14 +240,18 @@ void IRC::responder(std::string message, int fd) {
 	print_prompt(0, message);
 }
 
+
+
 void IRC::print_prompt(int sig, std::string message) //sig == 0 sending; sig == 1 reciving
 {
 	struct in_addr ipAddr;
 	char str[INET_ADDRSTRLEN];
-
+	struct hostent *hp;
 	ipAddr = remote.sin_addr;
+	getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
+	
 	if(!sig)
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " ⬅️  " << message << std::endl;
+		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << str <<" ⬅️  " << message << std::endl;
 	else
 		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " ➡️  " << message << std::endl;;
 

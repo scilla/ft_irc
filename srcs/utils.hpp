@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <sstream>
+ #include <string.h>
 
 
 void replace_substr(std::string& haystack, std::string needle)
