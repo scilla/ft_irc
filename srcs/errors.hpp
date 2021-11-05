@@ -6,6 +6,8 @@
 #define ERR_NOLOGIN				"444\n"
 #define ERR_NEEDMOREPARAMS		"461\n"
 #define ERR_PASSWDMISMATCH		"464\n"
+#define ERR_NOORIGIN			"409\n"
+#define ERR_NOSUCHSERVER		"402\n"
 
 
 

@@ -56,8 +56,12 @@ class IRC: public Server
 		void					launch();
 		void					print_prompt(int sig, std::string msg);
 		void					abort_connection(int disconnected_fd);
+		int						initializer(std::vector<std::string> parsed);
+		void					commandSelector(std::vector<std::string> parsed);
+
 		void					user_creator();
 		void					user_logged();
+
 
 
 		void parse(std::string raw);
@@ -98,6 +102,8 @@ class IRC: public Server
 		int passCmd(std::vector<std::string>);
 		int nickCmd(std::vector<std::string>);
 		int joinCmd(std::vector<std::string>);
+		int pongCmd(std::vector<std::string>);
+
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
@@ -214,27 +220,9 @@ void IRC::parse(std::string raw)
 		//for(int i = 0; (*it).c_str()[i] != 0; i ++)
 		//	std::cout << (int)(*it).c_str()[i] << std::endl;
 	}
-	current_user = get_user(connected_fd);
-	std::pair<std::map<size_t, User>::iterator, bool> res;
-	if (!current_user) {
-		if(passCmd(parsed))
-			return ;
-		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
-		current_user = &res.first.operator*().second;
-		return ;
-	}
-	if(!current_user->_state.nick)
-	{
-		nickCmd(parsed);
+	if(initializer(parsed))
 		return;
-	}
-	if(!current_user->_state.user)
-	{
-		if(!userCmd(parsed))
-			user_logged();
-		return;
-	}
-
+	commandSelector(parsed);
 }
 
 
@@ -273,7 +261,7 @@ void IRC::print_prompt(int sig, std::string message) //sig == 0 sending; sig == 
 	char str[INET_ADDRSTRLEN];
 	struct hostent *hp;
 	ipAddr = remote.sin_addr;
-	getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
+	//getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
 	
 	if(!sig)
 		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << str <<" ⬅️  " << message << std::endl;
