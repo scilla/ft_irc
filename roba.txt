@@ -82,3 +82,55 @@ USER username 0 10.11.8.1 :\x031,11\x0frealname
 :e4r8p1.42roma.it 352 alnickname #cacca buonve 127.0.0.1 e4r8p1.42roma.it Nickname H :0 real_name
 :e4r8p1.42roma.it 315 alnickname #cacca :End of WHO list
 '
+
+
+
+
+
+
+
+
+Accepted connection from 10.11.9.2:49760.
+[10.11.9.2:49760] -> b'PASS :ciao
+'
+[10.11.9.2:49760] -> b'NICK nickname
+USER username 0 10.11.8.1 :\x031,11\x0frealname
+'
+[10.11.9.2:49760] <- b':e4r8p1.42roma.it 433 * nickname :Nickname is already in use
+'
+[10.11.9.2:49760] -> b'NICK alnickname
+'
+[10.11.9.2:49760] <- b':e4r8p1.42roma.it 001 alnickname :Hi, welcome to IRC
+:e4r8p1.42roma.it 002 alnickname :Your host is e4r8p1.42roma.it, running version miniircd-2.1
+:e4r8p1.42roma.it 003 alnickname :This server was created sometime
+:e4r8p1.42roma.it 004 alnickname e4r8p1.42roma.it miniircd-2.1 o o
+:e4r8p1.42roma.it 251 alnickname :There are 2 users and 0 services on 1 server
+:e4r8p1.42roma.it 422 alnickname :MOTD File is missing
+'
+[10.11.9.2:49760] -> b'PING alnickname e4r8p1.42roma.it
+'
+[10.11.9.2:49760] <- b':e4r8p1.42roma.it PONG e4r8p1.42roma.it :alnickname
+'
+[10.11.9.2:49760] -> b'JOIN #cacca
+'
+[127.0.0.1:51321] <- b':alnickname!username@10.11.9.2 JOIN #cacca
+'
+[10.11.9.2:49760] <- b':alnickname!username@10.11.9.2 JOIN #cacca
+:e4r8p1.42roma.it 331 alnickname #cacca :No topic is set
+:e4r8p1.42roma.it 353 alnickname = #cacca :Nickname alnickname
+:e4r8p1.42roma.it 366 alnickname #cacca :End of NAMES list
+'
+[10.11.9.2:49760] -> b'MODE #cacca
+'
+[10.11.9.2:49760] <- b':e4r8p1.42roma.it 324 alnickname #cacca +
+'
+[10.11.9.2:49760] -> b'WHO #cacca
+'
+[10.11.9.2:49760] <- b':e4r8p1.42roma.it 352 alnickname #cacca username 10.11.9.2 e4r8p1.42roma.it alnickname H :0 \x031,11\x0frealname
+:e4r8p1.42roma.it 352 alnickname #cacca buonve 127.0.0.1 e4r8p1.42roma.it Nickname H :0 real_name
+:e4r8p1.42roma.it 315 alnickname #cacca :End of WHO list
+'
+[10.11.9.2:49760] -> b'MODE #cacca b
+'
+[10.11.9.2:49760] <- b':e4r8p1.42roma.it 472 alnickname b :Unknown MODE flag
+'

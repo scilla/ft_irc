@@ -34,6 +34,8 @@ class User
 		std::string get_nick() const;
 		std::string get_username() const;
 		std::string get_psw() const;
+		std::string get_host() const;
+		std::string get_domain() const;
 		size_t get_id() const;
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
@@ -65,6 +67,16 @@ void User::set_username(std::string user)
 {
 	_state.user = true;
 	_username = user;
+}
+
+std::string User::get_host() const
+{
+	return _host;
+}
+
+std::string User::get_domain() const
+{
+	return _domain;
 }
 
 #endif /* USER_HPP */
