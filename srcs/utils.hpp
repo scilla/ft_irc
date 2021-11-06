@@ -40,4 +40,10 @@ void responder(std::string message, User& ux) {
 	print_prompt(0, ux.get_ip_str(), message);
 }
 
+void responder(std::string message, int fd) {
+	write(fd, message.c_str(), message.length());
+	write(fd, "\n", 1);
+	//print_prompt(0, ux.get_ip_str(), message);
+}
+
 #endif /* UTILS_HPP */

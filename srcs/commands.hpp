@@ -166,15 +166,12 @@ int IRC::quitCmd(std::string raw)
 {
 	std::vector<std::string> params = splitter(raw, ' ');
 	if(params.size())
-		responder(current_user->get_nick(), current_user);
+		responder(current_user->get_nick(), *current_user);
 	else
-		responder(params[0], current_user);
+		responder(params[0], *current_user);
 	//rimuovere utente da canali
 	readfds.erase(readfds.find(current_user->get_id()));
 	USER_MAP.erase(current_user->get_id());
-	
-
-
 }
 
 
