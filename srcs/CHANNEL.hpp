@@ -61,16 +61,16 @@ Channel::~Channel() {};
 void Channel::userJoin(User& user, std::string pass = "") {
 	t_user_status stat((t_user_status){false, false});
 	if (modes.has_key && pass != key) {
-		responder(ERR_BADCHANNELKEY, user.get_id());
+		responder(ERR_BADCHANNELKEY, user);
 		return;
 	}
 	if (modes.has_limit && USER_MAP.size() >= user_limit) {
-		responder(ERR_CHANNELISFULL, user.get_id());
+		responder(ERR_CHANNELISFULL, user);
 		return;
 	}
 	if (modes.invite) {
 		if (!invited_users.count(user.get_id())) {
-			responder(ERR_INVITEONLYCHAN, user.get_id());
+			responder(ERR_INVITEONLYCHAN, user);
 			return;
 		}
 		invited_users.erase(user.get_id());
@@ -81,7 +81,7 @@ void Channel::userJoin(User& user, std::string pass = "") {
 	std::cout << "User " << user.get_nick() << " joined channel " << _name << std::endl;
 	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) //communicate to all the user connected to the same channel that the new user connected
 	{
-		responder(":" + user.get_nick() + "!" + user.get_username() + "@" + user.get_host() + user.get_domain() + " JOIN " + this->_name, it.operator*().first);
+		responder(":" + user.get_nick() + "!" + user.get_username() + "@" + user.get_host() + user.get_domain() + " JOIN " + this->_name, user);
 	}
 	// todo: broadcast join to users already in channel
 	// todo: RPL_TOPIC
@@ -106,7 +106,7 @@ void Channel::userKick(User& user){
 }
 
 t_channel_modes Channel::getModes() const{
-
+	return modes;
 }
 
 void Channel::setModes(t_channel_modes){

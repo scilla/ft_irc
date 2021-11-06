@@ -36,6 +36,7 @@ class User
 		std::string get_psw() const;
 		std::string get_host() const;
 		std::string get_domain() const;
+		std::string get_ip_str();
 		size_t get_id() const;
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
@@ -59,6 +60,10 @@ std::string User::get_username() const{
 	return _username;
 }
 
+std::string User::get_ip_str() {
+	std::string str = _domain + "." + _host;
+	return str;
+}
 
 size_t User::get_id() const { return _id;}
 

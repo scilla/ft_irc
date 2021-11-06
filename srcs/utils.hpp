@@ -22,22 +22,22 @@ void replace_substr(std::string& haystack, std::string needle)
 	}
 }
 
-void print_prompt(int sig, std::string message) //sig == 0 sending; sig == 1 reciving
+void print_prompt(int sig, std::string ipstr, std::string message) //sig == 0 sending; sig == 1 reciving
 {
 	char str[INET_ADDRSTRLEN];
-	struct hostent *hp;
+	char *ipstr_c = const_cast<char*>(ipstr.c_str());
 	//getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
 	
 	if(!sig)
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " << " << message << std::endl;
+		std::cout << "[" << inet_ntop( AF_INET, ipstr_c, str, INET_ADDRSTRLEN ) << "]" << " << " << message << std::endl;
 	else
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " >> " << message << std::endl;;
+		std::cout << "[" << inet_ntop( AF_INET, ipstr_c, str, INET_ADDRSTRLEN ) << "]" << " >> " << message << std::endl;;
 }
 
-void responder(std::string message, int fd) {
-	write(fd, message.c_str(), message.length());
-	write(fd, "\n", 1);
-	print_prompt(0, message);
+void responder(std::string message, User& ux) {
+	write(ux.get_id(), message.c_str(), message.length());
+	write(ux.get_id(), "\n", 1);
+	print_prompt(0, ux.get_ip_str(), message);
 }
 
 #endif /* UTILS_HPP */

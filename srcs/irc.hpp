@@ -63,6 +63,7 @@ class IRC: public Server
 		std::string		_network_password;
 		size_t			_port;					//local server port
 		std::string		_password;				//local server psw
+		std::string		own_ip;
 		// fd_set 			*readfds;
 		// fd_set 			*writefds;
 		std::set<int>	readfds;
@@ -162,7 +163,7 @@ void IRC::user_logged()
 	message.append(" ");
 	message.append(current_user->get_nick());
 	message.append(" :Hi welcome to IRC");
-	responder(message, connected_fd);
+	responder(message, *current_user);
 	message.clear();
 	message.append(RPL_YOURHOST);
 	message.append(" ");
@@ -170,13 +171,13 @@ void IRC::user_logged()
 	message.append(" :Your host is ");
 	message.append( inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
 	message.append(", running version ft_irc-0.1");
-	responder(message, connected_fd);
+	responder(message, *current_user);
 	message.clear();
 	message.append(RPL_CREATED);
 	message.append(" ");
 	message.append(current_user->get_nick());
 	message.append( " :This server was created sometime");
-	responder(message, connected_fd);
+	responder(message, *current_user);
 	message.clear();
 	message.append(RPL_MYINFO);
 	message.append(" ");
@@ -184,7 +185,7 @@ void IRC::user_logged()
 	message.append(" ");
 	message.append( inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
 	message.append("ft_irc-0.1 o o");
-	responder(message, connected_fd);
+	responder(message, *current_user);
 	message.clear();
 	message.append(RPL_LUSERCLIENT);
 	message.append(" ");
@@ -194,7 +195,7 @@ void IRC::user_logged()
 	tmp << USER_MAP.size();
 	message.append(tmp.str());
 	message.append(" users online, *services and servers to be done*");
-	responder(message, connected_fd);
+	responder(message, *current_user);
 }
 
 std::vector<std::string> splitter(std::string raw, char sep) {
@@ -253,14 +254,17 @@ std::string IRC::receiver()
 	recv(connected_fd, buff, 500, 0);
 	abort_connection(connected_fd);
 	std::string messageFromClient(buff);
-	print_prompt(1, messageFromClient);
+	print_prompt(1, current_user->get_ip_str(), messageFromClient);
 	return(messageFromClient);
 }
 
 void IRC::launch() {
+	char str[INET_ADDRSTRLEN];
 	remote = getServerSocket()->getRemote();
-	ipAddr = remote.sin_addr;
 	int remoteLen = sizeof(remote);
+	ipAddr = remote.sin_addr;
+	inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN );
+	this->own_ip = str;
 	struct timeval timeout;
 	timeout.tv_usec = 100;
 	int max;

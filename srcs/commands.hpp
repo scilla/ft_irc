@@ -5,11 +5,15 @@
 
 int IRC::initializer(std::vector<std::string> parsed)
 {
+	char str[INET_ADDRSTRLEN];
+
+	//std::vector<std::string>
 	current_user = get_user(connected_fd);
 	std::pair<std::map<size_t, User>::iterator, bool> res;
 	if (!current_user) {
 		if(passCmd(parsed))
 			return 1;
+		inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN );
 		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd, "host", "domain")));
 		current_user = &res.first.operator*().second;
 		return 1;
@@ -63,14 +67,14 @@ int IRC::passCmd(std::vector<std::string> parsed)
 
 	if ((!parsed[0].compare("PASS") && parsed.size() < 2) || (parsed[0].compare("PASS"))){
 		std::cout<< "User sent no pass" << std::endl;
-		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		responder(ERR_NEEDMOREPARAMS, *current_user);
 		abort_connection(connected_fd);
 		return (1);
 	}
 	if(parsed[1].compare(":" + this->_password) && parsed[1].compare(this->_password))
 	{
 		std::cout<< "User sent wrong pass" << std::endl;
-		responder(ERR_PASSWDMISMATCH, connected_fd);
+		responder(ERR_PASSWDMISMATCH, *current_user);
 		bzero(buff, sizeof(buff));
 		abort_connection(connected_fd);
 		return (1);
@@ -83,17 +87,17 @@ int IRC::nickCmd(std::vector<std::string> parsed)
 
 	std::cout<< "USER SENT NICK" << std::endl;
 	if(parsed.size() < 2){
-		responder(ERR_NONICKNAMEGIVEN, connected_fd);
+		responder(ERR_NONICKNAMEGIVEN, *current_user);
 		return 1;
 	}
 	if(parsed[1].size() > 9){
-		responder(ERR_ERRONEUSNICKNAME, connected_fd);
+		responder(ERR_ERRONEUSNICKNAME, *current_user);
 		return 1;
 	}
 	for(std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 	{
 		if(!parsed[1].compare(it.operator*().second.get_nick())) {
-			responder(ERR_NICKNAMEINUSE, connected_fd);
+			responder(ERR_NICKNAMEINUSE, *current_user);
 			return 1;
 		}
 	}
@@ -105,7 +109,7 @@ int IRC::userCmd(std::vector<std::string> parsed)
 {
 	std::cout<< "USER SENT USER" << std::endl;
 	if(parsed.size() < 2){
-		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		responder(ERR_NEEDMOREPARAMS, *current_user);
 		return 1;
 	}
 	current_user->set_username(parsed[1]);
@@ -119,7 +123,7 @@ int IRC::pongCmd(std::string raw)
 
 	message.append(parsed[2] + " ");
 	message.append(parsed[1] + "\n");
-	responder(message, connected_fd);
+	responder(message, *current_user);
 	return 0;
 }
 
@@ -132,7 +136,7 @@ int IRC::joinCmd(std::string raw)
 
 	if(!params.size())
 	{
-		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		responder(ERR_NEEDMOREPARAMS, *current_user);
 		return 1;
 	}
 	std::cout << raw << " RAW" << std::endl;
@@ -143,7 +147,7 @@ int IRC::joinCmd(std::string raw)
 	for (int i = 0; i < channels.size(); i++) {
 		std::cout << channels[i] << " trytojoin\n";
 		if (channels[i][0] != '#') {
-			responder(ERR_NOSUCHCHANNEL, current_user->get_id());
+			responder(ERR_NOSUCHCHANNEL, *current_user);
 			continue;
 		}
 		current_channel = &get_channel(channels[i]);
@@ -246,6 +250,7 @@ int IRC::modeCmd(std::string raw)
 		}
 	}
 	//error ERR_NEEDMOREPARAMS 
+	return 1;
 }
 
 #endif /*COMMAND_HPP*/
