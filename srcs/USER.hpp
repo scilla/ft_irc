@@ -55,6 +55,11 @@ std::string User::get_nick() const
 	return (_nick);
 }
 
+std::string User::get_username() const{
+	return _username;
+}
+
+
 size_t User::get_id() const { return _id;}
 
 void User::set_nick(std::string nick)
