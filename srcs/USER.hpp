@@ -26,19 +26,22 @@ class User
 		int						_fdread;
 		int						_fdwrite;
 		int						_last_activity;
+		std::string				_host;
+		std::string				_domain;
 	public:
-		User(size_t id);
+		User(size_t, std::string, std::string);
 		~User();
 		std::string get_nick() const;
 		std::string get_username() const;
 		std::string get_psw() const;
+		size_t get_id() const;
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
 		int						get_roles;
 		t_state					_state;
 };
 
-User::User(size_t id) : _id(id), _state((t_state){true, false, false})
+User::User(size_t id, std::string host, std::string domain) : _id(id), _state((t_state){true, false, false}), _host(host), _domain(domain)
 {
 	std::cout << "New user created, fd: " << id << std::endl;
 }
@@ -50,6 +53,7 @@ std::string User::get_nick() const
 	return (_nick);
 }
 
+size_t User::get_id() const { return _id;}
 
 void User::set_nick(std::string nick)
 {
@@ -63,4 +67,4 @@ void User::set_username(std::string user)
 	_username = user;
 }
 
-#endif
+#endif /* USER_HPP */

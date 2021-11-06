@@ -9,7 +9,7 @@ class Server
 private:
     virtual void accepter() = 0;
     virtual void handler(int) = 0;
-    virtual void responder(std::string, int) = 0;
+    //virtual void responder(std::string, int) = 0;
 protected:
     ListeningSocket * socket;
 public:

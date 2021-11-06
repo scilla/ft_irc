@@ -5,35 +5,26 @@
 #include <string>
 #include <map>
 #include <list>
-#include "USER.hpp"
 #include <sys/types.h>
-#include "CHANNEL.hpp"
-#include "netinet/in.h"
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include "networking/server/Server.hpp"
 #include <unistd.h>
 #include <vector>
 #include <strings.h>
 #include <set>
-#include "errors.hpp"
 #include <fstream>
-#include "utils.hpp"
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-
-#define ERR_NONICKNAMEGIVEN		"431\n"
-#define ERR_ERRONEUSNICKNAME	"432\n"
-#define ERR_NICKNAMEINUSE		"433\n"
-// #define ERR_NICKCOLLISION		"436\n"
-#define ERR_NOLOGIN				"444\n"
-#define ERR_NEEDMOREPARAMS		"461\n"
-#define ERR_PASSWDMISMATCH		"464\n"
-
-
+struct in_addr ipAddr;
+#include "USER.hpp"
+#include "CHANNEL.hpp"
+#include "netinet/in.h"
+#include "networking/server/Server.hpp"
+#include "errors.hpp"
+#include "utils.hpp"
 
 class IRC: public Server
 {
@@ -54,7 +45,6 @@ class IRC: public Server
 		Channel					get_channel(std::string channelname);
 
 		void					launch();
-		void					print_prompt(int sig, std::string msg);
 		void					abort_connection(int disconnected_fd);
 		int						initializer(std::vector<std::string> parsed);
 		void					commandSelector(std::string parsed);
@@ -87,7 +77,6 @@ class IRC: public Server
 		int newSocket;
 		void accepter();
 		void handler(int connected_fd);
-		void responder(std::string, int);
 		std::string receiver();
 		std::string psw;
 
@@ -255,31 +244,9 @@ std::string IRC::receiver()
 	return(messageFromClient);
 }
 
-void IRC::responder(std::string message, int fd) {
-	write(fd, message.c_str(), message.length());
-	write(fd, "\n", 1);
-	print_prompt(0, message);
-}
-
-
-
-void IRC::print_prompt(int sig, std::string message) //sig == 0 sending; sig == 1 reciving
-{
-	struct in_addr ipAddr;
-	char str[INET_ADDRSTRLEN];
-	struct hostent *hp;
-	ipAddr = remote.sin_addr;
-	//getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
-	
-	if(!sig)
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " << " << message << std::endl;
-	else
-		std::cout << "[" << inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN ) << "]" << " >> " << message << std::endl;;
-
-}
-
 void IRC::launch() {
 	remote = getServerSocket()->getRemote();
+	ipAddr = remote.sin_addr;
 	int remoteLen = sizeof(remote);
 	struct timeval timeout;
 	timeout.tv_usec = 100;

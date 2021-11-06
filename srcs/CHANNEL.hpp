@@ -5,6 +5,7 @@
 #include <list>
 #include <set>
 #include "USER.hpp"
+#include "ERRORS.hpp"
 
 typedef struct s_channel_modes {
 	bool priv;
@@ -36,7 +37,7 @@ class Channel
 		Channel(std::string);
 		~Channel();
 
-		void userJoin(User&);
+		void userJoin(User&, std::string);
 		void userLeft(User&);
 		void userBan(User&);
 		void userOp(User&);
@@ -44,6 +45,7 @@ class Channel
 		t_channel_modes getModes() const;
 		void setModes(t_channel_modes);
 		void setKey(std::string);
+		void setTopic(std::string);
 };
 
 Channel::Channel(std::string channel_name) {
@@ -53,8 +55,10 @@ Channel::Channel(std::string channel_name) {
 Channel::~Channel() {};
 
 
-void Channel::userJoin(User& user){
-
+void Channel::userJoin(User& user, std::string pass = ""){
+	if (modes.has_key && pass != key) {
+		responder(ERR_BADCHANNELKEY, user.get_id());
+	}
 }
 
 void Channel::userLeft(User& user){
