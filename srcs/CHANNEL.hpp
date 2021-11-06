@@ -5,7 +5,8 @@
 #include <list>
 #include <set>
 #include "USER.hpp"
-#include "ERRORS.hpp"
+#include "errors.hpp"
+#include "utils.hpp"
 
 typedef struct s_channel_modes {
 	bool priv;
@@ -31,7 +32,9 @@ class Channel
 		std::string						key;
 		std::string						topic;
 		std::map<size_t, t_user_status>	USER_MAP; //mappa con user right come key e utente corrispondende
-		int								user_limit;
+		std::set<size_t>				invited_users;
+		size_t							user_limit;
+		size_t							user_count;
 		t_channel_modes					modes;
 	public:
 		Channel(std::string);
@@ -52,13 +55,33 @@ Channel::Channel(std::string channel_name) {
 	_name = channel_name;
 	modes = (t_channel_modes){false, false, false, false, false, false, false};
 };
+
 Channel::~Channel() {};
 
-
-void Channel::userJoin(User& user, std::string pass = ""){
+void Channel::userJoin(User& user, std::string pass = "") {
+	t_user_status stat((t_user_status){false, false});
 	if (modes.has_key && pass != key) {
 		responder(ERR_BADCHANNELKEY, user.get_id());
+		return;
 	}
+	if (modes.has_limit && USER_MAP.size() >= user_limit) {
+		responder(ERR_CHANNELISFULL, user.get_id());
+		return;
+	}
+	if (modes.invite) {
+		if (!invited_users.count(user.get_id())) {
+			responder(ERR_INVITEONLYCHAN, user.get_id());
+			return;
+		}
+		invited_users.erase(user.get_id());
+	}
+	if (!USER_MAP.size())
+		stat.admin = true;
+	USER_MAP.insert(std::make_pair(user.get_id(), stat));
+	std::cout << "User " << user.get_nick() << " joined channel " << _name << std::endl;
+	// todo: broadcast join to users already in channel
+	// todo: RPL_TOPIC
+	// todo: RPL_NAMREPLY list users including me
 }
 
 void Channel::userLeft(User& user){

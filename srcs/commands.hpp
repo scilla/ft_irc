@@ -10,7 +10,7 @@ int IRC::initializer(std::vector<std::string> parsed)
 	if (!current_user) {
 		if(passCmd(parsed))
 			return 1;
-		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd)));
+		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd, "host", "domain")));
 		current_user = &res.first.operator*().second;
 		return 1;
 	}
@@ -38,14 +38,15 @@ void	IRC::commandSelector(std::string raw)
 	std::string					command;
 	std::string					params;
 
+	current_user = get_user(connected_fd);
 	parsed = splitter(raw, ' ');
 	command = parsed[0];
-	params = raw.substr(parsed.size() + 1, raw.size());
-	if(command.compare("PONG"))
+	params = raw.substr(command.size() + 1, raw.size());
+	if(!command.compare("PONG"))
 		pongCmd(params);
-	else if(command.compare("JOIN"))
+	else if(!command.compare("JOIN"))
 		joinCmd(params);
-	else if(command.compare("NICK"))
+	else if(!command.compare("NICK"))
 		nickCmd(parsed);
 	//else if(parsed[0].compare("PRIVMSG"))
 	//	privmsgCmd(parsed);
@@ -124,11 +125,34 @@ int IRC::pongCmd(std::string raw)
 
 int IRC::joinCmd(std::string raw)
 {
-	std::map<std::string, Channel>::iterator res;
-	if(params.size() > 1)
+	std::vector<std::string> 	params = splitter(raw, ' ');
+	std::vector<std::string> 	channels;
+	std::vector<std::string> 	keys;
+	Channel* 					current_channel;
+
+	if(!params.size())
 	{
-		if(params[0].compare(params[0].size(), 1, "#")) //channel mode
-		{
+		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		return 1;
+	}
+	std::cout << raw << " RAW" << std::endl;
+	std::cout << params[0] << " PARAMS" << std::endl;
+	channels = splitter(params[0], ',');
+	if (params.size() > 1)
+		keys = splitter(params[1], ',');
+	for (int i = 0; i < channels.size(); i++) {
+		std::cout << channels[i] << " trytojoin\n";
+		if (channels[i][0] != '#') {
+			responder(ERR_NOSUCHCHANNEL, current_user->get_id());
+			continue;
+		}
+		current_channel = &get_channel(channels[i]);
+		if (i < keys.size()) {
+			current_channel->userJoin(*current_user, keys[i]);
+		} else {
+			current_channel->userJoin(*current_user);
+		}
+	}
 	return 0;
 }
 

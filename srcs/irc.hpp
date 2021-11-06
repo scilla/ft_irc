@@ -42,7 +42,7 @@ class IRC: public Server
 		User*					get_user(int fd);
 		bool					is_user(int fd);
 		std::list<Channel>		get_channels();
-		Channel					get_channel(std::string channelname);
+		Channel&				get_channel(std::string channelname);
 
 		void					launch();
 		void					abort_connection(int disconnected_fd);
@@ -108,6 +108,19 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 		};
 
 void IRC::accepter(){
+}
+
+Channel& IRC::get_channel(std::string channel_name) {
+	std::map<std::string, Channel>::iterator it;
+	Channel*		res;
+
+	it = CHANNEL_MAP.find(channel_name);
+	if (it == CHANNEL_MAP.end()) {
+		res = new Channel(channel_name);
+		return *res;
+	} else {
+		return it.operator*().second;
+	}
 }
 
 bool IRC::check_psw(std::string psw) {
@@ -263,7 +276,6 @@ void IRC::launch() {
 			if (*it >= max)
 				max = *it + 1;
 		}
-		std::cout << "------------WAITING-------------" << std::endl;
 		select(max, &fds, NULL, NULL, &timeout);
 		if(FD_ISSET(getServerSocket()->getSocket(), &fds)){
 			newSocket = accept(getServerSocket()->getSocket(), (struct sockaddr *)&remote, (socklen_t * )&remoteLen);
@@ -281,8 +293,6 @@ void IRC::launch() {
 		}
 		//accepter();
 		//responder();
-		std::cout << "------------DONE-----------" << std::endl;
-
 	}
 }
 #endif /* IRC_HPP */
