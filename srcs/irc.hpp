@@ -93,6 +93,7 @@ class IRC: public Server
 		int joinCmd(std::string);
 		int pongCmd(std::string);
 		int modeCmd(std::string);
+		int quitCmd(std::string);
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
