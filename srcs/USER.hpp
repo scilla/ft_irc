@@ -40,7 +40,7 @@ class User
 
 User::User(size_t id) : _id(id), _state((t_state){true, false, false})
 {
-	std::cout<< "New user created, fd: " << id << std::endl;
+	std::cout << "New user created, fd: " << id << std::endl;
 }
 
 User::~User() {}
