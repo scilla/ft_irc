@@ -202,7 +202,7 @@ MODE #Finnish +im               ; Makes #Finnish channel moderated and
 MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on
 */
 
-/*int IRC::modeCmd(std::string raw)
+int IRC::modeCmd(std::string raw)
 {
 	std::vector<std::string> params;
 	params = splitter(raw, ' ');
@@ -215,10 +215,6 @@ MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on
 			{
 
 			}
-			else //crea canale
-			{
-
-			}
 		}
 		else //user mode
 		{
@@ -226,7 +222,7 @@ MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on
 		}
 	}
 	//error ERR_NEEDMOREPARAMS 
-}*/
+}
 
 #endif /*COMMAND_HPP*/
 
