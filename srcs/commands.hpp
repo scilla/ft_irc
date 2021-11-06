@@ -7,14 +7,15 @@ int IRC::initializer(std::vector<std::string> parsed)
 {
 	char str[INET_ADDRSTRLEN];
 
-	//std::vector<std::string>
+	std::vector<std::string> str_vect;
 	current_user = get_user(connected_fd);
 	std::pair<std::map<size_t, User>::iterator, bool> res;
 	if (!current_user) {
 		if(passCmd(parsed))
 			return 1;
 		inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN );
-		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd, "host", "domain")));
+		str_vect = splitter(str, '.');
+		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd, str_vect[0] + "." + str_vect[1] + "." + str_vect[2], str_vect[3])));
 		current_user = &res.first.operator*().second;
 		return 1;
 	}
@@ -46,7 +47,7 @@ void	IRC::commandSelector(std::string raw)
 	parsed = splitter(raw, ' ');
 	command = parsed[0];
 	params = raw.substr(command.size() + 1, raw.size());
-	if(!command.compare("PONG"))
+	if(!command.compare("PING"))
 		pongCmd(params);
 	else if(!command.compare("JOIN"))
 		joinCmd(params);
