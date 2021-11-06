@@ -115,7 +115,7 @@ USER username 0 10.11.8.1 :\x031,11\x0frealname
 '
 [127.0.0.1:51321] <- b':alnickname!username@10.11.9.2 JOIN #cacca
 '
-[10.11.9.2:49760] <- b':alnickname!username@10.11.9.2 JOIN #cacca
+<- b':alnickname!username@10.11.9.2 JOIN #cacca
 :e4r8p1.42roma.it 331 alnickname #cacca :No topic is set
 :e4r8p1.42roma.it 353 alnickname = #cacca :Nickname alnickname
 :e4r8p1.42roma.it 366 alnickname #cacca :End of NAMES list

@@ -52,6 +52,8 @@ void	IRC::commandSelector(std::string raw)
 		joinCmd(params);
 	else if(!command.compare("NICK"))
 		nickCmd(parsed);
+	else if(!command.compare("QUIT"))
+		quitCmd(params);
 	//else if(parsed[0].compare("PRIVMSG"))
 	//	privmsgCmd(parsed);
 	//else if(parsed[0].compare("KILL"))
@@ -145,7 +147,6 @@ int IRC::joinCmd(std::string raw)
 	if (params.size() > 1)
 		keys = splitter(params[1], ',');
 	for (int i = 0; i < channels.size(); i++) {
-		std::cout << channels[i] << " trytojoin\n";
 		if (channels[i][0] != '#') {
 			responder(ERR_NOSUCHCHANNEL, *current_user);
 			continue;
@@ -159,6 +160,22 @@ int IRC::joinCmd(std::string raw)
 	}
 	return 0;
 }
+
+int IRC::quitCmd(std::string raw)
+{
+	std::vector<std::string> params = splitter(raw, ' ');
+	if(params.size())
+		responder(current_user->get_nick(), current_user);
+	else
+		responder(params[0], current_user);
+	//rimuovere utente da canali
+	readfds.erase(readfds.find(current_user->get_id()));
+	USER_MAP.erase(current_user->get_id());
+	
+
+
+}
+
 
 /*4.2.3.1 Channel modes
 
