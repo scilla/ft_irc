@@ -36,10 +36,13 @@ class User
 		std::string get_psw() const;
 		std::string get_host() const;
 		std::string get_domain() const;
+		std::string get_full_address() const;
 		std::string get_ip_str();
 		size_t get_id() const;
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
+		void set_host(std::string host);
+		void set_domain(std::string domain);
 		int						get_roles;
 		t_state					_state;
 };
@@ -61,7 +64,9 @@ std::string User::get_username() const{
 }
 
 std::string User::get_ip_str() {
-	std::string str = _domain + "." + _host;
+	std::string str(_domain);
+	str.append(".");
+	str.append(_host);
 	return str;
 }
 
@@ -79,6 +84,14 @@ void User::set_username(std::string user)
 	_username = user;
 }
 
+void User::set_host(std::string new_host) {
+	_host = new_host;
+}
+
+void User::set_domain(std::string new_domain) {
+	_domain = new_domain;
+}
+
 std::string User::get_host() const
 {
 	return _host;
@@ -87,6 +100,10 @@ std::string User::get_host() const
 std::string User::get_domain() const
 {
 	return _domain;
+}
+
+std::string User::get_full_address() const {
+	return _domain + "." + _host;
 }
 
 #endif /* USER_HPP */

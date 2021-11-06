@@ -105,6 +105,7 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 		_password(psw),
 		Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
 		{
+			current_user = NULL;
 			//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
 		};
 
@@ -254,12 +255,14 @@ std::string IRC::receiver()
 	recv(connected_fd, buff, 500, 0);
 	abort_connection(connected_fd);
 	std::string messageFromClient(buff);
-	print_prompt(1, current_user->get_ip_str(), messageFromClient);
+	if (current_user)
+		print_prompt(1, current_user->get_ip_str(), messageFromClient);
 	return(messageFromClient);
 }
 
 void IRC::launch() {
 	char str[INET_ADDRSTRLEN];
+	current_user = NULL;
 	remote = getServerSocket()->getRemote();
 	int remoteLen = sizeof(remote);
 	ipAddr = remote.sin_addr;
