@@ -124,8 +124,12 @@ int IRC::pongCmd(std::string raw)
 	std::vector<std::string> parsed = splitter(raw, ' ');
 	std::string message("PONG ");
 
-	message.append(parsed[2] + " ");
-	message.append(parsed[1] + "\n");
+	if (parsed.size() == 2) {
+		message.append(parsed[1] + " ");
+		message.append(parsed[0] + "\n");
+	} else {
+		message.append(raw);
+	}
 	responder(message, *current_user);
 	return 0;
 }
