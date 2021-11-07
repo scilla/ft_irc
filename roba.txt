@@ -33,7 +33,15 @@ https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select
 :e4r8p1.42roma.it 366 Nickname #cacca :End of NAMES list
 '
 '
+PASS ciao
+NICK Uno
+USER Uno
+JOIN #cacca
 
+PASS ciao
+NICK Due
+USER Due
+JOIN #cacca
 
 
 

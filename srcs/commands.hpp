@@ -157,6 +157,7 @@ int IRC::joinCmd(std::string raw)
 			continue;
 		}
 		current_channel = &get_channel(channels[i]);
+
 		if (i < keys.size()) {
 			current_channel->userJoin(*current_user, keys[i]);
 		} else {
@@ -174,9 +175,9 @@ int IRC::quitCmd(std::string raw)
 		responder(current_user->get_nick(), *current_user);
 	else
 		responder(params[0], *current_user);
-	for(std::map<std::string, Channel>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+	for(std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 	{
-		it.operator*().second.userLeft(*current_user);
+		it.operator*().second->userLeft(*current_user);
 	}
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
@@ -201,7 +202,7 @@ int IRC::privmsgCmd(std::string raw)
 	// 		priv_message.append(" ");
 	// }
 
-	std::map<std::string, Channel>::iterator res;
+	std::map<std::string, Channel*>::iterator res;
 	bool found = false;
 
 	for(std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
@@ -212,7 +213,7 @@ int IRC::privmsgCmd(std::string raw)
 			if (res != CHANNEL_MAP.end())
 			{
 				std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
-				(*res).second.globalUserResponder(tmp, current_user->get_id());
+				res.operator*().second->globalUserResponder(tmp, current_user->get_id());
 			}
 			else
 			{
@@ -318,7 +319,7 @@ int IRC::modeCmd(std::string raw)
 	{
 		if(params[0].compare(params[0].size(), 1, "#")) //channel mode
 		{
-			std::map<std::string, Channel>::iterator res;
+			std::map<std::string, Channel*>::iterator res;
 			if((res = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
 			{
 

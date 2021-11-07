@@ -83,7 +83,7 @@ class IRC: public Server
 
 		std::map<size_t, User> 			USER_MAP;
 		std::map<std::string, size_t> 	FD_MAP;
-		std::map<std::string, Channel> 	CHANNEL_MAP;
+		std::map<std::string, Channel*> 	CHANNEL_MAP;
 		std::map<std::string, int(IRC::*)(std::vector<std::string>)> CMD_MAP;
 
 
@@ -115,18 +115,18 @@ void IRC::accepter(){
 }
 
 Channel& IRC::get_channel(std::string channel_name) {
-	std::map<std::string, Channel>::iterator it;
-	Channel*		res;
+	std::map<std::string, Channel*>::iterator it;
+	Channel		*res;
 
 	it = CHANNEL_MAP.find(channel_name);
 	if (it == CHANNEL_MAP.end()) {
 		res = new Channel(channel_name);
-		CHANNEL_MAP.insert(std::make_pair(channel_name, *res));
+		CHANNEL_MAP.insert(std::pair<std::string, Channel *>(channel_name, *&res));
 		std::cout << "NUOVOCANALE CREATO: " << channel_name << std::endl;
 		return *res;
 	} else {
 		std::cout << "CANALE TROVATO: " << it.operator*().first << std::endl;
-		return it.operator*().second;
+		return *(it.operator*().second);
 
 	}
 }
