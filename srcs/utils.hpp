@@ -48,7 +48,7 @@ void responder(std::string message, User& ux) {
 void responder(std::string message, int fd) {
 	write(fd, message.c_str(), message.length());
 	write(fd, "\n", 1);
-	//print_prompt(0, ux.get_ip_str(), message);
+	print_prompt(0, "USER_IP", message);
 }
 
 #endif /* UTILS_HPP */
