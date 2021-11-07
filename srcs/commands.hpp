@@ -206,10 +206,13 @@ int IRC::privmsgCmd(std::string raw)
 	{
 		if((*it)[0] == '#')
 		{
-			res = CHANNEL_MAP.find((*it).substr(((*it)[1], (*it).size())));
+			std::cout << "CERCO: " << (*it) << std::endl; 
+			res = CHANNEL_MAP.find((*it));
+			std::cout << "TROVO: " << res.operator*().first << std::endl; 
 			if (res != CHANNEL_MAP.end())
 			{
-				(*res).second.globalUserResponder(priv_message);
+				std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
+				(*res).second.globalUserResponder(tmp);
 			}
 			else
 			{
