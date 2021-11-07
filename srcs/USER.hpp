@@ -37,6 +37,7 @@ class User
 		std::string get_host() const;
 		std::string get_domain() const;
 		std::string get_full_address() const;
+		std::string get_identifier() const;
 		std::string get_ip_str();
 		size_t get_id() const;
 		void set_nick(std::string nick);
@@ -104,6 +105,10 @@ std::string User::get_domain() const
 
 std::string User::get_full_address() const {
 	return _domain + "." + _host;
+}
+
+std::string User::get_identifier() const {
+	return _nick + "!" + _username + "@" + get_full_address();
 }
 
 #endif /* USER_HPP */

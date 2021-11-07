@@ -34,8 +34,8 @@ class Channel
 		std::map<size_t, t_user_status>	USER_MAP; //mappa con user right come key e utente corrispondende
 		std::set<size_t>				invited_users;
 		size_t							user_limit;
-		size_t							user_count;
 		t_channel_modes					modes;
+		std::vector<std::string>		ban_masks;
 	public:
 		Channel(std::string);
 		~Channel();
@@ -45,14 +45,26 @@ class Channel
 		void userBan(User&);
 		void userOp(User&);
 		void userKick(User&);
+
 		t_channel_modes getModes() const;
 		void setModes(t_channel_modes);
-		void setKey(std::string);
 		void setTopic(std::string);
+
+		void setPrivate(bool);
+		void setSecret(bool);
+		void setInviteOnly(bool);
+		void setNoOpTopic(bool);
+		void setNoExternalMessages(bool);
+		void setModerated(bool);
+		void setUserLimit(bool, size_t);
+		void setKey(bool, std::string);
 };
 
 Channel::Channel(std::string channel_name) {
 	_name = channel_name;
+	key = "";
+	topic = "";
+	user_limit = 0;
 	modes = (t_channel_modes){false, false, false, false, false, false, false};
 };
 
@@ -81,7 +93,7 @@ void Channel::userJoin(User& user, std::string pass = "") {
 	std::cout << "User " << user.get_nick() << " joined channel " << _name << std::endl;
 	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) //communicate to all the user connected to the same channel that the new user connected
 	{
-		responder(":" + user.get_nick() + "!" + user.get_username() + "@" + user.get_host() + user.get_domain() + " JOIN " + this->_name, user);
+		responder(":" + user.get_identifier() + " JOIN " + this->_name, user);
 	}
 	// todo: broadcast join to users already in channel
 	// todo: RPL_TOPIC
@@ -89,32 +101,62 @@ void Channel::userJoin(User& user, std::string pass = "") {
 }
 
 
-void Channel::userLeft(User& user){
+void Channel::userLeft(User& user) {
 
 }
 
-void Channel::userBan(User& user){
+void Channel::userBan(User& user) {
 
 }
 
-void Channel::userOp(User& user){
+void Channel::userOp(User& user) {
 
 }
 
-void Channel::userKick(User& user){
+void Channel::userKick(User& user) {
 
 }
 
-t_channel_modes Channel::getModes() const{
+t_channel_modes Channel::getModes() const {
 	return modes;
 }
 
-void Channel::setModes(t_channel_modes){
-
+void Channel::setModes(t_channel_modes new_modes) {
+	modes = new_modes;
 }
 
-void Channel::setKey(std::string){
+void Channel::setPrivate(bool b = true) {
+	modes.priv = b;
+}
 
+void Channel::setSecret(bool b = true) {
+	modes.secret = b;
+}
+
+void Channel::setInviteOnly(bool b = true) {
+	modes.invite = b;
+}
+
+void Channel::setNoOpTopic(bool b = true) {
+	modes.topic = b;
+}
+
+void Channel::setNoExternalMessages(bool b = true) {
+	modes.no_ext = b;
+}
+
+void Channel::setModerated(bool b = true) {
+	modes.moderate = b;
+}
+
+void Channel::setUserLimit(bool b = true, size_t s = 0) {
+	modes.has_limit = b;
+	user_limit = s;
+}
+
+void Channel::setKey(bool b = true, std::string s = "") {
+	modes.has_key = b;
+	key = s;
 }
 
 
