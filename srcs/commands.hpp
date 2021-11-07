@@ -165,13 +165,17 @@ int IRC::joinCmd(std::string raw)
 int IRC::quitCmd(std::string raw)
 {
 	std::vector<std::string> params = splitter(raw, ' ');
-	if(params.size())
+	if(!params.size())
 		responder(current_user->get_nick(), *current_user);
 	else
 		responder(params[0], *current_user);
-	//rimuovere utente da canali
+	for(std::map<std::string, Channel>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+	{
+		it.operator*().second.userLeft(*current_user);
+	}
 	readfds.erase(readfds.find(current_user->get_id()));
-	USER_MAP.erase(current_user->get_id());
+	close(current_user->get_id());
+	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
 }
 
 

@@ -120,6 +120,7 @@ Channel& IRC::get_channel(std::string channel_name) {
 	it = CHANNEL_MAP.find(channel_name);
 	if (it == CHANNEL_MAP.end()) {
 		res = new Channel(channel_name);
+		CHANNEL_MAP.insert(std::make_pair(channel_name, *res));
 		return *res;
 	} else {
 		return it.operator*().second;
