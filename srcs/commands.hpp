@@ -162,6 +162,7 @@ int IRC::joinCmd(std::string raw)
 		} else {
 			current_channel->userJoin(*current_user);
 		}
+		
 	}
 	return 0;
 }
@@ -191,8 +192,8 @@ int IRC::privmsgCmd(std::string raw)
 
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
-	splitted.erase(splitted.begin());
-	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
+	//splitted.erase(splitted.begin());
+	priv_message = raw.substr(splitted[0].size() + 2, raw.size());
 	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
 	// {
 	// 	priv_message.append(*it.base());
@@ -201,33 +202,38 @@ int IRC::privmsgCmd(std::string raw)
 	// }
 
 	std::map<std::string, Channel>::iterator res;
+	bool found = false;
 
 	for(std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
 	{
 		if((*it)[0] == '#')
 		{
-			std::cout << "CERCO: " << (*it) << std::endl; 
 			res = CHANNEL_MAP.find((*it));
-			std::cout << "TROVO: " << res.operator*().first << std::endl; 
 			if (res != CHANNEL_MAP.end())
 			{
 				std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
-				(*res).second.globalUserResponder(tmp);
+				(*res).second.globalUserResponder(tmp, current_user->get_id());
 			}
 			else
 			{
-				//canale non esiste;
+				responder(ERR_NOSUCHCHANNEL, *current_user);
 			}
 		}
 		else
 		{
+			found = false;
 			for(std::map<size_t, User>::iterator ite = USER_MAP.begin(); ite != USER_MAP.end(); ite++)
 			{
 				if(!(*ite).second.get_nick().compare((*it)))
 				{
-					responder(priv_message, (*ite).second);
+					std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
+					responder(tmp, (*ite).second);
+					found = true;
+					break;
 				}
 			}
+			if(!found)
+				responder(ERR_NOSUCHNICK, *current_user);
 		}
 	}
 }

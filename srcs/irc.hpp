@@ -122,9 +122,12 @@ Channel& IRC::get_channel(std::string channel_name) {
 	if (it == CHANNEL_MAP.end()) {
 		res = new Channel(channel_name);
 		CHANNEL_MAP.insert(std::make_pair(channel_name, *res));
+		std::cout << "NUOVOCANALE CREATO: " << channel_name << std::endl;
 		return *res;
 	} else {
+		std::cout << "CANALE TROVATO: " << it.operator*().first << std::endl;
 		return it.operator*().second;
+
 	}
 }
 
