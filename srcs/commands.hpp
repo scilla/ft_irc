@@ -55,8 +55,8 @@ void	IRC::commandSelector(std::string raw)
 		nickCmd(parsed);
 	else if(!command.compare("QUIT"))
 		quitCmd(params);
-	//else if(parsed[0].compare("PRIVMSG"))
-	//	privmsgCmd(parsed);
+	else if(parsed[0].compare("PRIVMSG"))
+		privmsgCmd(parsed);
 	//else if(parsed[0].compare("KILL"))
 	//	killCmd(parsed);
 	//else if(parsed[0].compare("WHO"))
@@ -177,6 +177,55 @@ int IRC::quitCmd(std::string raw)
 	close(current_user->get_id());
 	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
 }
+
+int IRC::privmsgCmd(std::string raw)
+{
+	std::vector<std::string> splitted;
+	std::vector<std::string> receivers;
+	std::string priv_message;
+
+
+	splitted = splitter(raw, ' ');
+	receivers = splitter(splitted[0], ',');
+	splitted.erase(splitted.begin());
+	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
+	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
+	// {
+	// 	priv_message.append(*it.base());
+	// 	if(it != (splitted.end() - 1))
+	// 		priv_message.append(" ");
+	// }
+
+	std::map<std::string, Channel>::iterator res;
+	std::map<std::size_t, User>::iterator found_user;
+
+	for(std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
+	{
+		if((*it)[0] == '#')
+		{
+			res = CHANNEL_MAP.find((*it).substr((1, (*it).size())));
+			if (res != CHANNEL_MAP.end())
+			{
+				(*res).second.globalUserResponder(priv_message);
+			}
+			else
+			{
+				//canale non esiste;
+			}
+		}
+		else
+		{
+			for(std::map<size_t, User>::iterator ite = USER_MAP.begin(); ite != USER_MAP.end(); ite++)
+			{
+				if((*ite).second.get_nick().compare((*it)))
+				{
+					responder(priv_message, (*ite).second);
+				}
+			}
+		}
+	}
+}
+
 
 
 /*4.2.3.1 Channel modes
