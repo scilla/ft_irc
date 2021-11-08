@@ -141,4 +141,61 @@ USER username 0 10.11.8.1 :\x031,11\x0frealname
 [10.11.9.2:49760] -> b'MODE #cacca b
 '
 [10.11.9.2:49760] <- b':e4r8p1.42roma.it 472 alnickname b :Unknown MODE flag
-'
+
+
+
+
+
+
+RISPOSTA SERVER A /LIST:
+
+[22:54:45] :italia.ircitalia.net 321 Buonve Channel :Users  Name
+[22:54:46] :italia.ircitalia.net 322 Buonve #radiologos 6 :[+ntr]  Interagisci con credenti evangelici e con le dirette di RadioLogos  - Mercoled� ore 21:00  -  Venerd� ore 17:00  -  Domenica culto ore 10:30  -  http://www.radiologos.it  -  click su "diretta canale 1"'o "tunein".
+[22:54:46] :italia.ircitalia.net 322 Buonve #help 3 :[+ntr] IRCItalia Official Help Channel  Esponi le tue domande (inerenti ESCLUSIVAMENTE ai Servizi di IRCItalia) NON querare gli operatori , per vedere la lista canali usare il comando /list il canale principale della net è #italia raggiungibile con /join #italia
+[22:54:46] :italia.ircitalia.net 322 Buonve #linux 2 :[+ntrSC] Salix OS Fluxbox installation & live x86/x86_64 Released! http://www.salixos.org/wiki/index.php/Download
+[22:54:46] :italia.ircitalia.net 322 Buonve #italia 8 :[+ntr]           -ITALIA-           IRCItalia vi da il benvenuto sul nostro network e vi augura una piacevole permanenza.'
+[22:54:46] :italia.ircitalia.net 322 Buonve #matrix 2 :[+ntr] ---> MaTriX <--- Posso solo indicarti la soglia, sei tu quello che la deve attraversare ---> MaTriX <---
+[22:54:46] :italia.ircitalia.net 322 Buonve #RadioIrcItalia 3 :[+ntr] ::..Benvenuti su #RadioIRCItalia ::.. Per ascoltarci  http://matrix.listen2myradio.com ..::.::RadioIRCItalia::.::..La Musica in un Click!..::
+[22:54:46] :italia.ircitalia.net 323 Buonve :End of /LIST
+
+
+
+RISPOSTA SERVER A /WHO:
+
+[22:55:56] WHO
+[22:55:56] :italia.ircitalia.net 352 Buonve * kvirc IRCItalia-99B9B8AE.cust.vodafonedsl.it italia.ircitalia.net Buonve H :0 KVIrc 5.0.0 Aria http://kvirc.net/
+[22:55:56] :italia.ircitalia.net 352 Buonve #italia Mirc IRCItalia-C5C60D2A.retail.telecomitalia.it italia.ircitalia.net RLogos|Off Hr :0 mIRCItalia
+[22:55:56] :italia.ircitalia.net 352 Buonve #matrix PeRfIdA 168.235.EE18B3AA.ip.IRCItalia.net italia.ircitalia.net IRCItalia14506 G :0 WhOiSaMiAnKoRaEtIDoSsoLePiGnE subscribe #over35
+[22:55:56] :italia.ircitalia.net 352 Buonve #RadioIrcItalia weareone IRCItalia-4F793614.org italia.ircitalia.net Wollino H :0 Wollino
+[22:55:56] :italia.ircitalia.net 352 Buonve #italia NoWarez IRCItalia-E1A09802.clients.your-server.de italia.ircitalia.net NoWarezBot Hr :0 IRCItalia No Warez Bot
+[22:55:56] :italia.ircitalia.net 352 Buonve * Bot Bot.IrcItalia.net hidden ViVaLaGnOKkA H :0 S�, sono un Bot di IrcItalia
+[22:55:56] :italia.ircitalia.net 352 Buonve #matrix trinity bot.ircitalia.net hidden Trin|ty H :0 Trinity
+[22:55:57] :italia.ircitalia.net 352 Buonve * ircitalia te.vedo hidden TeVedo H :0 ircitalia
+[22:55:57] :italia.ircitalia.net 352 Buonve #help Bot Bot.IrcItalia.net hidden SysOp H :0 S�, sono un Bot di Botserv
+[22:55:57] :italia.ircitalia.net 352 Buonve * valentina bot.ircitalia.net hidden sorellina H :0 valentina
+[22:55:57] :italia.ircitalia.net 352 Buonve #radiologos Bot Bot.IrcItalia.Net hidden Security H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot Bot.IrcItalia.net hidden Sauron H :0 S�, sono un bot di BotServ :)
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot Bot.IrcItalia.Net hidden Roma H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot bot.ircitalia.net hidden Radiowebnetwork H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * irs radioindipendentzia.net hidden RADIOINDIPENDENTZIA H :0 Radioindipendentzia
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot bot.ircitalia.net hidden Radiochat H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot Bot.IrcItalia.Net hidden Operatore H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot Bot.IrcItalia.Net hidden mIRC H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve #linux Bot Bot.IrcItalia.Net hidden Linux H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Client Official.KVIrc.Bot hidden KVIrc H :0 KVIrc Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve #RadioIrcItalia Bot Official.IRCItalia.Bot hidden IRCItalia H :0 S�, sono un Bot di BotServ :)
+[22:55:57] :italia.ircitalia.net 352 Buonve * iSee Rotfl.seeir.hiaaij.db.nskalalol hidden IoVedo H :0 Rotflseeirhiaaijdbnskalalol
+[22:55:57] :italia.ircitalia.net 352 Buonve * GrisuBot vvd.to.it hidden Grisu H :0 Grisu Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot Bot.IrcItalia.Net hidden Furby H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * PinkFloyd FloydChannel.official.bot hidden FloydChannel H :0 Bot di #floydchannel - www.pink-floyd.it
+[22:55:57] :italia.ircitalia.net 352 Buonve * IRCItalia IRCItalia.Fastcrash.Chat hidden FASTCRASH H :0 Fastcrash Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Fantasy Official.BotServ.FantasyBot hidden FantasyBot H :0 Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Bot bot.ircitalia.net hidden Angels H :0 Services Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * Albus bot.ircitalia.net hidden Albus_Silente H :0 Official Bot
+[22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden HelpServ H* :0 Help Server
+[22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden BotServ H* :0 Bot Server
+[22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden MemoServ H* :0 Memo Server
+[22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden HostServ H* :0 vHost Server
+[22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden ChanServ H* :0 Channel Server
+[22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden NickServ H* :0 Nickname Server
+[22:55:57] :italia.ircitalia.net 315 Buonve * :End of /WHO list.

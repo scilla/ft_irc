@@ -116,8 +116,6 @@ void Channel::globalUserResponder(std::string message, size_t skip = 0)
 	}
 }
 
-
-
 void Channel::userLeft(User& user) {
 
 	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) 
