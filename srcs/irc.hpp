@@ -45,7 +45,7 @@ class IRC: public Server
 		Channel&				get_channel(std::string channelname);
 
 		void					launch();
-		void					abort_connection(int disconnected_fd);
+		void					check_connection(int disconnected_fd);
 		int						initializer(std::vector<std::string> parsed);
 		void					commandSelector(std::string parsed);
 
@@ -74,7 +74,7 @@ class IRC: public Server
 		char			hostname[_SC_HOST_NAME_MAX];
 
 
-		char buff[500];
+		char buff[300000];
 		int newSocket;
 		void accepter();
 		void handler(int connected_fd);
@@ -92,6 +92,7 @@ class IRC: public Server
 		int passCmd(std::vector<std::string>);
 		int nickCmd(std::vector<std::string>);
 		int joinCmd(std::string);
+		int partCmd(std::string);
 		int pongCmd(std::string);
 		int modeCmd(std::string);
 		int quitCmd(std::string);
@@ -152,12 +153,10 @@ User* IRC::get_user(int fd) {
 	return(NULL);
 }
 
-void	IRC::abort_connection(int disconnected_fd){
-
+void	IRC::check_connection(int disconnected_fd){
 	if(!buff[0])
 	{
-		close(disconnected_fd); std::cout << "closed connection \n";
-		readfds.erase(readfds.find(disconnected_fd));
+		quitCmd("");
 		return ;
 	}
 }
@@ -212,6 +211,8 @@ std::vector<std::string> splitter(std::string raw, char sep) {
 
 	while (std::getline(tokenStream, token, sep))
 		parsed.push_back(token);
+	if (!parsed.size())
+		parsed.push_back("");
 	return parsed;
 }
 
@@ -259,7 +260,7 @@ void IRC::handler(int connected_fd) {
 std::string IRC::receiver()
 {
 	recv(connected_fd, buff, 500, 0);
-	abort_connection(connected_fd);
+	check_connection(connected_fd);
 	std::string messageFromClient(buff);
 	if (current_user)
 		print_prompt(1, current_user->get_ip_str(), messageFromClient);

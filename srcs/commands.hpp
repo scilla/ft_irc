@@ -41,12 +41,12 @@ void	IRC::commandSelector(std::string raw)
 {
 	std::vector<std::string>	parsed;
 	std::string					command;
-	std::string					params;
+	std::string					params = "";
 
 	current_user = get_user(connected_fd);
 	parsed = splitter(raw, ' ');
 	command = parsed[0];
-	if(parsed[1].c_str())
+	if(parsed.size() > 1 && parsed[1].size())
 		params = raw.substr(command.size() + 1, raw.size());
 	if(!command.compare("PING"))
 		pongCmd(params);
@@ -58,6 +58,8 @@ void	IRC::commandSelector(std::string raw)
 		quitCmd(params);
 	else if(!parsed[0].compare("PRIVMSG"))
 		privmsgCmd(params);
+	else if(!parsed[0].compare("PART"))
+		partCmd(params);
 	//else if(parsed[0].compare("KILL"))
 	//	killCmd(parsed);
 	//else if(parsed[0].compare("WHO"))
@@ -68,19 +70,22 @@ void	IRC::commandSelector(std::string raw)
 
 int IRC::passCmd(std::vector<std::string> parsed)
 {
-
 	if ((!parsed[0].compare("PASS") && parsed.size() < 2) || (parsed[0].compare("PASS"))){
 		std::cout<< "User sent no pass" << std::endl;
-		responder(ERR_NEEDMOREPARAMS, *current_user);
-		abort_connection(connected_fd);
+		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		// abort_connection(connected_fd);
+		close(connected_fd);
+		readfds.erase(connected_fd);
 		return (1);
 	}
 	if(parsed[1].compare(":" + this->_password) && parsed[1].compare(this->_password))
 	{
 		std::cout<< "User sent wrong pass" << std::endl;
-		responder(ERR_PASSWDMISMATCH, *current_user);
+		responder(ERR_PASSWDMISMATCH, connected_fd);
 		bzero(buff, sizeof(buff));
-		abort_connection(connected_fd);
+		// abort_connection(connected_fd);
+		close(connected_fd);
+		readfds.erase(connected_fd);
 		return (1);
 	}
 	return 0;
@@ -158,7 +163,6 @@ int IRC::joinCmd(std::string raw)
 			continue;
 		}
 		current_channel = &get_channel(channels[i]);
-
 		if (i < keys.size()) {
 			current_channel->userJoin(*current_user, keys[i]);
 		} else {
@@ -176,6 +180,8 @@ int IRC::quitCmd(std::string raw)
 		responder(current_user->get_nick(), *current_user);
 	else
 		responder(params[0], *current_user);
+	if (params.size() < 2)
+		params.push_back("");
 	for(std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 	{
 		it.operator*().second->userLeft(*current_user);
@@ -183,6 +189,10 @@ int IRC::quitCmd(std::string raw)
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
 	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
+	for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) {
+		std::string tmp = ":" + current_user->get_identifier() + " QUIT :" + params[1] + "\n";
+		responder(tmp, (*it).second.get_id());
+	}
 	return 0;
 }
 
@@ -196,7 +206,7 @@ int IRC::privmsgCmd(std::string raw)
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
 	//splitted.erase(splitted.begin());
-	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
+	priv_message = raw.substr(splitted[0].size() + 2, raw.size());
 	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
 	// {
 	// 	priv_message.append(*it.base());
@@ -241,6 +251,44 @@ int IRC::privmsgCmd(std::string raw)
 	}
 	return 0;
 }
+
+int IRC::partCmd(std::string raw)
+{
+	std::vector<std::string> splitted;
+	std::vector<std::string> receivers;
+	std::string priv_message;
+
+	splitted = splitter(raw, ' ');
+	receivers = splitter(splitted[0], ',');
+	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
+
+
+	std::map<std::string, Channel*>::iterator res;
+	bool found = false;
+
+	for(std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
+	{
+		if((*it)[0] == '#')
+		{
+			res = CHANNEL_MAP.find((*it));
+			if (res != CHANNEL_MAP.end())
+			{
+				std::string tmp = ":" + current_user->get_identifier() + " PART " + *it + " " + priv_message + "\n";
+				//responder(tmp, *current_user);
+				(*res).second->globalUserResponder(tmp);
+				res.operator*().second->userLeft(*current_user);
+
+
+			}
+			else
+			{
+				responder(ERR_NOSUCHCHANNEL, *current_user);
+			}
+		}
+	}
+	return 0;
+}
+
 
 
 

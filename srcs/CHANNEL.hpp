@@ -88,6 +88,11 @@ void Channel::userJoin(User& user, std::string pass = "") {
 		}
 		invited_users.erase(user.get_id());
 	}
+	if(USER_MAP.find(user.get_id()) != USER_MAP.end())
+	{
+		responder(ERR_ALREADYREGISTRED, user);
+		return;
+	}
 	if (!USER_MAP.size())
 		stat.admin = true;
 	std::pair<std::map<size_t, t_user_status>::iterator, bool> ritorno = USER_MAP.insert(std::pair<size_t, t_user_status>(user.get_id(), stat));
@@ -105,23 +110,28 @@ void Channel::userJoin(User& user, std::string pass = "") {
 
 void Channel::globalUserResponder(std::string message, size_t skip = 0)
 {
-	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) //communicate to all the user connected to the same channel that the new user connected
-	{
+	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++){
 		if((*it).first != skip)
 			responder(message, it.operator*().first);
 	}
 }
 
-void Channel::userLeft(User& user){
-	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) //communicate to all the user connected to the same channel that the new user connected
+
+
+void Channel::userLeft(User& user) {
+
+	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) 
 	{
 		if(it.operator*().first == user.get_id())
 		{
 			USER_MAP.erase(user.get_id());
-			globalUserResponder(user.get_nick() + " left the channel");
+			break;
 		}
 	}
 }
+
+
+
 
 void Channel::userBan(User& user) {
 
