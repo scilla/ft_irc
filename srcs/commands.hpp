@@ -46,7 +46,8 @@ void	IRC::commandSelector(std::string raw)
 	current_user = get_user(connected_fd);
 	parsed = splitter(raw, ' ');
 	command = parsed[0];
-	params = raw.substr(command.size() + 1, raw.size());
+	if(parsed[1].c_str())
+		params = raw.substr(command.size() + 1, raw.size());
 	if(!command.compare("PING"))
 		pongCmd(params);
 	else if(!command.compare("JOIN"))
@@ -182,6 +183,7 @@ int IRC::quitCmd(std::string raw)
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
 	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
+	return 0;
 }
 
 int IRC::privmsgCmd(std::string raw)
@@ -237,6 +239,7 @@ int IRC::privmsgCmd(std::string raw)
 				responder(ERR_NOSUCHNICK, *current_user);
 		}
 	}
+	return 0;
 }
 
 
