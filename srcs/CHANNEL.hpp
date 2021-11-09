@@ -29,8 +29,8 @@ class Channel
 	private:
 		// size_t					_id;
 		std::string						_name;
-		std::string						key;
-		std::string						topic;
+		std::string						_key;
+		std::string						_topic;
 		std::map<size_t, t_user_status>	USER_MAP; //mappa con user right come key e utente corrispondende
 		std::set<size_t>				invited_users;
 		size_t							user_limit;
@@ -66,8 +66,8 @@ class Channel
 
 Channel::Channel(std::string channel_name) {
 	_name = channel_name;
-	key = "";
-	topic = "";
+	_key = "";
+	_topic = "";
 	user_limit = 0;
 	modes = (t_channel_modes){false, false, false, false, false, false, false};
 };
@@ -86,23 +86,30 @@ std::string Channel::get_modes_str()
 {
 	std::string res = "[+";
 	if(modes.has_key)
+		res.append("k");
 	if(modes.has_limit)
+		res.append("l");
 	if(modes.invite)
+		res.append("i");
 	if(modes.moderate)
+		res.append("m");
 	if(modes.no_ext)
+		res.append("e");
 	if(modes.priv)
+		res.append("p");
 	if(modes.secret)
+		res.append("s");
 	if(modes.topic)
+		res.append("t");
+	res.append("]");
+	return(res);
 }
 
-std::string Channel::get_topic()
-{
-	
-}
+std::string Channel::get_topic(){ return(_topic); }
 
 void Channel::userJoin(User& user, std::string pass = "") {
 	t_user_status stat((t_user_status){false, false});
-	if (modes.has_key && pass != key) {
+	if (modes.has_key && pass != _key) {
 		responder(ERR_BADCHANNELKEY, user);
 		return;
 	}
@@ -211,7 +218,7 @@ void Channel::setUserLimit(bool b = true, size_t s = 0) {
 
 void Channel::setKey(bool b = true, std::string s = "") {
 	modes.has_key = b;
-	key = s;
+	_key = s;
 }
 
 
