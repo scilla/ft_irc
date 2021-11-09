@@ -62,6 +62,7 @@ class Channel
 		std::string	get_user_nb();
 		std::string get_modes_str();
 		std::string get_topic();
+		std::string get_name();
 		std::vector<size_t> get_users_ids();
 };
 
@@ -82,6 +83,12 @@ std::string		Channel::get_user_nb()
 	std::string number = connectedUsersNb.str();
 	return(number);
 }
+
+std::string Channel::get_name()
+{
+	return(_name);
+}
+
 
 /*
            o - give/take channel operator privileges;

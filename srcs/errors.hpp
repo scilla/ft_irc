@@ -53,7 +53,8 @@
 #define RPL_LISTSTART			"321"
 #define RPL_LIST				"322"
 #define RPL_LISTEND				"323"
-
+#define RPL_NAMREPLY			"353"
+#define RPL_ENDOFNAME			"366"
 #define RPL_WHOREPLY			"352"
 #define RPL_ENDOFWHO			"315"
 
