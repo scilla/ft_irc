@@ -310,7 +310,7 @@ int IRC::listCmd(std::string raw)
 	}
 	/*end list message*/
 	msg.clear();
-	msg = RPL_LIST;
+	msg = RPL_LISTEND;
 	msg.append(" " + current_user->get_nick() + " :End of /LIST");
 	responder(msg, *current_user);
 	return 0;
