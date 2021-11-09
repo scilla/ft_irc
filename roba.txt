@@ -199,3 +199,15 @@ RISPOSTA SERVER A /WHO:
 [22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden ChanServ H* :0 Channel Server
 [22:55:57] :italia.ircitalia.net 352 Buonve * services ircitalia.net hidden NickServ H* :0 Nickname Server
 [22:55:57] :italia.ircitalia.net 315 Buonve * :End of /WHO list.
+
+
+[127.0.0.1:50593] -> b'WHO #cacca
+[127.0.0.1:50593] <- b':e3r10p7.42roma.it 352 Nickname #cacca buonve 127.0.0.1 e3r10p7.42roma.it Nickname H :0 real_name
+:e3r10p7.42roma.it 315 Nickname #cacca :End of WHO list
+
+WHO #cacca
+'
+[10.12.11.8:49911] <- b':e3r10p7.42roma.it 352 frapz #cacca user 10.12.11.8 e3r10p7.42roma.it frapz H :0 \x031,11\x0ffrancesca
+						:e3r10p7.42roma.it 352 frapz #cacca buonve 127.0.0.1 e3r10p7.42roma.it Nickname H :0 real_name
+						:e3r10p7.42roma.it 315 frapz #cacca :End of WHO list
+'

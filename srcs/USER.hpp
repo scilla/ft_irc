@@ -22,6 +22,7 @@ class User
 		const size_t 			_id;
 		std::string 			_nick; //max 9 chars
 		std::string 			_username;
+		std::string				_realname;
 		//std::map<int, Roles>	channels;
 		int						_fdread;
 		int						_fdwrite;
@@ -36,6 +37,7 @@ class User
 		std::string get_psw() const;
 		std::string get_host() const;
 		std::string get_domain() const;
+		std::string get_realname() const;
 		std::string get_full_address() const;
 		std::string get_identifier() const;
 		std::string get_ip_str();
@@ -61,7 +63,9 @@ std::string User::get_nick() const
 	return (_nick);
 }
 
-
+std::string User::get_realname() const{
+	return _realname;
+}
 
 
 std::string User::get_username() const{

@@ -64,8 +64,8 @@ void	IRC::commandSelector(std::string raw)
 		listCmd(params);
 	//else if(parsed[0].compare("KILL"))
 	//	killCmd(parsed);
-	//else if(parsed[0].compare("WHO"))
-	//	whoCmd(parsed);
+	else if(!parsed[0].compare("WHO"))
+		whoCmd(params);
 
 
 }
@@ -463,10 +463,31 @@ int IRC::whoCmd(std::string raw)
 			{
 				if(!(*it).first.compare(raw))
 				{
-					
+					std::string msg;
+					std::vector<size_t> whoInTheChann = (*it).second->get_users_ids();
+					for(int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
+					{
+						msg.append(RPL_WHOREPLY);
+						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
+						msg.append(" " + current_user->get_nick() + " " + (*it).first + " " \
+						+ (*found).second.get_username() + " " + (*found).second.get_ip_str()\
+						+ " " + (*found).second.get_nick() + " H :0" + (*found).second.get_realname());
+						responder(msg, *current_user);
+						msg.clear();
+					}
+					/*send endlist*/
+					msg.clear();
+					msg = RPL_ENDOFWHO;
+					msg.append(" " + current_user->get_nick() + " " + (*it).first + " :End of WHO list");
+					responder(msg, *current_user);
+					break;
 				}
 			}
 		}
+	}
+	else
+	{
+		responder(ERR_NEEDMOREPARAMS, *current_user);
 	}
 	return 0;
 }

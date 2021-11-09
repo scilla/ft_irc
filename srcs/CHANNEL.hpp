@@ -62,6 +62,7 @@ class Channel
 		std::string	get_user_nb();
 		std::string get_modes_str();
 		std::string get_topic();
+		std::vector<size_t> get_users_ids();
 };
 
 Channel::Channel(std::string channel_name) {
@@ -120,6 +121,15 @@ std::string Channel::get_modes_str()
 }
 
 std::string Channel::get_topic(){ return(_topic); }
+
+std::vector<size_t> Channel::get_users_ids()
+{
+	std::vector<size_t> res;
+	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
+		res.push_back((*it).first);
+	return(res);
+}
+
 
 void Channel::userJoin(User& user, std::string pass = "") {
 	t_user_status stat((t_user_status){false, false});
