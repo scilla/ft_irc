@@ -50,7 +50,7 @@ void	IRC::commandSelector(std::string raw)
 		params = raw.substr(command.size() + 1, raw.size());
 	if(!command.compare("PING"))
 		pongCmd(params);
-	else if(!command.compare("JOIN"))
+	else if(!command.compare("JOIN") || !command.compare("join"))
 		joinCmd(params);
 	else if(!command.compare("NICK"))
 		nickCmd(parsed);
