@@ -19,7 +19,7 @@ class Socket
 		~Socket() {};
         Socket(int domain, int service, int protocol, int serverPort, u_long interface);
         virtual int netConnection(int hSocket, struct sockaddr_in remote) = 0;
-        void testConnection(int toTest);
+        int testConnection(int toTest);
         int getSocket();
         int getConnection(); // to check!!!
         void setConnection(int con);
@@ -39,11 +39,12 @@ Socket::Socket(int domain, int service, int protocol, int serverPort, u_long int
 	this->testConnection(hSocket);
 }
 
-void Socket::testConnection(int toTest){
+int Socket::testConnection(int toTest){
 	if(toTest < 0){
 		perror("Failed to connect...");
-		exit(EXIT_FAILURE);
+		return(EXIT_FAILURE);
 	}
+	return(EXIT_SUCCESS);
 }
 
 int Socket::getSocket(){

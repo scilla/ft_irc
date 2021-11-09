@@ -14,8 +14,19 @@ public:
 
 BindingSocket::BindingSocket(int domain, int service, int protocol, int serverPort, u_long interface):
 	Socket(domain, service, protocol, serverPort, interface){
-		setConnection(netConnection(getSocket(), getRemote()));
-		testConnection(getConnection());
+		while(true){
+            setConnection(netConnection(getSocket(), getRemote()));
+		    if (getConnection() < 0){
+                std::cout << "retry" << std::endl;
+                sleep(3); 
+                continue;
+            }
+            else{
+                break;
+            }
+        }
+        std::cout << "connected" << std::endl;
+        // perror("ok\n");
 	}
 	
 BindingSocket::~BindingSocket(){}
