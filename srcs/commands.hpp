@@ -62,12 +62,8 @@ void	IRC::commandSelector(std::string raw)
 		partCmd(params);
 	else if(!parsed[0].compare("LIST"))
 		listCmd(params);
-	//else if(parsed[0].compare("KILL"))
-	//	killCmd(parsed);
 	else if(!parsed[0].compare("WHO"))
 		whoCmd(params);
-
-
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
@@ -167,8 +163,10 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size()) {
 			current_channel->userJoin(*current_user, keys[i]);
+			namesCmd(*current_channel);
 		} else {
 			current_channel->userJoin(*current_user);
+			namesCmd(*current_channel);
 		}
 		
 	}
@@ -279,8 +277,6 @@ int IRC::partCmd(std::string raw)
 				//responder(tmp, *current_user);
 				(*res).second->globalUserResponder(tmp);
 				res.operator*().second->userLeft(*current_user);
-
-
 			}
 			else
 			{
@@ -315,8 +311,6 @@ int IRC::listCmd(std::string raw)
 	responder(msg, *current_user);
 	return 0;
 }
-
-
 
 
 /*4.2.3.1 Channel modes
@@ -453,6 +447,30 @@ RFC 1459              Internet Relay Chat Protocol              May 1993
                                    "jto*" if they are an operator.
 */
 
+int IRC::namesCmd(Channel curr_channel)
+{
+	std::string msg;
+	std::vector<size_t> whoInTheChann = curr_channel.get_users_ids();
+	for(int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
+	{
+		msg.append(":e3r10p7.42roma.it ");
+		msg.append(RPL_WHOREPLY);
+		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
+		msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " " \
+		+ (*found).second.get_username() + " " + (*found).second.get_ip_str()\
+		+ " " + (*found).second.get_nick() + " H :0" + (*found).second.get_realname());
+		responder(msg, *current_user);
+		msg.clear();
+	}
+	/*send endlist*/
+	msg.clear();
+	msg.append(":e3r10p7.42roma.it ");
+	msg.append(RPL_ENDOFWHO);
+	msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :End of WHO list");
+	responder(msg, *current_user);
+}
+
+
 int IRC::whoCmd(std::string raw)
 {
 	if(raw.size())
@@ -467,6 +485,7 @@ int IRC::whoCmd(std::string raw)
 					std::vector<size_t> whoInTheChann = (*it).second->get_users_ids();
 					for(int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
 					{
+						msg.append(":e3r10p7.42roma.it ");
 						msg.append(RPL_WHOREPLY);
 						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 						msg.append(" " + current_user->get_nick() + " " + (*it).first + " " \
@@ -477,7 +496,8 @@ int IRC::whoCmd(std::string raw)
 					}
 					/*send endlist*/
 					msg.clear();
-					msg = RPL_ENDOFWHO;
+					msg.append(":e3r10p7.42roma.it ");
+					msg.append(RPL_ENDOFWHO);
 					msg.append(" " + current_user->get_nick() + " " + (*it).first + " :End of WHO list");
 					responder(msg, *current_user);
 					break;

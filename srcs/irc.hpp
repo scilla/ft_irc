@@ -98,9 +98,8 @@ class IRC: public Server
 		int quitCmd(std::string);
 		int privmsgCmd(std::string);
 		int whoCmd(std::string );
-		int listCmd(std::string raw);
-
-
+		int listCmd(std::string);
+		int namesCmd(Channel);
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own):
