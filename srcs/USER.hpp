@@ -21,6 +21,7 @@ class User
 	private:
 		const size_t 			_id;
 		std::string 			_nick; //max 9 chars
+		std::string				_altnick;
 		std::string 			_username;
 		std::string				_realname;
 		//std::map<int, Roles>	channels;
@@ -42,7 +43,8 @@ class User
 		std::string get_identifier() const;
 		std::string get_ip_str();
 		size_t		get_user_nb();
-		size_t get_id() const;
+		size_t 		get_id() const;
+		std::string get_altnick() const;
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
 		void set_host(std::string host);
@@ -66,6 +68,12 @@ std::string User::get_nick() const
 std::string User::get_realname() const{
 	return _realname;
 }
+
+std::string User::get_altnick() const
+{
+	return _altnick;
+}
+
 
 
 std::string User::get_username() const{
