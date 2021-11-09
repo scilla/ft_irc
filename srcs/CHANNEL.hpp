@@ -82,6 +82,20 @@ std::string		Channel::get_user_nb()
 	return(number);
 }
 
+/*
+           o - give/take channel operator privileges;
+           -p - private channel flag;
+           -s - secret channel flag;
+           -i - invite-only channel flag;
+           -t - topic settable by channel operator only flag;
+           -n - no messages to channel from clients on the outside;
+           -m - moderated channel;
+           -l - set the user limit to channel;
+           b - set a ban mask to keep users out;
+           v - give/take the ability to speak on a moderated channel;
+           -k - set a channel key (password).
+*/
+
 std::string Channel::get_modes_str()
 {
 	std::string res = "[+";
@@ -94,7 +108,7 @@ std::string Channel::get_modes_str()
 	if(modes.moderate)
 		res.append("m");
 	if(modes.no_ext)
-		res.append("e");
+		res.append("n");
 	if(modes.priv)
 		res.append("p");
 	if(modes.secret)
