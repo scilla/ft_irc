@@ -60,6 +60,8 @@ void	IRC::commandSelector(std::string raw)
 		privmsgCmd(params);
 	else if(!parsed[0].compare("PART"))
 		partCmd(params);
+	else if(!parsed[0].compare("LIST"))
+		listCmd(params);
 	//else if(parsed[0].compare("KILL"))
 	//	killCmd(parsed);
 	//else if(parsed[0].compare("WHO"))
@@ -293,7 +295,7 @@ int IRC::listCmd(std::string raw)
 {
 	/*start list message*/
 	std::string msg = RPL_LISTSTART;
-	msg.append(" " + current_user->get_nick() + " Channel :Users Name\n");
+	msg.append(" " + current_user->get_nick() + " Channel :Users Name");
 	responder(msg, *current_user);
 	/*send actual list*/
 	for (std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
@@ -302,13 +304,16 @@ int IRC::listCmd(std::string raw)
 		{
 			msg.clear();
 			msg = RPL_LIST;
-			responder(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + ":" + (*it).second->get_modes_str() + " " + (*it).second->get_topic(), *current_user);
+			msg.append( " " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :" + (*it).second->get_modes_str() + " " + (*it).second->get_topic());
+			responder(msg, *current_user);
 		}
 	}
 	/*end list message*/
 	msg.clear();
 	msg = RPL_LIST;
-	responder(" " + current_user->get_nick() + " :End of /LIST", *current_user);
+	msg.append(" " + current_user->get_nick() + " :End of /LIST");
+	responder(msg, *current_user);
+	return 0;
 }
 
 
@@ -463,6 +468,7 @@ int IRC::whoCmd(std::string raw)
 			}
 		}
 	}
+	return 0;
 }
 
 #endif /*COMMAND_HPP*/
