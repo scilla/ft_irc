@@ -98,6 +98,8 @@ class IRC: public Server
 		int quitCmd(std::string);
 		int privmsgCmd(std::string);
 		int whoCmd(std::string );
+		int listCmd(std::string raw);
+
 
 };
 

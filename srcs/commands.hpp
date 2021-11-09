@@ -289,6 +289,28 @@ int IRC::partCmd(std::string raw)
 	return 0;
 }
 
+int IRC::listCmd(std::string raw)
+{
+	/*start list message*/
+	std::string msg = RPL_LISTSTART;
+	msg.append(" " + current_user->get_nick() + " Channel :Users Name\n");
+	responder(msg, *current_user);
+	/*send actual list*/
+	for (std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+	{
+		if(!(*it).second->getModes().secret)
+		{
+			msg.clear();
+			msg = RPL_LIST;
+			responder(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + ":" + (*it).second->get_modes_str() + " " + (*it).second->get_topic(), *current_user);
+		}
+	}
+	/*end list message*/
+	msg.clear();
+	msg = RPL_LIST;
+	responder(" " + current_user->get_nick() + " :End of /LIST", *current_user);
+}
+
 
 
 
@@ -435,7 +457,9 @@ int IRC::whoCmd(std::string raw)
 			for(std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 			{
 				if(!(*it).first.compare(raw))
+				{
 					
+				}
 			}
 		}
 	}

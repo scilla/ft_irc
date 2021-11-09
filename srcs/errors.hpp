@@ -50,3 +50,7 @@
 #define RPL_CREATED 			"003"
 #define RPL_MYINFO				"004"
 #define RPL_LUSERCLIENT			"251"
+#define RPL_LISTSTART			"321"
+#define RPL_LIST				"322"
+#define RPL_LISTEND				"323"
+

@@ -39,6 +39,7 @@ class User
 		std::string get_full_address() const;
 		std::string get_identifier() const;
 		std::string get_ip_str();
+		size_t		get_user_nb();
 		size_t get_id() const;
 		void set_nick(std::string nick);
 		void set_username(std::string nick);
@@ -60,6 +61,9 @@ std::string User::get_nick() const
 	return (_nick);
 }
 
+
+
+
 std::string User::get_username() const{
 	return _username;
 }
@@ -71,7 +75,7 @@ std::string User::get_ip_str() {
 	return str;
 }
 
-size_t User::get_id() const { return _id;}
+size_t User::get_id() const { return _id; }
 
 void User::set_nick(std::string nick)
 {

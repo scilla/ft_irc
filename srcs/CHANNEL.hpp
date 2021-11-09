@@ -59,6 +59,9 @@ class Channel
 		void setModerated(bool);
 		void setUserLimit(bool, size_t);
 		void setKey(bool, std::string);
+		std::string	get_user_nb();
+		std::string get_modes_str();
+		std::string get_topic();
 };
 
 Channel::Channel(std::string channel_name) {
@@ -70,6 +73,32 @@ Channel::Channel(std::string channel_name) {
 };
 
 Channel::~Channel() {};
+
+std::string		Channel::get_user_nb()
+{
+	std::stringstream connectedUsersNb;
+	connectedUsersNb << USER_MAP.size();
+	std::string number = connectedUsersNb.str();
+	return(number);
+}
+
+std::string Channel::get_modes_str()
+{
+	std::string res = "[+";
+	if(modes.has_key)
+	if(modes.has_limit)
+	if(modes.invite)
+	if(modes.moderate)
+	if(modes.no_ext)
+	if(modes.priv)
+	if(modes.secret)
+	if(modes.topic)
+}
+
+std::string Channel::get_topic()
+{
+	
+}
 
 void Channel::userJoin(User& user, std::string pass = "") {
 	t_user_status stat((t_user_status){false, false});
