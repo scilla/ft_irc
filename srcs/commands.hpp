@@ -211,14 +211,13 @@ int IRC::privmsgCmd(std::string raw)
 
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
-	//splitted.erase(splitted.begin());
-	priv_message = raw.substr(splitted[0].size() + 2, raw.size());
-	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
-	// {
-	// 	priv_message.append(*it.base());
-	// 	if(it != (splitted.end() - 1))
-	// 		priv_message.append(" ");
-	// }
+	splitted.erase(splitted.begin());
+	for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
+	{
+		priv_message.append(*it.base());
+		if(it != (splitted.end() - 1))
+			priv_message.append(" ");
+	}
 
 	std::map<std::string, Channel*>::iterator res;
 	bool found = false;
@@ -537,8 +536,7 @@ int IRC::namesCmd(Channel curr_channel)
 		msg.append(RPL_NAMREPLY);
 		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" \
-		+ (*found).second.get_username() + " " + (*found).second.get_altnick()\
-		+ " " + (*found).second.get_username());
+		+ (*found).second.get_nick());
 		responder(msg, *current_user);
 		msg.clear();
 	}

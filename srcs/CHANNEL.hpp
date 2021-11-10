@@ -222,6 +222,12 @@ void Channel::setModes(t_channel_modes new_modes) {
 	modes = new_modes;
 }
 
+void Channel::setTopic(std::string topic)
+{
+	_topic = topic;
+}
+
+
 void Channel::setPrivate(bool b = true) {
 	modes.priv = b;
 }
