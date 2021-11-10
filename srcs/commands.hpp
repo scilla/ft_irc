@@ -178,8 +178,12 @@ int IRC::quitCmd(std::string raw)
 	std::vector<std::string> params = splitter(raw, ' ');
 	if(!params.size())
 		responder(current_user->get_nick(), *current_user);
-	else
+	else if(current_user) // is current_user == NULL check added. SEG. FAULT in case of CTRL-C from client(user) 
 		responder(params[0], *current_user);
+	else{
+		std::cout << "connection closed from client side" << std::endl;
+		exit(0);
+	}
 	if (params.size() < 2)
 		params.push_back("");
 	for(std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)

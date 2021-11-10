@@ -13,7 +13,8 @@ public:
 ConnectingSocket::ConnectingSocket(int domain, int service, int protocol, int serverPort, u_long interface):
 	Socket(domain, service, protocol, serverPort, interface){
 		setConnection(netConnection(getSocket(), getRemote()));
-		testConnection(getConnection());
+		if(testConnection(getConnection()))
+			exit(EXIT_FAILURE);
 	}
 	
 ConnectingSocket::~ConnectingSocket(){}

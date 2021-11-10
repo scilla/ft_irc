@@ -20,7 +20,8 @@ ListeningSocket::ListeningSocket(int domain, int service, int protocol, int serv
 {
 	this->backlog = backlog;
 	startListening();
-	testConnection(this->listening);
+	if(testConnection(this->listening))
+		exit(EXIT_FAILURE);
 }
 
 ListeningSocket::~ListeningSocket()

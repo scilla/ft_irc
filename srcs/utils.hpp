@@ -40,6 +40,8 @@ void print_prompt(int sig, std::string ipstr, std::string message) //sig == 0 se
 }
 
 void responder(std::string message, User& ux) {
+	// if(!&ux)
+	// 	exit(0);
 	write(ux.get_id(), message.c_str(), message.length());
 	write(ux.get_id(), "\n", 1);
 	print_prompt(0, ux.get_ip_str(), message);

@@ -42,6 +42,7 @@ Socket::Socket(int domain, int service, int protocol, int serverPort, u_long int
 int Socket::testConnection(int toTest){
 	if(toTest < 0){
 		perror("Failed to connect...");
+		sleep(3);
 		return(EXIT_FAILURE);
 	}
 	return(EXIT_SUCCESS);
