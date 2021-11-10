@@ -233,7 +233,7 @@ void Channel::setPrivate(bool b = true) {
 	modes.priv = b;
 }
 
-void Channel::setSpeak(bool b = true, std::string nick) {
+void Channel::setSpeak(bool b = true, std::string nick = "") {
 	modes.speak = b;
 }
 

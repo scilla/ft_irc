@@ -215,3 +215,15 @@ WHO #cacca
 [17:32:07] :e3r11p6.42roma.it 331 Nickname #x :No topic is set
 [17:32:07] :e3r11p6.42roma.it 353 Nickname = #x :Nickname altnick sadas
 [17:32:07] :e3r11p6.42roma.it 366 Nickname #x :End of NAMES list
+
+TOPIC + channel + topic -> setta topic
+
+[18:32:42] TOPIC #cacca :ciao a tutti managgia a tutto 
+[18:32:42] :Buonve!kvirc@37.161.33E830F.ip.IRCItalia.net TOPIC #cacca :ciao a tutti managgia a tutto
+[18:33:06] PING Buonve italia.ircitalia.net
+[18:33:06] :italia.ircitalia.net PONG italia.ircitalia.net :Buonve
+
+TOPIC + channel -> mostra topic
+[18:33:28] TOPIC #cacca
+[18:33:28] :italia.ircitalia.net 332 Buonve #cacca :ciao a tutti managgia a tutto
+[18:33:28] :italia.ircitalia.net 333 Buonve #cacca Buonve 1636565555
