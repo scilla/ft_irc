@@ -22,7 +22,7 @@ typedef struct s_channel_modes {
 
 typedef struct s_user_status {
 	bool admin;
-	bool banned;
+	bool speak;
 } t_user_status;
 
 class Channel
@@ -52,13 +52,14 @@ class Channel
 		void setTopic(std::string);
 		void globalUserResponder(std::string, size_t);
 
+		void setOp(bool, std::string);
 		void setPrivate(bool);
 		void setSecret(bool);
 		void setInviteOnly(bool);
 		void setNoOpTopic(bool);
 		void setNoExternalMessages(bool);
 		void setModerated(bool);
-		void setSpeak(bool);
+		void setSpeak(bool, std::string);
 		void setUserLimit(bool, size_t);
 		void setKey(bool, std::string);
 		void setBanMask(std::string);
@@ -156,7 +157,7 @@ void Channel::userJoin(User& user, std::string pass = "") {
 			responder(ERR_INVITEONLYCHAN, user);
 			return;
 		}
-		invited_users.erase(user.get_id());
+		invited_users.erase(user.get_id()); // todo: delete fd when disconnected
 	}
 	if(USER_MAP.find(user.get_id()) != USER_MAP.end())
 	{
@@ -232,7 +233,7 @@ void Channel::setPrivate(bool b = true) {
 	modes.priv = b;
 }
 
-void Channel::setSpeak(bool b = true) {
+void Channel::setSpeak(bool b = true, std::string nick) {
 	modes.speak = b;
 }
 

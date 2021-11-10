@@ -10,26 +10,27 @@ int IRC::initializer(std::vector<std::string> parsed)
 	std::vector<std::string> str_vect;
 	current_user = get_user(connected_fd);
 	std::pair<std::map<size_t, User>::iterator, bool> res;
-	if (!current_user) {
-		if(passCmd(parsed))
+	if (!current_user)
+	{
+		if (passCmd(parsed))
 			return 1;
-		inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN );
+		inet_ntop(AF_INET, &ipAddr, str, INET_ADDRSTRLEN);
 		str_vect = splitter(str, '.');
 		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd, str_vect[0] + "." + str_vect[1] + "." + str_vect[2], str_vect[3])));
 		current_user = &res.first.operator*().second;
 		return 1;
 	}
-	if(!current_user->_state.nick)
+	if (!current_user->_state.nick)
 	{
-		if(!parsed[0].compare("NICK"))
+		if (!parsed[0].compare("NICK"))
 			nickCmd(parsed);
 		return 1;
 	}
-	if(!current_user->_state.user)
+	if (!current_user->_state.user)
 	{
-		if(!parsed[0].compare("USER"))
+		if (!parsed[0].compare("USER"))
 		{
-			if(!userCmd(parsed))
+			if (!userCmd(parsed))
 				user_logged();
 		}
 		return 1;
@@ -37,48 +38,49 @@ int IRC::initializer(std::vector<std::string> parsed)
 	return 0;
 }
 
-void	IRC::commandSelector(std::string raw)
+void IRC::commandSelector(std::string raw)
 {
-	std::vector<std::string>	parsed;
-	std::string					command;
-	std::string					params = "";
+	std::vector<std::string> parsed;
+	std::string command;
+	std::string params = "";
 
 	current_user = get_user(connected_fd);
 	parsed = splitter(raw, ' ');
 	command = parsed[0];
-	if(parsed.size() > 1 && parsed[1].size())
+	if (parsed.size() > 1 && parsed[1].size())
 		params = raw.substr(command.size() + 1, raw.size());
-	if(!command.compare("PING"))
+	if (!command.compare("PING"))
 		pongCmd(params);
-	else if(!command.compare("JOIN") || !command.compare("join"))
+	else if (!command.compare("JOIN") || !command.compare("join"))
 		joinCmd(params);
-	else if(!command.compare("NICK"))
+	else if (!command.compare("NICK"))
 		nickCmd(parsed);
-	else if(!command.compare("QUIT"))
+	else if (!command.compare("QUIT"))
 		quitCmd(params);
-	else if(!parsed[0].compare("PRIVMSG"))
+	else if (!parsed[0].compare("PRIVMSG"))
 		privmsgCmd(params);
-	else if(!parsed[0].compare("PART"))
+	else if (!parsed[0].compare("PART"))
 		partCmd(params);
-	else if(!parsed[0].compare("LIST"))
+	else if (!parsed[0].compare("LIST"))
 		listCmd(params);
-	else if(!parsed[0].compare("WHO"))
+	else if (!parsed[0].compare("WHO"))
 		whoCmd(params);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
 {
-	if ((!parsed[0].compare("PASS") && parsed.size() < 2) || (parsed[0].compare("PASS"))){
-		std::cout<< "User sent no pass" << std::endl;
+	if ((!parsed[0].compare("PASS") && parsed.size() < 2) || (parsed[0].compare("PASS")))
+	{
+		std::cout << "User sent no pass" << std::endl;
 		responder(ERR_NEEDMOREPARAMS, connected_fd);
 		// abort_connection(connected_fd);
 		close(connected_fd);
 		readfds.erase(connected_fd);
 		return (1);
 	}
-	if(parsed[1].compare(":" + this->_password) && parsed[1].compare(this->_password))
+	if (parsed[1].compare(":" + this->_password) && parsed[1].compare(this->_password))
 	{
-		std::cout<< "User sent wrong pass" << std::endl;
+		std::cout << "User sent wrong pass" << std::endl;
 		responder(ERR_PASSWDMISMATCH, connected_fd);
 		bzero(buff, sizeof(buff));
 		// abort_connection(connected_fd);
@@ -92,18 +94,21 @@ int IRC::passCmd(std::vector<std::string> parsed)
 int IRC::nickCmd(std::vector<std::string> parsed)
 {
 
-	std::cout<< "USER SENT NICK" << std::endl;
-	if(parsed.size() < 2){
+	std::cout << "USER SENT NICK" << std::endl;
+	if (parsed.size() < 2)
+	{
 		responder(ERR_NONICKNAMEGIVEN, *current_user);
 		return 1;
 	}
-	if(parsed[1].size() > 9){
+	if (parsed[1].size() > 9)
+	{
 		responder(ERR_ERRONEUSNICKNAME, *current_user);
 		return 1;
 	}
-	for(std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
+	for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 	{
-		if(!parsed[1].compare(it.operator*().second.get_nick())) {
+		if (!parsed[1].compare(it.operator*().second.get_nick()))
+		{
 			responder(ERR_NICKNAMEINUSE, *current_user);
 			return 1;
 		}
@@ -114,8 +119,9 @@ int IRC::nickCmd(std::vector<std::string> parsed)
 
 int IRC::userCmd(std::vector<std::string> parsed)
 {
-	std::cout<< "USER SENT USER" << std::endl;
-	if(parsed.size() < 2){
+	std::cout << "USER SENT USER" << std::endl;
+	if (parsed.size() < 2)
+	{
 		responder(ERR_NEEDMOREPARAMS, *current_user);
 		return 1;
 	}
@@ -128,10 +134,13 @@ int IRC::pongCmd(std::string raw)
 	std::vector<std::string> parsed = splitter(raw, ' ');
 	std::string message("PONG ");
 
-	if (parsed.size() == 2) {
+	if (parsed.size() == 2)
+	{
 		message.append(parsed[1] + " ");
 		message.append(parsed[0] + "\n");
-	} else {
+	}
+	else
+	{
 		message.append(raw);
 	}
 	responder(message, *current_user);
@@ -140,12 +149,12 @@ int IRC::pongCmd(std::string raw)
 
 int IRC::joinCmd(std::string raw)
 {
-	std::vector<std::string> 	params = splitter(raw, ' ');
-	std::vector<std::string> 	channels;
-	std::vector<std::string> 	keys;
-	Channel* 					current_channel;
+	std::vector<std::string> params = splitter(raw, ' ');
+	std::vector<std::string> channels;
+	std::vector<std::string> keys;
+	Channel *current_channel;
 
-	if(!params.size())
+	if (!params.size())
 	{
 		responder(ERR_NEEDMOREPARAMS, *current_user);
 		return 1;
@@ -155,22 +164,26 @@ int IRC::joinCmd(std::string raw)
 	channels = splitter(params[0], ',');
 	if (params.size() > 1)
 		keys = splitter(params[1], ',');
-	for (int i = 0; i < channels.size(); i++) {
-		if (channels[i][0] != '#') {
+	for (int i = 0; i < channels.size(); i++)
+	{
+		if (channels[i][0] != '#')
+		{
 			responder(ERR_NOSUCHCHANNEL, *current_user);
 			continue;
 		}
 		current_channel = &get_channel(channels[i]);
-		if (i < keys.size()) {
+		if (i < keys.size())
+		{
 			current_channel->userJoin(*current_user, keys[i]);
 			topicCmd(*current_channel);
 			namesCmd(*current_channel);
-		} else {
+		}
+		else
+		{
 			current_channel->userJoin(*current_user);
 			topicCmd(*current_channel);
 			namesCmd(*current_channel);
 		}
-		
 	}
 	return 0;
 }
@@ -178,24 +191,26 @@ int IRC::joinCmd(std::string raw)
 int IRC::quitCmd(std::string raw)
 {
 	std::vector<std::string> params = splitter(raw, ' ');
-	if(!params.size())
+	if (!params.size())
 		responder(current_user->get_nick(), *current_user);
-	else if(current_user) // is current_user == NULL check added. SEG. FAULT in case of CTRL-C from client(user) 
+	else if (current_user) // is current_user == NULL check added. SEG. FAULT in case of CTRL-C from client(user)
 		responder(params[0], *current_user);
-	else{
+	else
+	{
 		std::cout << "connection closed from client side" << std::endl;
 		exit(0);
 	}
 	if (params.size() < 2)
 		params.push_back("");
-	for(std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+	for (std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 	{
 		it.operator*().second->userLeft(*current_user);
 	}
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
 	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
-	for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++) {
+	for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
+	{
 		std::string tmp = ":" + current_user->get_identifier() + " QUIT :" + params[1] + "\n";
 		responder(tmp, (*it).second.get_id());
 	}
@@ -208,23 +223,22 @@ int IRC::privmsgCmd(std::string raw)
 	std::vector<std::string> receivers;
 	std::string priv_message;
 
-
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
 	splitted.erase(splitted.begin());
-	for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
+	for (std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
 	{
 		priv_message.append(*it.base());
-		if(it != (splitted.end() - 1))
+		if (it != (splitted.end() - 1))
 			priv_message.append(" ");
 	}
 
-	std::map<std::string, Channel*>::iterator res;
+	std::map<std::string, Channel *>::iterator res;
 	bool found = false;
 
-	for(std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
+	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
 	{
-		if((*it)[0] == '#')
+		if ((*it)[0] == '#')
 		{
 			res = CHANNEL_MAP.find((*it));
 			if (res != CHANNEL_MAP.end())
@@ -240,9 +254,9 @@ int IRC::privmsgCmd(std::string raw)
 		else
 		{
 			found = false;
-			for(std::map<size_t, User>::iterator ite = USER_MAP.begin(); ite != USER_MAP.end(); ite++)
+			for (std::map<size_t, User>::iterator ite = USER_MAP.begin(); ite != USER_MAP.end(); ite++)
 			{
-				if(!(*ite).second.get_nick().compare((*it)))
+				if (!(*ite).second.get_nick().compare((*it)))
 				{
 					std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
 					responder(tmp, (*ite).second);
@@ -250,7 +264,7 @@ int IRC::privmsgCmd(std::string raw)
 					break;
 				}
 			}
-			if(!found)
+			if (!found)
 				responder(ERR_NOSUCHNICK, *current_user);
 		}
 	}
@@ -267,13 +281,12 @@ int IRC::partCmd(std::string raw)
 	receivers = splitter(splitted[0], ',');
 	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
 
-
-	std::map<std::string, Channel*>::iterator res;
+	std::map<std::string, Channel *>::iterator res;
 	bool found = false;
 
-	for(std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
+	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
 	{
-		if((*it)[0] == '#')
+		if ((*it)[0] == '#')
 		{
 			res = CHANNEL_MAP.find((*it));
 			if (res != CHANNEL_MAP.end())
@@ -299,13 +312,13 @@ int IRC::listCmd(std::string raw)
 	msg.append(" " + current_user->get_nick() + " Channel :Users Name");
 	responder(msg, *current_user);
 	/*send actual list*/
-	for (std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+	for (std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 	{
-		if(!(*it).second->getModes().secret)
+		if (!(*it).second->getModes().secret)
 		{
 			msg.clear();
 			msg = RPL_LIST;
-			msg.append( " " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :" + (*it).second->get_modes_str() + " " + (*it).second->get_topic());
+			msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :" + (*it).second->get_modes_str() + " " + (*it).second->get_topic());
 			responder(msg, *current_user);
 		}
 	}
@@ -316,7 +329,6 @@ int IRC::listCmd(std::string raw)
 	responder(msg, *current_user);
 	return 0;
 }
-
 
 /*4.2.3.1 Channel modes
 
@@ -392,66 +404,85 @@ int IRC::modeCmd(std::string raw)
 {
 	std::vector<std::string> params;
 	params = splitter(raw, ' ');
-	if(params.size() > 1)
+	if (params.size() > 1)
 	{
-		if(params[0].compare(params[0].size(), 1, "#")) //channel mode
+		if (params[0].compare(params[0].size(), 1, "#")) //channel mode
 		{
-			std::map<std::string, Channel*>::iterator found;
-			if((found = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
+			std::map<std::string, Channel *>::iterator found;
+			if ((found = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
 			{
-				if(params[1][0] == '+')
+				if (params[1][0] == '+')
 				{
-					for(int i = 1; i < params[1].size(); i++)
+					for (int i = 1; i < params[1].size(); i++)
 					{
-						if(params[1][i] == 'o')
-							(*found).second->setNoOpTopic();
-						else if(params[1][i] == 'p')
+						if(params[1][i] == 'o') {
+							if (params.size() > 2)
+								(*found).second->setOp(true, params[2]);
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'p')
 							(*found).second->setPrivate();
-						else if(params[1][i] == 's')
+						else if (params[1][i] == 's')
 							(*found).second->setSecret();
-						else if(params[1][i] == 'i')
+						else if (params[1][i] == 'i')
 							(*found).second->setInviteOnly();
-						else if(params[1][i] == 't')
-							(*found).second->setTopic(params[2]);
-						else if(params[1][i] == 'n')
+						else if (params[1][i] == 't')
+							(*found).second->setNoOpTopic();
+						else if (params[1][i] == 'n')
 							(*found).second->setNoExternalMessages();
-						else if(params[1][i] == 'm')
+						else if (params[1][i] == 'm')
 							(*found).second->setModerated();
-						else if(params[1][i] == 'l')
-							(*found).second->setUserLimit();
-						else if(params[1][i] == 'b')
-							(*found).second->setBanMask(params[2]);
-						else if(params[1][i] == 'v' && (*found).second->getModes().moderate == true)
-							(*found).second->setSpeak();
-						else if(params[1][i] == 'k')
+						else if (params[1][i] == 'l')
+						{
+							if (params.size() > 2)
+								(*found).second->setUserLimit(true, atoi(params[2].c_str()));
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'b')
+						{
+							if (params.size() > 2)
+								(*found).second->setBanMask(params[2]);
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'v')
+						{
+							if (params.size() > 2)
+								(*found).second->setSpeak(true, params[2]);
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'k')
 							(*found).second->setKey();
 					}
 				}
-				else if(params[1][0] == '-')
+				else if (params[1][0] == '-')
 				{
-					for(int i = 1; i < params[1].size(); i++)
+					for (int i = 1; i < params[1].size(); i++)
 					{
-						if(params[1][i] == 'o')
+						if (params[1][i] == 'o')
 							(*found).second->setNoOpTopic(false);
-						else if(params[1][i] == 'p')
+						else if (params[1][i] == 'p')
 							(*found).second->setPrivate(false);
-						else if(params[1][i] == 's')
+						else if (params[1][i] == 's')
 							(*found).second->setSecret(false);
-						else if(params[1][i] == 'i')
+						else if (params[1][i] == 'i')
 							(*found).second->setInviteOnly(false);
-						else if(params[1][i] == 't')
+						else if (params[1][i] == 't')
 							(*found).second->setTopic(params[2]);
-						else if(params[1][i] == 'n')
+						else if (params[1][i] == 'n')
 							(*found).second->setNoExternalMessages(false);
-						else if(params[1][i] == 'm')
+						else if (params[1][i] == 'm')
 							(*found).second->setModerated(false);
-						else if(params[1][i] == 'l')
+						else if (params[1][i] == 'l')
 							(*found).second->setUserLimit(false);
-						else if(params[1][i] == 'b')
+						else if (params[1][i] == 'b')
 							(*found).second->setBanMask(params[2]);
-						else if(params[1][i] == 'v' && (*found).second->getModes().moderate == true)
+						else if (params[1][i] == 'v' && (*found).second->getModes().moderate == true)
 							(*found).second->setSpeak(false);
-						else if(params[1][i] == 'k')
+						else if (params[1][i] == 'k')
 							(*found).second->setKey(false);
 					}
 				}
@@ -459,10 +490,14 @@ int IRC::modeCmd(std::string raw)
 		}
 		else //user mode
 		{
-			
 		}
 	}
-	//error ERR_NEEDMOREPARAMS 
+	else
+	{
+		std::string resp = "0.0.0.falso " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " +";
+		responder();
+	}
+	//error ERR_NEEDMOREPARAMS
 	return 1;
 }
 
@@ -510,7 +545,8 @@ RFC 1459              Internet Relay Chat Protocol              May 1993
 int IRC::topicCmd(Channel curr_channel)
 {
 	std::string msg;
-	if(curr_channel.get_topic().size()) {
+	if (curr_channel.get_topic().size())
+	{
 		msg.append(":e3r10p7.42roma.it "); //da cambiare con IP
 		msg.append(RPL_TOPIC);
 		msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :" + curr_channel.get_topic());
@@ -530,13 +566,12 @@ int IRC::namesCmd(Channel curr_channel)
 {
 	std::string msg;
 	std::vector<size_t> whoInTheChann = curr_channel.get_users_ids();
-	for(int i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
+	for (int i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
 	{
 		msg.append(":e3r10p7.42roma.it "); //da cambiare con IP
 		msg.append(RPL_NAMREPLY);
 		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
-		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" \
-		+ (*found).second.get_nick());
+		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" + (*found).second.get_nick());
 		responder(msg, *current_user);
 		msg.clear();
 	}
@@ -549,27 +584,24 @@ int IRC::namesCmd(Channel curr_channel)
 	return 0;
 }
 
-
 int IRC::whoCmd(std::string raw)
 {
-	if(raw.size())
+	if (raw.size())
 	{
-		if(raw[0] == '#')
+		if (raw[0] == '#')
 		{
-			for(std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+			for (std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 			{
-				if(!(*it).first.compare(raw))
+				if (!(*it).first.compare(raw))
 				{
 					std::string msg;
 					std::vector<size_t> whoInTheChann = (*it).second->get_users_ids();
-					for(int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
+					for (int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
 					{
 						msg.append(":e3r10p7.42roma.it ");
 						msg.append(RPL_WHOREPLY);
 						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
-						msg.append(" " + current_user->get_nick() + " " + (*it).first + " " \
-						+ (*found).second.get_username() + " " + (*found).second.get_ip_str()\
-						+ " " + (*found).second.get_nick() + " H :0" + (*found).second.get_realname());
+						msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*found).second.get_username() + " " + (*found).second.get_ip_str() + " " + (*found).second.get_nick() + " H :0" + (*found).second.get_realname());
 						responder(msg, *current_user);
 						msg.clear();
 					}
@@ -592,4 +624,3 @@ int IRC::whoCmd(std::string raw)
 }
 
 #endif /*COMMAND_HPP*/
-
