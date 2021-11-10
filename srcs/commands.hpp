@@ -494,8 +494,8 @@ int IRC::modeCmd(std::string raw)
 	}
 	else
 	{
-		std::string resp = "0.0.0.falso " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " +";
-		responder();
+		std::string resp = "0.0.0.falso " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " " + current_user->get_user_modes());
+		responder(resp, *current_user);
 	}
 	//error ERR_NEEDMOREPARAMS
 	return 1;

@@ -14,8 +14,6 @@ typedef struct s_state{
 	bool nick;
 	bool user;
 	bool invisible;
-	bool server_notices;
-	bool wallops; //non lo implementiamo
 	bool op;
 	
 }				t_state;
@@ -47,6 +45,7 @@ class User
 		std::string get_full_address() const;
 		std::string get_identifier() const;
 		std::string get_ip_str();
+		std::string get_user_modes();
 		size_t		get_user_nb();
 		size_t 		get_id() const;
 		std::string get_altnick() const;
@@ -83,6 +82,16 @@ std::string User::get_altnick() const
 
 std::string User::get_username() const{
 	return _username;
+}
+
+std::string User::get_user_modes() {
+
+	std::string res = "+";
+	if(_state.op)
+		res.append("o");
+	if(_state.invisible)
+		res.append("i");
+	return(res);
 }
 
 std::string User::get_ip_str() {
