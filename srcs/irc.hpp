@@ -238,11 +238,7 @@ void IRC::parse(std::string raw)
 	if (!(parsed.size()))
 		return;
 	for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
-	{
 		std::cout << *it << " " << std::endl;
-		//for(int i = 0; (*it).c_str()[i] != 0; i ++)
-		//	std::cout << (int)(*it).c_str()[i] << std::endl;
-	}
 	if(initializer(parsed))
 		return;
 	commandSelector(raw);
