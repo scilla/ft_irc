@@ -63,6 +63,7 @@ class Channel
 		void setUserLimit(bool, size_t);
 		void setKey(bool, std::string);
 		void setBanMask(std::string);
+		void set_topic(std::string);
 		std::string	get_user_nb();
 		std::string get_modes_str();
 		std::string get_topic();
@@ -91,6 +92,11 @@ std::string		Channel::get_user_nb()
 std::string Channel::get_name()
 {
 	return(_name);
+}
+
+void Channel::set_topic(std::string topic)
+{
+	_topic = topic;
 }
 
 

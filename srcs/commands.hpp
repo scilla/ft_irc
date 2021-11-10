@@ -323,7 +323,7 @@ int IRC::topicCmd(std::string raw)
 		{
 			if(!channel_name.compare((*it).first))
 			{
-				(*it).second->set_topic(topic)
+				(*it).second->set_topic(topic);
 				//respond topic is set;
 				break;
 			}
@@ -341,6 +341,7 @@ int IRC::topicCmd(std::string raw)
 			else
 			{
 				//respond no topic is set
+				break;
 			}
 		}
 	}
