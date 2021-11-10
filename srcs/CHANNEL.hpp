@@ -17,6 +17,7 @@ typedef struct s_channel_modes {
 	bool moderate;
 	bool has_limit;
 	bool has_key;
+	bool speak;
 } t_channel_modes;
 
 typedef struct s_user_status {
@@ -57,8 +58,10 @@ class Channel
 		void setNoOpTopic(bool);
 		void setNoExternalMessages(bool);
 		void setModerated(bool);
+		void setSpeak(bool);
 		void setUserLimit(bool, size_t);
 		void setKey(bool, std::string);
+		void setBanMask(std::string);
 		std::string	get_user_nb();
 		std::string get_modes_str();
 		std::string get_topic();
@@ -195,9 +198,6 @@ void Channel::userLeft(User& user) {
 	}
 }
 
-
-
-
 void Channel::userBan(User& user) {
 
 }
@@ -214,12 +214,20 @@ t_channel_modes Channel::getModes() const {
 	return modes;
 }
 
+void Channel::setBanMask(std::string banMask) {
+	ban_masks.push_back(banMask);
+}
+
 void Channel::setModes(t_channel_modes new_modes) {
 	modes = new_modes;
 }
 
 void Channel::setPrivate(bool b = true) {
 	modes.priv = b;
+}
+
+void Channel::setSpeak(bool b = true) {
+	modes.speak = b;
 }
 
 void Channel::setSecret(bool b = true) {

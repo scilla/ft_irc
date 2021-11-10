@@ -13,6 +13,11 @@ typedef struct s_state{
 	bool pass;
 	bool nick;
 	bool user;
+	bool invisible;
+	bool server_notices;
+	bool wallops; //non lo implementiamo
+	bool op;
+	
 }				t_state;
 
 
@@ -53,7 +58,7 @@ class User
 		t_state					_state;
 };
 
-User::User(size_t id, std::string host, std::string domain) : _id(id), _state((t_state){true, false, false}), _host(host), _domain(domain)
+User::User(size_t id, std::string host, std::string domain) : _id(id), _state((t_state){true, false, false, false, false, false, false}), _host(host), _domain(domain)
 {
 	std::cout << "New user created, fd: " << id << std::endl;
 }

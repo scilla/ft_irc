@@ -397,15 +397,70 @@ int IRC::modeCmd(std::string raw)
 	{
 		if(params[0].compare(params[0].size(), 1, "#")) //channel mode
 		{
-			std::map<std::string, Channel*>::iterator res;
-			if((res = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
+			std::map<std::string, Channel*>::iterator found;
+			if((found = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
 			{
-
+				if(params[1][0] == '+')
+				{
+					for(int i = 1; i < params[1].size(); i++)
+					{
+						if(params[1][i] == 'o')
+							(*found).second->setNoOpTopic();
+						else if(params[1][i] == 'p')
+							(*found).second->setPrivate();
+						else if(params[1][i] == 's')
+							(*found).second->setSecret();
+						else if(params[1][i] == 'i')
+							(*found).second->setInviteOnly();
+						else if(params[1][i] == 't')
+							(*found).second->setTopic(params[2]);
+						else if(params[1][i] == 'n')
+							(*found).second->setNoExternalMessages();
+						else if(params[1][i] == 'm')
+							(*found).second->setModerated();
+						else if(params[1][i] == 'l')
+							(*found).second->setUserLimit();
+						else if(params[1][i] == 'b')
+							(*found).second->setBanMask(params[2]);
+						else if(params[1][i] == 'v' && (*found).second->getModes().moderate == true)
+							(*found).second->setSpeak();
+						else if(params[1][i] == 'k')
+							(*found).second->setKey();
+					}
+				}
+				else if(params[1][0] == '-')
+				{
+					for(int i = 1; i < params[1].size(); i++)
+					{
+						if(params[1][i] == 'o')
+							(*found).second->setNoOpTopic(false);
+						else if(params[1][i] == 'p')
+							(*found).second->setPrivate(false);
+						else if(params[1][i] == 's')
+							(*found).second->setSecret(false);
+						else if(params[1][i] == 'i')
+							(*found).second->setInviteOnly(false);
+						else if(params[1][i] == 't')
+							(*found).second->setTopic(params[2]);
+						else if(params[1][i] == 'n')
+							(*found).second->setNoExternalMessages(false);
+						else if(params[1][i] == 'm')
+							(*found).second->setModerated(false);
+						else if(params[1][i] == 'l')
+							(*found).second->setUserLimit(false);
+						else if(params[1][i] == 'b')
+							(*found).second->setBanMask(params[2]);
+						else if(params[1][i] == 'v' && (*found).second->getModes().moderate == true)
+							(*found).second->setSpeak(false);
+						else if(params[1][i] == 'k')
+							(*found).second->setKey(false);
+					}
+				}
 			}
 		}
 		else //user mode
 		{
-
+			
 		}
 	}
 	//error ERR_NEEDMOREPARAMS 
