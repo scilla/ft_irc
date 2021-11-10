@@ -57,4 +57,6 @@
 #define RPL_ENDOFNAME			"366"
 #define RPL_WHOREPLY			"352"
 #define RPL_ENDOFWHO			"315"
+#define RPL_NOTOPIC				"331"
+#define RPL_TOPIC				"332"
 

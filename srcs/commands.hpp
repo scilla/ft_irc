@@ -163,9 +163,11 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size()) {
 			current_channel->userJoin(*current_user, keys[i]);
+			topicCmd(*current_channel);
 			namesCmd(*current_channel);
 		} else {
 			current_channel->userJoin(*current_user);
+			topicCmd(*current_channel);
 			namesCmd(*current_channel);
 		}
 		
@@ -447,13 +449,32 @@ RFC 1459              Internet Relay Chat Protocol              May 1993
                                    "jto*" if they are an operator.
 */
 
+int IRC::topicCmd(Channel curr_channel)
+{
+	std::string msg;
+	if(curr_channel.get_topic().size()) {
+		msg.append(":e3r10p7.42roma.it "); //da cambiare con IP
+		msg.append(RPL_TOPIC);
+		msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :" + curr_channel.get_topic());
+		responder(msg, *current_user);
+	}
+	else
+	{
+		msg.append(":e3r10p7.42roma.it "); //da cambiare con IP
+		msg.append(RPL_NOTOPIC);
+		msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :No topic is set");
+		responder(msg, *current_user);
+	}
+	return 0;
+}
+
 int IRC::namesCmd(Channel curr_channel)
 {
 	std::string msg;
 	std::vector<size_t> whoInTheChann = curr_channel.get_users_ids();
 	for(int i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
 	{
-		msg.append(":e3r10p7.42roma.it ");
+		msg.append(":e3r10p7.42roma.it "); //da cambiare con IP
 		msg.append(RPL_NAMREPLY);
 		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" \
@@ -468,6 +489,7 @@ int IRC::namesCmd(Channel curr_channel)
 	msg.append(RPL_ENDOFNAME);
 	msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :End of NAMES list");
 	responder(msg, *current_user);
+	return 0;
 }
 
 
