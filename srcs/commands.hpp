@@ -178,7 +178,7 @@ int IRC::quitCmd(std::string raw)
 	std::vector<std::string> params = splitter(raw, ' ');
 	if(!params.size())
 		responder(current_user->get_nick(), *current_user);
-	else
+	else if(current_user)
 		responder(params[0], *current_user);
 	if (params.size() < 2)
 		params.push_back("");
@@ -488,7 +488,8 @@ int IRC::namesCmd(Channel curr_channel)
 	std::vector<size_t> whoInTheChann = curr_channel.get_users_ids();
 	for(int i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
 	{
-		msg.append(":0.0.0.falso ");
+		msg.append(current_user->get_remote_ip() + " ");
+		// msg.append(":0.0.0.falso ");
 		msg.append(RPL_NAMREPLY);
 		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" \
@@ -499,7 +500,8 @@ int IRC::namesCmd(Channel curr_channel)
 	}
 	/*send endNamelist*/
 	msg.clear();
-	msg.append(":0.0.0.falso");
+	// msg.append(":0.0.0.falso");
+	msg.append(current_user->get_remote_ip() + " ");
 	msg.append(RPL_ENDOFNAME);
 	msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :End of NAMES list");
 	responder(msg, *current_user);
@@ -521,7 +523,8 @@ int IRC::whoCmd(std::string raw)
 					std::vector<size_t> whoInTheChann = (*it).second->get_users_ids();
 					for(int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
 					{
-						msg.append(":0.0.0.falso ");
+						// msg.append(":0.0.0.falso ");
+						msg.append(current_user->get_remote_ip() + " ");
 						msg.append(RPL_WHOREPLY);
 						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 						if(!(*found).second._state.invisible && current_user->get_id() != (*found).first)
@@ -535,7 +538,8 @@ int IRC::whoCmd(std::string raw)
 					}
 					/*send endlist*/
 					msg.clear();
-					msg.append(":0.0.0.falso ");
+					// msg.append(":0.0.0.falso ");
+					msg.append(current_user->get_remote_ip() + " ");
 					msg.append(RPL_ENDOFWHO);
 					msg.append(" " + current_user->get_nick() + " " + (*it).first + " :End of WHO list");
 					responder(msg, *current_user);
