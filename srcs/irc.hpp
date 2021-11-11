@@ -157,6 +157,17 @@ User* IRC::get_user(int fd) {
 	return(NULL);
 }
 
+User* IRC::get_user(std::string nickname) {
+	std::map<size_t, User>::iterator found = USER_MAP.begin();
+
+	for (; found != USER_MAP.end(); found++)
+		if (found->second.get_nick() == nickname)
+			break;
+	if(found != USER_MAP.end())
+		return(&found->second);
+	return(NULL);
+}
+
 void	IRC::check_connection(void){
 	if(!buff[0])
 	{
