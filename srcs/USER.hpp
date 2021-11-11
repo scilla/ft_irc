@@ -33,6 +33,7 @@ class User
 		int						_last_activity;
 		std::string				_host;
 		std::string				_domain;
+		std::string				_remote_ip;
 	public:
 		User(size_t, std::string, std::string);
 		~User();
@@ -46,6 +47,7 @@ class User
 		std::string get_identifier() const;
 		std::string get_ip_str();
 		std::string get_user_modes();
+		std::string get_remote_ip();
 		size_t		get_user_nb();
 		size_t 		get_id() const;
 		std::string get_altnick() const;
@@ -53,6 +55,7 @@ class User
 		void set_username(std::string nick);
 		void set_host(std::string host);
 		void set_domain(std::string domain);
+		void set_remote_ip(std::string ip);
 		int						get_roles;
 		t_state					_state;
 };
@@ -101,6 +104,10 @@ std::string User::get_ip_str() {
 	return str;
 }
 
+std::string User::get_remote_ip() {
+	return this->_remote_ip;
+}
+
 size_t User::get_id() const { return _id; }
 
 void User::set_nick(std::string nick)
@@ -121,6 +128,10 @@ void User::set_host(std::string new_host) {
 
 void User::set_domain(std::string new_domain) {
 	_domain = new_domain;
+}
+
+void User::set_remote_ip(std::string ip) {
+	_remote_ip = ip;
 }
 
 std::string User::get_host() const
