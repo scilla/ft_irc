@@ -13,10 +13,10 @@ int IRC::initializer(std::vector<std::string> parsed)
 	if (!current_user) {
 		if(passCmd(parsed))
 			return 1;
-		inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN );
 		str_vect = splitter(str, '.');
 		res = USER_MAP.insert(std::pair<size_t, User>(connected_fd, User(connected_fd, str_vect[0] + "." + str_vect[1] + "." + str_vect[2], str_vect[3])));
 		current_user = &res.first.operator*().second;
+		current_user->set_remote_ip(inet_ntoa(remote.sin_addr));
 		return 1;
 	}
 	if(!current_user->_state.nick)
@@ -152,8 +152,6 @@ int IRC::joinCmd(std::string raw)
 		responder(ERR_NEEDMOREPARAMS, *current_user);
 		return 1;
 	}
-	std::cout << raw << " RAW" << std::endl;
-	std::cout << params[0] << " PARAMS" << std::endl;
 	channels = splitter(params[0], ',');
 	if (params.size() > 1)
 		keys = splitter(params[1], ',');
@@ -635,7 +633,7 @@ int IRC::whoCmd(std::string raw)
 						if(!(*found).second._state.invisible && current_user->get_id() != (*found).first)
 						{
 							msg.append(" " + current_user->get_nick() + " " + (*it).first + " " \
-							+ (*found).second.get_username() + " " + (*found).second.get_ip_str()\
+							+ (*found).second.get_username() + " " + (*found).second.get_remote_ip()\
 							+ " " + (*found).second.get_nick() + " H :0" + (*found).second.get_realname());
 							responder(msg, *current_user);
 						}

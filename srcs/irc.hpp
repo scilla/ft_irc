@@ -177,7 +177,7 @@ void	IRC::check_connection(void){
 void IRC::user_logged()
 {
 	char str[100];
-	current_user->set_remote_ip(inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
+	// current_user->set_remote_ip(inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
 	std::string message(RPL_WELCOME);
 	message.append(" ");
 	message.append(current_user->get_nick());
@@ -273,7 +273,6 @@ std::string IRC::receiver()
 	std::string messageFromClient(buff);
 	if (current_user)
 		print_prompt(1, current_user->get_remote_ip(), messageFromClient);
-
 	return(messageFromClient);
 }
 
