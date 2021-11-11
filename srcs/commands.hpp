@@ -338,8 +338,9 @@ int IRC::topicCmd(std::string raw)
 		{
 			if (!channel_name.compare((*it).first))
 			{
-				(*it).second->set_topic(topic);
-				// respond topic is set;
+				(*it).second->set_topic(topic.substr(1, topic.size()));
+				std::string msg = ":" + current_user->get_identifier() + " TOPIC " + (*it).first + " :" + (*it).second->get_topic();
+				responder(msg, *current_user);
 				break;
 			}
 		}
@@ -353,7 +354,7 @@ int IRC::topicCmd(std::string raw)
 				std::vector<size_t> tmp = (*it).second->get_users_ids();
 				for (std::vector<size_t>::iterator ite = tmp.begin(); ite != tmp.end(); ite++) // search the user in the channel
 				{
-					std::string msg = current_user->get_identifier() + " ";
+					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " ";  
 					if (*ite.base() == current_user->get_id() && (*it).second->get_topic().size()) // user in the channel found and topic is set
 					{
 						msg.append(RPL_TOPIC);
@@ -361,7 +362,7 @@ int IRC::topicCmd(std::string raw)
 						responder(msg, *current_user);
 						return 0;
 					}
-					else if (*ite.base() != current_user->get_id() && (*it).second->get_topic().size()) // user found but no topic is set
+					else if (*ite.base() == current_user->get_id() && !(*it).second->get_topic().size()) // user found but no topic is set
 					{
 						msg.clear();
 						msg.append(RPL_NOTOPIC);
@@ -652,7 +653,6 @@ int IRC::whoCmd(std::string raw)
 					}
 					/*send endlist*/
 					msg.clear();
-					// msg.append(":0.0.0.falso ");
 					msg.append(":" + current_user->get_remote_ip() + " ");
 					msg.append(RPL_ENDOFWHO);
 					msg.append(" " + current_user->get_nick() + " " + (*it).first + " :End of WHO list");
