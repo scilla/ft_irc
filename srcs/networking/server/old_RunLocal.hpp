@@ -38,7 +38,7 @@ void RunLocal::accepter(){
 }
 
 void RunLocal::handler(){
-	std::cout<< buff << std::endl;
+	// std::cout<< buff << std::endl;
 }
 
 void RunLocal::responder(){

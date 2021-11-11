@@ -33,6 +33,7 @@ int IRC::initializer(std::vector<std::string> parsed)
 		if (!current_user->_state.nick || !current_user->_state.user)
 			return 1;
 		user_logged();
+		return 2;
 	}
 	return 0;
 }

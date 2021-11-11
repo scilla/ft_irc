@@ -137,14 +137,14 @@ Channel& IRC::get_channel(std::string channel_name) {
 }
 
 bool IRC::check_psw(std::string psw) {
-	for (int i = 0; i < psw.length(); i++) {
-		printf("%d ", psw[i]);
-	}
+	// for (int i = 0; i < psw.length(); i++) {
+	// 	printf("%d ", psw[i]);
+	// }
 	std::cout << "\nsent: " << psw << "|\npass: " << _password << "|" << std::endl;
-	for (int i = 0; i < _password.length(); i++) {
-		printf("%d ", _password[i]);
-	}
-	printf("\n");
+	// for (int i = 0; i < _password.length(); i++) {
+	// 	printf("%d ", _password[i]);
+	// }
+	// printf("\n");
 	return ((psw == _password) ? true : false);
 }
 
@@ -246,11 +246,13 @@ void IRC::parse(std::string raw)
 	parsed = splitter(raw, ' ');
 	if (!(parsed.size()))
 		return;
-	for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
-		std::cout << *it << " " << std::endl;
-	if(initializer(parsed))
+	// for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
+	// 	std::cout << *it << " " << std::endl;
+	int res;
+	if((res = initializer(parsed)) == 1)
 		return;
-	commandSelector(raw);
+	if (!res)
+		commandSelector(raw);
 }
 
 
