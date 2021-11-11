@@ -314,14 +314,14 @@ int IRC::listCmd(std::string raw)
 		if (!(*it).second->getModes().secret)
 		{
 			msg.clear();
-			msg = RPL_LIST;
+			msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_LIST));
 			msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :" + (*it).second->get_modes_str() + " " + (*it).second->get_topic());
 			responder(msg, *current_user);
 		}
 	}
 	/*end list message*/
 	msg.clear();
-	msg = RPL_LISTEND;
+	msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_LIST));
 	msg.append(" " + current_user->get_nick() + " :End of /LIST");
 	responder(msg, *current_user);
 	return 0;
