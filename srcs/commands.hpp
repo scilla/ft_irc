@@ -187,7 +187,7 @@ int IRC::quitCmd(std::string raw)
 	for(std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
 	{
 		it.operator*().second->userLeft(*current_user);
-	}
+	} 
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
 	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
@@ -542,7 +542,7 @@ int IRC::modeCmd(std::string raw)
 	else
 	{
 		std::string resp = "0.0.0.falso " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " +";
-		responder();
+		//responder();
 	}
 	//error ERR_NEEDMOREPARAMS
 	return 1;

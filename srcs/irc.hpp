@@ -45,7 +45,7 @@ class IRC: public Server
 		Channel&				get_channel(std::string channelname);
 
 		void					launch();
-		void					check_connection(int disconnected_fd);
+		void					check_connection(void);
 		int						initializer(std::vector<std::string> parsed);
 		void					commandSelector(std::string parsed);
 
@@ -157,12 +157,21 @@ User* IRC::get_user(int fd) {
 	return(NULL);
 }
 
-void	IRC::check_connection(int disconnected_fd){
+void	IRC::check_connection(void){
 	if(!buff[0])
 	{
-		quitCmd("");
-		return ;
+		for(std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
+		{
+			if(connected_fd == (*it).second.get_id())
+			{
+				quitCmd("");
+				return;
+			}
+		}
+		close(connected_fd);
+		readfds.erase(connected_fd);
 	}
+	return;
 }
 
 void IRC::user_logged()
@@ -260,7 +269,7 @@ void IRC::handler(int connected_fd) {
 std::string IRC::receiver()
 {
 	recv(connected_fd, buff, 500, 0);
-	check_connection(connected_fd);
+	check_connection();
 	std::string messageFromClient(buff);
 	if (current_user)
 		print_prompt(1, current_user->get_remote_ip(), messageFromClient);

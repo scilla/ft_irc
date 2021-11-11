@@ -213,6 +213,12 @@ void Channel::userOp(User& user) {
 
 }
 
+void Channel::setOp(bool, std::string)
+{
+	
+}
+
+
 void Channel::userKick(User& user) {
 
 }
