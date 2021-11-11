@@ -64,6 +64,8 @@ void	IRC::commandSelector(std::string raw)
 		listCmd(params);
 	else if(!parsed[0].compare("WHO"))
 		whoCmd(params);
+	else if(!parsed[0].compare("TOPIC"))
+		topicCmd(params);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
@@ -329,22 +331,49 @@ int IRC::topicCmd(std::string raw)
 			}
 		}
 	}
-	else //show topic
+	else if(args.size() == 1)//show topic
 	{
-		for(std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+		for(std::map<std::string, Channel*>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++) //search the channel
 		{
-			if(!channel_name.compare((*it).first))
+			if(!channel_name.compare((*it).first)) //find the channel
 			{
-				//respond channel topic if theres one;
-				break;
-			}
-			else
-			{
-				//respond no topic is set
-				break;
+				std::vector<size_t> tmp = (*it).second->get_users_ids();
+				for(std::vector<size_t>::iterator ite = tmp.begin(); ite !=  tmp.end(); ite++) //search the user in the channel
+				{
+					std::string msg = current_user->get_identifier() + " ";
+					if(*ite.base() == current_user->get_id() && (*it).second->get_topic().size()) //user in the channel found and topic is set
+					{
+						msg.append(RPL_TOPIC);
+						msg.append(" " + channel_name + " :" + (*it).second->get_topic());
+						responder(msg, *current_user);
+						return 0;
+					}
+					else if(*ite.base() != current_user->get_id() && (*it).second->get_topic().size()) //user found but no topic is set
+					{
+						msg.clear();
+						msg.append(RPL_NOTOPIC);
+						responder(msg, *current_user);
+						return 1;
+					} 
+					else //user in the channel not found
+					{
+						msg.clear();
+						msg.append(ERR_NOTONCHANNEL);
+						responder(msg, *current_user);
+						return 1;
+					}
+				}
+				return 1;
 			}
 		}
 	}
+	else
+	{
+		std::string msg (std::string(ERR_NEEDMOREPARAMS));
+		responder(msg, *current_user);
+		return 1;
+	}
+	return 0;
 }
 
 
