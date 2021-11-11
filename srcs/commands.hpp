@@ -451,22 +451,100 @@ int IRC::modeCmd(std::string raw)
 {
 	std::vector<std::string> params;
 	params = splitter(raw, ' ');
-	if(params.size() > 1)
+	if (params.size() > 1)
 	{
-		if(params[0].compare(params[0].size(), 1, "#")) //channel mode
+		if (params[0].compare(params[0].size(), 1, "#")) //channel mode
 		{
-			std::map<std::string, Channel*>::iterator res;
-			if((res = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
+			std::map<std::string, Channel *>::iterator found;
+			if ((found = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
 			{
-
+				if (params[1][0] == '+')
+				{
+					for (int i = 1; i < params[1].size(); i++)
+					{
+						if(params[1][i] == 'o') {
+							if (params.size() > 2)
+								(*found).second->setOp(true, params[2]);
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'p')
+							(*found).second->setPrivate();
+						else if (params[1][i] == 's')
+							(*found).second->setSecret();
+						else if (params[1][i] == 'i')
+							(*found).second->setInviteOnly();
+						else if (params[1][i] == 't')
+							(*found).second->setNoOpTopic();
+						else if (params[1][i] == 'n')
+							(*found).second->setNoExternalMessages();
+						else if (params[1][i] == 'm')
+							(*found).second->setModerated();
+						else if (params[1][i] == 'l')
+						{
+							if (params.size() > 2)
+								(*found).second->setUserLimit(true, atoi(params[2].c_str()));
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'b')
+						{
+							if (params.size() > 2)
+								(*found).second->setBanMask(params[2]);
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'v')
+						{
+							if (params.size() > 2)
+								(*found).second->setSpeak(true, params[2]);
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
+						else if (params[1][i] == 'k')
+							(*found).second->setKey();
+					}
+				}
+				else if (params[1][0] == '-')
+				{
+					for (int i = 1; i < params[1].size(); i++)
+					{
+						if (params[1][i] == 'o')
+							(*found).second->setNoOpTopic(false);
+						else if (params[1][i] == 'p')
+							(*found).second->setPrivate(false);
+						else if (params[1][i] == 's')
+							(*found).second->setSecret(false);
+						else if (params[1][i] == 'i')
+							(*found).second->setInviteOnly(false);
+						else if (params[1][i] == 't')
+							(*found).second->setTopic(params[2]);
+						else if (params[1][i] == 'n')
+							(*found).second->setNoExternalMessages(false);
+						else if (params[1][i] == 'm')
+							(*found).second->setModerated(false);
+						else if (params[1][i] == 'l')
+							(*found).second->setUserLimit(false);
+						else if (params[1][i] == 'b')
+							(*found).second->setBanMask(params[2]);
+						else if (params[1][i] == 'v' && (*found).second->getModes().moderate == true)
+							(*found).second->setSpeak(false);
+						else if (params[1][i] == 'k')
+							(*found).second->setKey(false);
+					}
+				}
 			}
 		}
 		else //user mode
 		{
-
 		}
 	}
-	//error ERR_NEEDMOREPARAMS 
+	else
+	{
+		std::string resp = "0.0.0.falso " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " +";
+		responder();
+	}
+	//error ERR_NEEDMOREPARAMS
 	return 1;
 }
 
@@ -517,20 +595,18 @@ int IRC::namesCmd(Channel curr_channel)
 	std::vector<size_t> whoInTheChann = curr_channel.get_users_ids();
 	for(int i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
 	{
-		msg.append(current_user->get_remote_ip() + " ");
-		// msg.append(":0.0.0.falso ");
+		msg.append(":" + current_user->get_remote_ip() + " ");
 		msg.append(RPL_NAMREPLY);
 		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" \
-		+ (*found).second.get_username() + " " + (*found).second.get_altnick()\
-		+ " " + (*found).second.get_username());
+		+ (*found).second.get_nick());
 		responder(msg, *current_user);
 		msg.clear();
 	}
 	/*send endNamelist*/
 	msg.clear();
 	// msg.append(":0.0.0.falso");
-	msg.append(current_user->get_remote_ip() + " ");
+	msg.append(":" + current_user->get_remote_ip() + " ");
 	msg.append(RPL_ENDOFNAME);
 	msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :End of NAMES list");
 	responder(msg, *current_user);
@@ -553,7 +629,7 @@ int IRC::whoCmd(std::string raw)
 					for(int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
 					{
 						// msg.append(":0.0.0.falso ");
-						msg.append(current_user->get_remote_ip() + " ");
+						msg.append(":" + current_user->get_remote_ip() + " ");
 						msg.append(RPL_WHOREPLY);
 						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 						if(!(*found).second._state.invisible && current_user->get_id() != (*found).first)
@@ -568,7 +644,7 @@ int IRC::whoCmd(std::string raw)
 					/*send endlist*/
 					msg.clear();
 					// msg.append(":0.0.0.falso ");
-					msg.append(current_user->get_remote_ip() + " ");
+					msg.append(":" + current_user->get_remote_ip() + " ");
 					msg.append(RPL_ENDOFWHO);
 					msg.append(" " + current_user->get_nick() + " " + (*it).first + " :End of WHO list");
 					responder(msg, *current_user);
