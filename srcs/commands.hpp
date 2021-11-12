@@ -67,6 +67,8 @@ void IRC::commandSelector(std::string raw)
 		whoCmd(params);
 	else if (!parsed[0].compare("TOPIC"))
 		topicCmd(params);
+	else if (!parsed[0].compare("MODE"))
+		modeCmd(params);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
@@ -354,7 +356,7 @@ int IRC::topicCmd(std::string raw)
 				std::vector<size_t> tmp = (*it).second->get_users_ids();
 				for (std::vector<size_t>::iterator ite = tmp.begin(); ite != tmp.end(); ite++) // search the user in the channel
 				{
-					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " ";  
+					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " ";
 					if (*ite.base() == current_user->get_id() && (*it).second->get_topic().size()) // user in the channel found and topic is set
 					{
 						msg.append(RPL_TOPIC);
@@ -469,7 +471,7 @@ int IRC::modeCmd(std::string raw)
 		if (params[0].compare(params[0].size(), 1, "#")) // channel mode
 		{
 			std::map<std::string, Channel *>::iterator found;
-			if ((found = CHANNEL_MAP.find(params[0].substr(1, params[0].size()))) != CHANNEL_MAP.end()) // canale trovato
+			if ((found = CHANNEL_MAP.find(params[0])) != CHANNEL_MAP.end()) // canale trovato
 			{
 				if (params[1][0] == '+')
 				{
@@ -555,8 +557,14 @@ int IRC::modeCmd(std::string raw)
 	}
 	else
 	{
-		std::string resp = current_user->get_identifier() + " " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " +";
-		//responder();
+		std::map<std::string, Channel *>::iterator found = CHANNEL_MAP.find(params[0]);
+		Channel* ch;
+		if (found != CHANNEL_MAP.end()) // canale trovato
+		{
+			ch = found->second;    // below, should be server ip?
+			std::string resp = ":" + current_user->get_remote_ip() + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
+			responder(resp + ch->get_modes_str("", ""), *current_user);
+		}
 	}
 	// error ERR_NEEDMOREPARAMS
 	return 1;

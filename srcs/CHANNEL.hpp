@@ -1,5 +1,6 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
+#define SSTR( x ) static_cast< std::ostringstream & >( ( std::ostringstream() << std::dec << x ) ).str()
 
 #include <iostream>
 #include <list>
@@ -7,6 +8,8 @@
 #include "USER.hpp"
 #include "errors.hpp"
 #include "utils.hpp"
+#include <ctime>
+#include <stdio.h>
 
 typedef struct s_channel_modes
 {
@@ -39,6 +42,7 @@ private:
 	size_t user_limit;
 	t_channel_modes modes;
 	std::vector<std::string> ban_masks;
+	time_t creation_time;
 
 public:
 	Channel(std::string);
@@ -57,7 +61,7 @@ public:
 	void setTopic(std::string);
 	void globalUserResponder(std::string, size_t);
 
-	void setOp(bool, User*);
+	void setOp(bool, User *);
 	void setPrivate(bool);
 	void setSecret(bool);
 	void setInviteOnly(bool);
@@ -70,10 +74,11 @@ public:
 	void setBanMask(std::string);
 	void set_topic(std::string);
 	std::string get_user_nb();
-	std::string get_modes_str();
+	std::string get_modes_str(std::string, std::string);
 	std::string get_topic();
 	std::string get_name();
 	std::vector<size_t> get_users_ids();
+	std::string get_creation_time();
 };
 
 Channel::Channel(std::string channel_name)
@@ -83,6 +88,7 @@ Channel::Channel(std::string channel_name)
 	_topic = "";
 	user_limit = 0;
 	modes = (t_channel_modes){false, false, false, false, false, false, false};
+	creation_time = std::time(NULL);
 };
 
 Channel::~Channel(){};
@@ -106,22 +112,22 @@ void Channel::set_topic(std::string topic)
 }
 
 /*
-           o - give/take channel operator privileges;
-           -p - private channel flag;
-           -s - secret channel flag;
-           -i - invite-only channel flag;
-           -t - topic settable by channel operator only flag;
-           -n - no messages to channel from clients on the outside;
-           -m - moderated channel;
-           -l - set the user limit to channel;
-           b - set a ban mask to keep users out;
-           v - give/take the ability to speak on a moderated channel;
-           -k - set a channel key (password).
+	o - give/take channel operator privileges;
+	-p - private channel flag;
+	-s - secret channel flag;
+	-i - invite-only channel flag;
+	-t - topic settable by channel operator only flag;
+	-n - no messages to channel from clients on the outside;
+	-m - moderated channel;
+	-l - set the user limit to channel;
+	b - set a ban mask to keep users out;
+	v - give/take the ability to speak on a moderated channel;
+	-k - set a channel key (password).
 */
 
-std::string Channel::get_modes_str()
+std::string Channel::get_modes_str(std::string prepend_str = "[", std::string append_str = "]")
 {
-	std::string res = "[+";
+	std::string res = prepend_str + "+";
 	if (modes.has_key)
 		res.append("k");
 	if (modes.has_limit)
@@ -138,7 +144,7 @@ std::string Channel::get_modes_str()
 		res.append("s");
 	if (modes.topic)
 		res.append("t");
-	res.append("]");
+	res.append(append_str);
 	return (res);
 }
 
@@ -204,7 +210,6 @@ void Channel::globalUserResponder(std::string message, size_t skip = 0)
 
 void Channel::userLeft(User &user)
 {
-
 	for (std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 	{
 		if (it.operator*().first == user.get_id())
@@ -223,23 +228,29 @@ void Channel::userOp(User &user)
 {
 }
 
-void Channel::setOp(bool, User* user)
+void Channel::setOp(bool, User *user)
 {
-
 }
 
 void Channel::userKick(User &user)
 {
 }
 
-bool Channel::userIsOp(User &user) {
+bool Channel::userIsOp(User &user)
+{
 	if (USER_MAP.find(user.get_id())->second.admin)
 		return true;
 	return false;
 }
+
 t_channel_modes Channel::getModes() const
 {
 	return modes;
+}
+
+std::string Channel::get_creation_time()
+{
+	return SSTR(creation_time);
 }
 
 void Channel::setBanMask(std::string banMask)
