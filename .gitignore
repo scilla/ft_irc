@@ -35,3 +35,4 @@
 .DS_Store
 ircserv
 *.dSYM
+bot/bot
