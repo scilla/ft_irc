@@ -267,8 +267,16 @@ int IRC::privmsgCmd(std::string raw)
 			{
 				if(!(*res).second->getModes().no_ext || ((*res).second->getModes().no_ext && (*res).second->is_in_channel(current_user->get_id())))
 				{
-					std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message;
-					res.operator*().second->globalUserResponder(tmp, current_user->get_id());
+					if((!(*res).second->getModes().moderate) || (((*res).second->getModes().moderate) && ((*res).second->userHasVoice(*current_user) || (*res).second->userIsOp(*current_user))))
+					{
+						std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message;
+						res.operator*().second->globalUserResponder(tmp, current_user->get_id());
+					}
+					else
+					{
+						std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CANNOTSENDTOCHAN) + " " + current_user->get_nick() + " " + (*res).first + " :No external channel message (" + (*res).first + ")";
+						responder(tmp, *current_user);
+					}	
 				}
 				else
 				{
