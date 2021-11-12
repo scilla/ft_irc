@@ -21,7 +21,7 @@ typedef struct s_channel_modes
 	bool moderate;
 	bool has_limit;
 	bool has_key;
-	bool speak;
+	bool voice;
 } t_channel_modes;
 
 typedef struct s_user_status
@@ -68,7 +68,7 @@ public:
 	void setNoOpTopic(bool);
 	void setNoExternalMessages(bool);
 	void setModerated(bool);
-	void setSpeak(bool, std::string);
+	void setVoice(bool, User *, User *);
 	void setUserLimit(bool, size_t);
 	void setKey(bool, std::string);
 	void setBanMask(std::string);
@@ -285,9 +285,20 @@ void Channel::setPrivate(bool b = true)
 	modes.priv = b;
 }
 
-void Channel::setSpeak(bool b = true, std::string nick = "")
+void Channel::setVoice(bool on, User *op, User *user)
 {
-	modes.speak = b;
+	if (!userIsOp(*op))
+		return;
+	if (!user)
+	{
+		responder(ERR_NOSUCHNICK, *op);
+		return;
+	}
+	t_user_status current_status = USER_MAP[user->get_id()];
+	USER_MAP[user->get_id()].admin = on;
+	std::string sign = on ? " +o " : " -o ";
+	std::string rep = ":" + op->get_identifier() + " MODE " + _name + sign + user->get_nick();
+	globalUserResponder(rep);
 }
 
 void Channel::setSecret(bool b = true)

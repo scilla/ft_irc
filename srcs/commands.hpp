@@ -513,7 +513,7 @@ int IRC::modeCmd(std::string raw)
 						else if (params[1][i] == 'v')
 						{
 							if (params.size() > 2)
-								(*found).second->setSpeak(true, params[2]);
+								(*found).second->setVoice(true, current_user, get_user(params[2]));
 							else
 								responder(ERR_NEEDMOREPARAMS, *current_user);
 						}
@@ -548,8 +548,13 @@ int IRC::modeCmd(std::string raw)
 							(*found).second->setUserLimit(false);
 						else if (params[1][i] == 'b')
 							(*found).second->setBanMask(params[2]);
-						else if (params[1][i] == 'v' && (*found).second->getModes().moderate == true)
-							(*found).second->setSpeak(false);
+						else if (params[1][i] == 'v')
+						{
+							if (params.size() > 2)
+								(*found).second->setVoice(true, current_user, get_user(params[2]));
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
 						else if (params[1][i] == 'k')
 							(*found).second->setKey(false);
 					}
