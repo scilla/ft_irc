@@ -80,6 +80,8 @@ public:
 	std::string get_name();
 	std::vector<size_t> get_users_ids();
 	std::string get_creation_time();
+	bool is_invited(size_t);
+	bool is_in_channel(size_t user_id);
 };
 
 Channel::Channel(std::string channel_name)
@@ -157,6 +159,29 @@ std::string Channel::get_modes_user_str(User &user)
 	if (user_modes.voice)
 		res.append("o");
 	return (res);
+}
+
+bool Channel::is_invited(size_t user_id)
+{
+	for(std::set<size_t>::iterator it = invited_users.begin(); it != invited_users.end(); it++)
+	{
+		if((*it) == user_id)
+		{
+			invited_users.erase(user_id);
+			return(true);
+		}
+	}
+	return(false);
+}
+
+bool Channel::is_in_channel(size_t user_id)
+{
+	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
+	{
+		if((*it).first == user_id)
+			return(true);
+	}
+	return(false);
 }
 
 std::string Channel::get_topic() { return (_topic); }
