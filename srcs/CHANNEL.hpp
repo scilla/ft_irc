@@ -22,6 +22,7 @@ typedef struct s_channel_modes
 	bool has_limit;
 	bool has_key;
 	bool voice;
+	bool no_op_topic;
 } t_channel_modes;
 
 typedef struct s_user_status
@@ -58,22 +59,20 @@ public:
 	bool userHasVoice(User &);
 
 	t_channel_modes getModes() const;
-	void setModes(t_channel_modes);
-	void setTopic(std::string);
+	void setTopic(std::string, User *);
 	void globalUserResponder(std::string, size_t);
 
 	void setOp(bool, User *, User *);
-	void setPrivate(bool);
-	void setSecret(bool);
-	void setInviteOnly(bool);
-	void setNoOpTopic(bool);
-	void setNoExternalMessages(bool);
-	void setModerated(bool);
+	void setPrivate(bool, User *);
+	void setSecret(bool, User *);
+	void setInviteOnly(bool, User *);
+	void setNoOpTopic(bool, User *);
+	void setNoExternalMessages(bool, User *);
+	void setModerated(bool, User *);
 	void setVoice(bool, User *, User *);
-	void setUserLimit(bool, size_t);
-	void setKey(bool, std::string);
-	void setBanMask(std::string);
-	void set_topic(std::string);
+	void setUserLimit(bool, User *, size_t);
+	void setKey(bool, User *, std::string);
+	void setBanMask(std::string, User *);
 	std::string get_user_nb();
 	std::string get_modes_str(std::string, std::string);
 	std::string get_modes_user_str(User &user);
@@ -89,7 +88,7 @@ Channel::Channel(std::string channel_name)
 	_key = "";
 	_topic = "";
 	user_limit = 0;
-	modes = (t_channel_modes){false, false, false, false, false, false, false};
+	modes = (t_channel_modes){false, false, false, false, false, false, false, false};
 	creation_time = std::time(NULL);
 };
 
@@ -106,11 +105,6 @@ std::string Channel::get_user_nb()
 std::string Channel::get_name()
 {
 	return (_name);
-}
-
-void Channel::set_topic(std::string topic)
-{
-	_topic = topic;
 }
 
 /*
@@ -147,6 +141,7 @@ std::string Channel::get_modes_str(std::string prepend_str = "[", std::string ap
 	if (modes.topic)
 		res.append("t");
 	res.append(append_str);
+	res = "[+ntr]";
 	return (res);
 }
 
@@ -289,23 +284,24 @@ std::string Channel::get_creation_time()
 	return SSTR(creation_time);
 }
 
-void Channel::setBanMask(std::string banMask)
+void Channel::setBanMask(std::string banMask, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	ban_masks.push_back(banMask);
 }
 
-void Channel::setModes(t_channel_modes new_modes)
+void Channel::setTopic(std::string topic, User *op)
 {
-	modes = new_modes;
-}
-
-void Channel::setTopic(std::string topic)
-{
+	if (!userIsOp(*op) && !modes.no_op_topic) 
+		return;
 	_topic = topic;
 }
 
-void Channel::setPrivate(bool b = true)
+void Channel::setPrivate(bool b, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.priv = b;
 }
 
@@ -325,39 +321,53 @@ void Channel::setVoice(bool on, User *op, User *user)
 	globalUserResponder(rep);
 }
 
-void Channel::setSecret(bool b = true)
+void Channel::setSecret(bool b, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.secret = b;
 }
 
-void Channel::setInviteOnly(bool b = true)
+void Channel::setInviteOnly(bool b, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.invite = b;
 }
 
-void Channel::setNoOpTopic(bool b = true)
+void Channel::setNoOpTopic(bool b, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.topic = b;
 }
 
-void Channel::setNoExternalMessages(bool b = true)
+void Channel::setNoExternalMessages(bool b, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.no_ext = b;
 }
 
-void Channel::setModerated(bool b = true)
+void Channel::setModerated(bool b, User *op)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.moderate = b;
 }
 
-void Channel::setUserLimit(bool b = true, size_t s = 0)
+void Channel::setUserLimit(bool b, User *op, size_t s = 0)
 {
+	if (!userIsOp(*op))
+		return;
 	modes.has_limit = b;
 	user_limit = s;
 }
 
-void Channel::setKey(bool b = true, std::string s = "")
+void Channel::setKey(bool b, User *op, std::string s = "")
 {
+	if (!userIsOp(*op))
+		return;
 	modes.has_key = b;
 	_key = s;
 }
