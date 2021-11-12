@@ -141,7 +141,6 @@ std::string Channel::get_modes_str(std::string prepend_str = "[", std::string ap
 	if (modes.topic)
 		res.append("t");
 	res.append(append_str);
-	res = "[+ntr]";
 	return (res);
 }
 

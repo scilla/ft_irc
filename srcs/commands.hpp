@@ -317,7 +317,7 @@ int IRC::listCmd(std::string raw)
 		{
 			msg.clear();
 			msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_LIST));
-			msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :" + (*it).second->get_modes_str() + " " + (*it).second->get_topic());
+			msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :"/* + (*it).second->get_modes_str() + " "*/ + (*it).second->get_topic());
 			responder(msg + "\r\n", *current_user);
 		}
 	}
