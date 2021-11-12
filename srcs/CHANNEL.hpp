@@ -90,7 +90,7 @@ Channel::Channel(std::string channel_name)
 	_key = "";
 	_topic = "";
 	user_limit = 0;
-	modes = (t_channel_modes){false, false, false, false, false, false, false, false};
+	modes = (t_channel_modes){false, false, false, true, true, false, false, true};
 	creation_time = std::time(NULL);
 };
 

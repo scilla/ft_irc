@@ -369,10 +369,20 @@ int IRC::topicCmd(std::string raw)
 		{
 			if (!channel_name.compare((*it).first))
 			{
-				(*it).second->setTopic(topic.substr(1, topic.size()), current_user);
-				std::string msg = ":" + current_user->get_identifier() + " TOPIC " + (*it).first + " :" + (*it).second->get_topic();
-				responder(msg, *current_user);
-				break;
+				if((!(*it).second->getModes().topic) || ((*it).second->getModes().topic && (*it).second->userIsOp(*current_user)))
+				{
+					(*it).second->setTopic(topic.substr(1, topic.size()), current_user);
+					std::string msg = ":" + current_user->get_identifier() + " TOPIC " + (*it).first + " :" + (*it).second->get_topic();
+					responder(msg, *current_user);
+					break;
+				}
+				else
+				{
+					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + std::string(ERR_CHANOPRIVSNEEDED) + " " + current_user->get_nick() + " " + channel_name + " :You're not channel operator";
+					responder(msg, *current_user);
+					break; 
+				}
+
 			}
 		}
 	}
