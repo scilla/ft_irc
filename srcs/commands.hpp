@@ -551,7 +551,7 @@ int IRC::modeCmd(std::string raw)
 						else if (params[1][i] == 'v')
 						{
 							if (params.size() > 2)
-								(*found).second->setVoice(true, current_user, get_user(params[2]));
+								(*found).second->setVoice(false, current_user, get_user(params[2]));
 							else
 								responder(ERR_NEEDMOREPARAMS, *current_user);
 						}
@@ -631,7 +631,7 @@ int IRC::namesCmd(Channel curr_channel)
 		msg.append(":" + current_user->get_remote_ip() + " ");
 		msg.append(RPL_NAMREPLY);
 		std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
-		is_op = curr_channel.userIsOp(found->second) ? "@" : "";
+		is_op = curr_channel.userIsOp(found->second) ? "@" : curr_channel.userHasVoice(found->second) ? "+" : "";
 		msg.append(" " + current_user->get_nick() + " = " + curr_channel.get_name() + " :" + is_op + (*found).second.get_nick());
 		responder(msg, *current_user);
 		msg.clear();
@@ -640,7 +640,7 @@ int IRC::namesCmd(Channel curr_channel)
 	msg.clear();
 	msg.append(":" + current_user->get_remote_ip() + " ");
 	msg.append(RPL_ENDOFNAME);
-	is_op = curr_channel.userIsOp(*current_user) ? "@" : "";
+	is_op = curr_channel.userIsOp(*current_user) ? "@" : curr_channel.userHasVoice(*current_user) ? "+" : "";
 	msg.append(" " + current_user->get_nick() + " " + curr_channel.get_name() + " :End of NAMES list");
 	responder(msg, *current_user);
 	return 0;
@@ -648,6 +648,7 @@ int IRC::namesCmd(Channel curr_channel)
 
 int IRC::whoCmd(std::string raw)
 {
+	std::string is_op;
 	if (raw.size())
 	{
 		if (raw[0] == '#')
@@ -665,7 +666,8 @@ int IRC::whoCmd(std::string raw)
 						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 						if (!(*found).second._state.invisible && current_user->get_id() != (*found).first)
 						{
-							std::string is_op = it->second->userIsOp(found->second) ? "@" : "";
+							// is_op = it->second->userIsOp(found->second) ? "@" : "";
+							is_op = it->second->userIsOp(found->second) ? "@" : it->second->userHasVoice(found->second) ? "+" : "";
 							msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*found).second.get_username() + " " + (*found).second.get_remote_ip() + " " + (*found).second.get_nick() + " H" + is_op + " :0" + (*found).second.get_realname());
 							responder(msg, *current_user);
 						}
@@ -673,7 +675,7 @@ int IRC::whoCmd(std::string raw)
 					}
 					/*send endlist*/
 					msg.clear();
-					std::string is_op = it->second->userIsOp(*current_user) ? "@" : "";
+					is_op = it->second->userIsOp(*current_user) ? "@" : it->second->userHasVoice(*current_user) ? "+" : "";
 					msg.append(":" + current_user->get_remote_ip() + " ");
 					msg.append(RPL_ENDOFWHO);
 					msg.append(" " + is_op + current_user->get_nick() + " " + (*it).first + " :End of WHO list");

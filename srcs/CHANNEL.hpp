@@ -55,6 +55,7 @@ public:
 	void userKick(User &);
 
 	bool userIsOp(User &);
+	bool userHasVoice(User &);
 
 	t_channel_modes getModes() const;
 	void setModes(t_channel_modes);
@@ -75,6 +76,7 @@ public:
 	void set_topic(std::string);
 	std::string get_user_nb();
 	std::string get_modes_str(std::string, std::string);
+	std::string get_modes_user_str(User &user);
 	std::string get_topic();
 	std::string get_name();
 	std::vector<size_t> get_users_ids();
@@ -145,6 +147,21 @@ std::string Channel::get_modes_str(std::string prepend_str = "[", std::string ap
 	if (modes.topic)
 		res.append("t");
 	res.append(append_str);
+	return (res);
+}
+
+std::string Channel::get_modes_user_str(User &user)
+{
+	std::string res = "+";
+	if (!USER_MAP.count(user.get_id())) {
+		std::cout << "User not found\n" << std::endl;
+		return "";
+	}
+	t_user_status user_modes = USER_MAP[user.get_id()];
+	if (user_modes.admin)
+		res.append("o");
+	if (user_modes.voice)
+		res.append("o");
 	return (res);
 }
 
@@ -255,6 +272,13 @@ bool Channel::userIsOp(User &user)
 	return false;
 }
 
+bool Channel::userHasVoice(User &user)
+{
+	if (USER_MAP.find(user.get_id())->second.voice)
+		return true;
+	return false;
+}
+
 t_channel_modes Channel::getModes() const
 {
 	return modes;
@@ -295,8 +319,8 @@ void Channel::setVoice(bool on, User *op, User *user)
 		return;
 	}
 	t_user_status current_status = USER_MAP[user->get_id()];
-	USER_MAP[user->get_id()].admin = on;
-	std::string sign = on ? " +o " : " -o ";
+	USER_MAP[user->get_id()].voice = on;
+	std::string sign = on ? " +v " : " -v ";
 	std::string rep = ":" + op->get_identifier() + " MODE " + _name + sign + user->get_nick();
 	globalUserResponder(rep);
 }
