@@ -176,11 +176,23 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size())
 		{
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				return 1;
+			}
 			current_channel->userJoin(*current_user, keys[i]);
 			namesCmd(*current_channel);
 		}
 		else
 		{
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + " " +current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				return 1;
+			}
 			current_channel->userJoin(*current_user);
 			namesCmd(*current_channel);
 		}
