@@ -211,7 +211,7 @@ void IRC::user_logged()
 	message.append(current_user->get_nick());
 	message.append(" ");
 	message.append(inet_ntop(AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN));
-	message.append("ft_irc-0.1 o o");
+	message.append(" ft_irc-0.1 o o");
 	responder(message, *current_user);
 	message.clear();
 	message.append(RPL_LUSERCLIENT);

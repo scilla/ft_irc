@@ -141,7 +141,7 @@ int IRC::pongCmd(std::string raw)
 	if (parsed.size() == 2)
 	{
 		message.append(parsed[1] + " ");
-		message.append(parsed[0] + "\n");
+		message.append(parsed[0]);
 	}
 	else
 	{
@@ -265,7 +265,7 @@ int IRC::privmsgCmd(std::string raw)
 			res = CHANNEL_MAP.find((*it));
 			if (res != CHANNEL_MAP.end())
 			{
-				std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
+				std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message;
 				res.operator*().second->globalUserResponder(tmp, current_user->get_id());
 			}
 			else
@@ -280,7 +280,7 @@ int IRC::privmsgCmd(std::string raw)
 			{
 				if (!(*ite).second.get_nick().compare((*it)))
 				{
-					std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message + "\n";
+					std::string tmp = ":" + current_user->get_identifier() + " PRIVMSG " + *it + " :" + priv_message;
 					responder(tmp, (*ite).second);
 					found = true;
 					break;
@@ -313,7 +313,7 @@ int IRC::partCmd(std::string raw)
 			res = CHANNEL_MAP.find((*it));
 			if (res != CHANNEL_MAP.end())
 			{
-				std::string tmp = ":" + current_user->get_identifier() + " PART " + *it + " " + priv_message + "\n";
+				std::string tmp = ":" + current_user->get_identifier() + " PART " + *it + " " + priv_message;
 				(*res).second->globalUserResponder(tmp);
 				res.operator*().second->userLeft(*current_user);
 				if(atoi((*res).second->get_user_nb().c_str()) == 0) //elimina canale se vuoto
@@ -354,7 +354,7 @@ int IRC::listCmd(std::string raw)
 	msg.clear();
 	msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_LISTEND));
 	msg.append(" " + current_user->get_nick() + " :End of /LIST");
-	responder(msg + "\r\n", *current_user);
+	responder(msg, *current_user);
 	return 0;
 }
 
