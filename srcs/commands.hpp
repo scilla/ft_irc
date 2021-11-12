@@ -480,7 +480,7 @@ int IRC::modeCmd(std::string raw)
 						if (params[1][i] == 'o')
 						{
 							if (params.size() > 2)
-								(*found).second->setOp(true, get_user(params[2]));
+								(*found).second->setOp(true, current_user, get_user(params[2]));
 							else
 								responder(ERR_NEEDMOREPARAMS, *current_user);
 						}
@@ -526,7 +526,12 @@ int IRC::modeCmd(std::string raw)
 					for (int i = 1; i < params[1].size(); i++)
 					{
 						if (params[1][i] == 'o')
-							(*found).second->setNoOpTopic(false);
+						{
+							if (params.size() > 2)
+								(*found).second->setOp(false, current_user, get_user(params[2]));
+							else
+								responder(ERR_NEEDMOREPARAMS, *current_user);
+						}
 						else if (params[1][i] == 'p')
 							(*found).second->setPrivate(false);
 						else if (params[1][i] == 's')

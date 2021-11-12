@@ -1,6 +1,6 @@
 #ifndef CHANNEL_HPP
 #define CHANNEL_HPP
-#define SSTR( x ) static_cast< std::ostringstream & >( ( std::ostringstream() << std::dec << x ) ).str()
+#define SSTR(x) static_cast<std::ostringstream &>((std::ostringstream() << std::dec << x)).str()
 
 #include <iostream>
 #include <list>
@@ -61,7 +61,7 @@ public:
 	void setTopic(std::string);
 	void globalUserResponder(std::string, size_t);
 
-	void setOp(bool, User *);
+	void setOp(bool, User *, User *);
 	void setPrivate(bool);
 	void setSecret(bool);
 	void setInviteOnly(bool);
@@ -228,8 +228,20 @@ void Channel::userOp(User &user)
 {
 }
 
-void Channel::setOp(bool, User *user)
+void Channel::setOp(bool on, User *op, User *user)
 {
+	if (!userIsOp(*op))
+		return;
+	if (!user)
+	{
+		responder(ERR_NOSUCHNICK, *op);
+		return;
+	}
+	t_user_status current_status = USER_MAP[user->get_id()];
+	USER_MAP[user->get_id()].admin = on;
+	std::string sign = on ? " +o " : " -o ";
+	std::string rep = ":" + op->get_identifier() + " MODE " + _name + sign + user->get_nick();
+	globalUserResponder(rep);
 }
 
 void Channel::userKick(User &user)
