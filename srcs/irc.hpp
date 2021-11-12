@@ -323,6 +323,7 @@ void IRC::launch()
 		for (std::set<int>::iterator it = readfds.begin(); it != readfds.end(); it++)
 		{
 			if (FD_ISSET(*it, &fds))
+
 			{
 				connected_fd = *it;
 				handler(connected_fd);

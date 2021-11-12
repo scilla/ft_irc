@@ -176,11 +176,23 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size())
 		{
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				return 1;
+			}
 			current_channel->userJoin(*current_user, keys[i]);
 			namesCmd(*current_channel);
 		}
 		else
 		{
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + " " +current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				return 1;
+			}
 			current_channel->userJoin(*current_user);
 			namesCmd(*current_channel);
 		}
@@ -197,9 +209,20 @@ int IRC::quitCmd(std::string raw)
 		responder(params[0], *current_user);
 	if (params.size() < 2)
 		params.push_back("");
-	for (std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++)
+	std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin();
+	std::map<std::string, Channel *>::iterator tmp;
+	while (it != CHANNEL_MAP.end())
 	{
 		it.operator*().second->userLeft(*current_user);
+		if(atoi((*it).second->get_user_nb().c_str()) == 0)
+		{
+			tmp = it;
+			tmp++;
+			CHANNEL_MAP.erase(it);
+			it = tmp;
+		}
+		else
+			it++;
 	}
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
@@ -291,9 +314,10 @@ int IRC::partCmd(std::string raw)
 			if (res != CHANNEL_MAP.end())
 			{
 				std::string tmp = ":" + current_user->get_identifier() + " PART " + *it + " " + priv_message;
-				// responder(tmp, *current_user);
 				(*res).second->globalUserResponder(tmp);
 				res.operator*().second->userLeft(*current_user);
+				if(atoi((*res).second->get_user_nb().c_str()) == 0) //elimina canale se vuoto
+					CHANNEL_MAP.erase((*res).first);
 			}
 			else
 			{
@@ -317,8 +341,13 @@ int IRC::listCmd(std::string raw)
 		{
 			msg.clear();
 			msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_LIST));
-			msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :"/* + (*it).second->get_modes_str() + " "*/ + (*it).second->get_topic());
-			responder(msg, *current_user);
+			msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*it).second->get_user_nb() + " :");
+			if((*it).second->getModes().priv && !(*it).second->is_in_channel(current_user->get_id()))
+			{
+				responder(msg, *current_user);
+			}
+			else
+				responder(msg /* + (*it).second->get_modes_str() + " "*/ + (*it).second->get_topic(), *current_user);
 		}
 	}
 	/*end list message*/
@@ -577,7 +606,7 @@ int IRC::modeCmd(std::string raw)
 		if (found != CHANNEL_MAP.end()) // canale trovato
 		{
 			ch = found->second; // below, should be server ip?
-			std::string resp = ":" + current_user->get_remote_ip() + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
+			std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
 			responder(resp + ch->get_modes_str("", ""), *current_user);
 		}
 	}
