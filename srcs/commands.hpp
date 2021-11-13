@@ -261,6 +261,7 @@ int IRC::quitCmd(std::string raw)
 			tmp = it;
 			tmp++;
 			CHANNEL_MAP.erase(it);
+			delete ((*it).second);
 			it = tmp;
 		}
 		else

@@ -126,7 +126,7 @@ Channel &IRC::get_channel(std::string channel_name)
 	if (it == CHANNEL_MAP.end())
 	{
 		res = new Channel(channel_name);
-		CHANNEL_MAP.insert(std::pair<std::string, Channel *>(channel_name, *&res));
+		CHANNEL_MAP.insert(std::pair<std::string, Channel *>(channel_name, res));
 		std::cout << "NUOVOCANALE CREATO: " << channel_name << std::endl;
 		return *res;
 	}
@@ -306,8 +306,11 @@ void IRC::launch()
 
 	fd_set fds; //fess d sort
 
+	// int nonepossibilecheesiste = 0;
 	while (true)
 	{
+		// nonepossibilecheesiste++;
+		// std::cout << "count " << nonepossibilecheesiste << std::endl;
 		max = getServerSocket()->getSocket() + 1;
 		FD_ZERO(&fds);
 		FD_SET(getServerSocket()->getSocket(), &fds);
@@ -335,6 +338,9 @@ void IRC::launch()
 				break;
 			}
 		}
+		// i++;
+		// if (i > 10)
+		// 	break;
 		//accepter();
 		//responder();
 	}
