@@ -8,6 +8,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
+#include <random>
+#include <time.h>
+#include <fstream>
+#define SSTR(x) static_cast<std::ostringstream &>((std::ostringstream() << std::dec << x)).str()
 
 int SOCK;
 
@@ -20,7 +24,6 @@ void exit_err()
 
 void sender(std::string str)
 {
-	sleep(1);
 	send(SOCK, (str + "\n").c_str(), str.size() + 1, 0);
 }
 
@@ -81,8 +84,27 @@ std::vector<std::string> get_channnels()
 	return split_vct(receiver(), '\n');
 }
 
+std::vector<std::string> load_lorem_ipsum()
+{
+	std::vector<std::string> res;
+	std::string line;
+	std::ifstream myfile("lorem_ipsum.txt");
+	if (myfile.is_open())
+	{
+		while (getline(myfile, line))
+		{
+			res.push_back(line);
+		}
+		myfile.close();
+	}
+	else
+		std::cout << "Unable to open file";
+	return res;
+}
+
 int main(int ac, char **av)
 {
+	srand(time(NULL));
 	SOCK = 0;
 	int valread;
 	struct sockaddr_in serv_addr;
@@ -91,7 +113,11 @@ int main(int ac, char **av)
 	std::string n_host;
 	std::string n_pass;
 	size_t n_port;
-	std::string hello("Hello from client");
+	std::string nick = "BoT";
+	std::vector<std::string> lorem_ipsum = load_lorem_ipsum();
+
+	for (int i = 0; i < 5; i++)
+		nick.push_back("0123456789"[rand() % 10]);
 
 	if (ac != 4)
 	{
@@ -120,14 +146,30 @@ int main(int ac, char **av)
 		printf("\nConnection Failed \n");
 		return -1;
 	}
-	hello = "PASS " + n_pass + "\n";
-	send(SOCK, hello.c_str(), hello.size(), 0);
-	hello = "NICK stocazzo\n";
-	send(SOCK, hello.c_str(), hello.size(), 0);
-	hello = "USER stocazzo\n";
-	send(SOCK, hello.c_str(), hello.size(), 0);
-	sleep(1);
-	std::vector<std::string> chs = get_channnels();
-	for (std::vector<std::string>::iterator it = chs.begin(); it != chs.end(); it++)
-		std::cout << *it << std::endl;
+	std::string cmd = "PASS " + n_pass + "\n";
+	send(SOCK, cmd.c_str(), cmd.size(), 0);
+	cmd = "NICK " + nick + "\n";
+	send(SOCK, cmd.c_str(), cmd.size(), 0);
+	cmd = "USER " + nick + "\n";
+	send(SOCK, cmd.c_str(), cmd.size(), 0);
+	std::vector<std::string> channel_to_join;
+	channel_to_join.push_back("Rai1");
+	channel_to_join.push_back("Rai2");
+	channel_to_join.push_back("Rai3");
+	channel_to_join.push_back("Rete4");
+	channel_to_join.push_back("Canale5");
+	channel_to_join.push_back("Italia1");
+	for (std::vector<std::string>::iterator it = channel_to_join.begin(); it != channel_to_join.end(); it++)
+	{
+		sleep(1);
+		cmd = "JOIN #" + *it;
+		sender(cmd);
+	}
+	int i = 0;
+	while (++i)
+	{
+		sleep(1);
+		cmd = "PRIVMSG #" + channel_to_join[i % channel_to_join.size()] + " :" + lorem_ipsum[rand() % lorem_ipsum.size()];
+		sender(cmd);
+	}
 }
