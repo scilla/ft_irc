@@ -169,6 +169,7 @@ void IRC::check_connection(void)
 {
 	if (!buff[0])
 	{
+		std::cout << "No buffer! > " << connected_fd << std::endl;
 		for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 		{
 			if (connected_fd == (*it).second.get_id())
@@ -291,7 +292,7 @@ std::string IRC::receiver()
 
 void IRC::launch()
 {
-	//signal(SIGPIPE, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 	char str[INET_ADDRSTRLEN];
 	current_user = NULL;
 	remote = getServerSocket()->getRemote();
@@ -328,6 +329,8 @@ void IRC::launch()
 			if (FD_ISSET(*it, &fds))
 			{
 				connected_fd = *it;
+				if (USER_MAP.count(connected_fd))
+					current_user = get_user(connected_fd);
 				handler(connected_fd);
 				break;
 			}

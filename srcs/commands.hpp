@@ -266,6 +266,7 @@ int IRC::quitCmd(std::string raw)
 		else
 			it++;
 	}
+
 	//if(readfds.find(current_user->get_id()) != readfds.end())
 		readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
