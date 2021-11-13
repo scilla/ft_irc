@@ -78,6 +78,7 @@ public:
 	std::string get_modes_user_str(User &user);
 	std::string get_topic();
 	std::string get_name();
+	size_t get_limit();
 	std::vector<size_t> get_users_ids();
 	std::string get_creation_time();
 	bool is_invited(size_t);
@@ -108,6 +109,12 @@ std::string Channel::get_name()
 {
 	return (_name);
 }
+
+size_t Channel::get_limit()
+{
+	return user_limit;
+}
+
 
 /*
 	o - give/take channel operator privileges;

@@ -158,6 +158,8 @@ int IRC::joinCmd(std::string raw)
 	std::vector<std::string> keys;
 	Channel *current_channel;
 
+
+// :italia.ircitalia.net 471 Buonve|2 #cacca :Cannot join channel (+l)
 	if (!params.size())
 	{
 		responder(ERR_NEEDMOREPARAMS, *current_user);
@@ -176,11 +178,17 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size())
 		{
-			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id())) //only invide mode is checked and use is searched in invite list
 			{
 				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
 				responder(msg, *current_user);
-				return 1;
+				continue;
+			}
+			if(current_channel->getModes().has_limit && current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANNELISFULL) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				continue;
 			}
 			current_channel->userJoin(*current_user, keys[i]);
 			namesCmd(*current_channel);
@@ -191,7 +199,13 @@ int IRC::joinCmd(std::string raw)
 			{
 				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + " " +current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
 				responder(msg, *current_user);
-				return 1;
+				continue;
+			}
+			if(current_channel->getModes().has_limit && current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANNELISFULL) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				continue;
 			}
 			current_channel->userJoin(*current_user);
 			namesCmd(*current_channel);
@@ -581,6 +595,12 @@ int IRC::modeCmd(std::string raw)
 							else
 								responder(ERR_NEEDMOREPARAMS, *current_user);
 						}
+						else
+						{
+							//:italia.ircitalia.net 472 Buonve 2 :is unknown mode char to me
+							std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UNKNOWNMODE) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
+							responder(tmp, *current_user);
+						}
 					}
 				}
 				else if (params[1][0] == '-')
@@ -619,12 +639,19 @@ int IRC::modeCmd(std::string raw)
 						}
 						else if (params[1][i] == 'k')
 							(*found).second->setKey(false, current_user);
+						else
+						{
+							//:italia.ircitalia.net 472 Buonve 2 :is unknown mode char to me
+							std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UNKNOWNMODE) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
+							responder(tmp, *current_user);
+						}
 					}
 				}
 			}
 		}
 		else // user mode
 		{
+			
 		}
 	}
 	else
@@ -633,7 +660,7 @@ int IRC::modeCmd(std::string raw)
 		Channel *ch;
 		if (found != CHANNEL_MAP.end()) // canale trovato
 		{
-			ch = found->second; // below, should be server ip?
+			ch = found->second;
 			std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
 			responder(resp + ch->get_modes_str("", ""), *current_user);
 		}
