@@ -266,8 +266,11 @@ int IRC::quitCmd(std::string raw)
 		else
 			it++;
 	}
-	readfds.erase(readfds.find(current_user->get_id()));
+	//if(readfds.find(current_user->get_id()) != readfds.end())
+		readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
+	//if(USER_MAP.find(current_user->get_id()) != USER_MAP.end())
+		USER_MAP.erase(USER_MAP.find(current_user->get_id()));
 	for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 	{
 		if ((*it).second.get_id() != current_user->get_id())
@@ -276,7 +279,6 @@ int IRC::quitCmd(std::string raw)
 			responder(tmp, (*it).second.get_id());
 		}
 	}
-	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
 	return 0;
 }
 

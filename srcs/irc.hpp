@@ -291,6 +291,7 @@ std::string IRC::receiver()
 
 void IRC::launch()
 {
+	//signal(SIGPIPE, SIG_IGN);
 	char str[INET_ADDRSTRLEN];
 	current_user = NULL;
 	remote = getServerSocket()->getRemote();
@@ -325,7 +326,6 @@ void IRC::launch()
 		for (std::set<int>::iterator it = readfds.begin(); it != readfds.end(); it++)
 		{
 			if (FD_ISSET(*it, &fds))
-
 			{
 				connected_fd = *it;
 				handler(connected_fd);
