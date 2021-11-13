@@ -18,13 +18,33 @@ void exit_err()
 	exit(1);
 }
 
-void sender(std::string str) {
+void sender(std::string str)
+{
+	sleep(1);
 	send(SOCK, (str + "\n").c_str(), str.size() + 1, 0);
 }
 
-std::string receiver() {
+std::string receiver()
+{
+	fd_set fds;
+	int ss;
+	std::string str = "";
+	FD_SET(SOCK, &fds);
+	struct timeval timeout;
+	timeout.tv_usec = 100;
+	select(SOCK + 1, &fds, NULL, NULL, &timeout);
 	char buffer[1024] = {0};
-	read(SOCK, buffer, 1024);
+	while ((ss = read(SOCK, buffer, 1024)) > 0)
+	{
+		str.append(buffer);
+		usleep(1000);
+		std::cout << str << "|" << ss << "|" << std::endl;
+		bzero(buffer, 1024);
+	}
+	str.append(buffer);
+	usleep(1000);
+	std::cout << str << "|" << ss << "|" << std::endl;
+	bzero(buffer, 1024);
 	return std::string(buffer);
 }
 
@@ -63,7 +83,8 @@ std::vector<std::string> get_channnels()
 
 int main(int ac, char **av)
 {
-	int SOCK = 0, valread;
+	SOCK = 0;
+	int valread;
 	struct sockaddr_in serv_addr;
 	std::vector<std::string> network;
 	bool type_bool;
@@ -105,6 +126,7 @@ int main(int ac, char **av)
 	send(SOCK, hello.c_str(), hello.size(), 0);
 	hello = "USER stocazzo\n";
 	send(SOCK, hello.c_str(), hello.size(), 0);
+	sleep(1);
 	std::vector<std::string> chs = get_channnels();
 	for (std::vector<std::string>::iterator it = chs.begin(); it != chs.end(); it++)
 		std::cout << *it << std::endl;
