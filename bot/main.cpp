@@ -9,11 +9,23 @@
 #include <unistd.h>
 #include <string.h>
 
+int SOCK;
+
 void exit_err()
 {
 	std::cout << "*** ERROR ***" << std::endl;
 	std::cout << "USAGE: ./ircserv <host> <port> <password>" << std::endl;
 	exit(1);
+}
+
+void sender(std::string str) {
+	send(SOCK, (str + "\n").c_str(), str.size() + 1, 0);
+}
+
+std::string receiver() {
+	char buffer[1024] = {0};
+	read(SOCK, buffer, 1024);
+	return std::string(buffer);
 }
 
 bool isNumber(const char *str)
@@ -43,9 +55,15 @@ void check_args(char **av)
 		exit_err();
 }
 
+std::vector<std::string> get_channnels()
+{
+	sender("LIST");
+	return split_vct(receiver(), '\n');
+}
+
 int main(int ac, char **av)
 {
-	int sock = 0, valread;
+	int SOCK = 0, valread;
 	struct sockaddr_in serv_addr;
 	std::vector<std::string> network;
 	bool type_bool;
@@ -53,7 +71,6 @@ int main(int ac, char **av)
 	std::string n_pass;
 	size_t n_port;
 	std::string hello("Hello from client");
-	char buffer[10240] = {0};
 
 	if (ac != 4)
 	{
@@ -64,7 +81,7 @@ int main(int ac, char **av)
 	n_pass = av[3];
 	n_port = atoi(av[2]);
 
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+	if ((SOCK = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n Socket creation error \n");
 		return -1;
@@ -77,23 +94,18 @@ int main(int ac, char **av)
 		printf("\nInvalid address/ Address not supported \n");
 		return -1;
 	}
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-        return -1;
-    }
+	if (connect(SOCK, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+	{
+		printf("\nConnection Failed \n");
+		return -1;
+	}
 	hello = "PASS " + n_pass + "\n";
-	send(sock, hello.c_str(), hello.size(), 0);
+	send(SOCK, hello.c_str(), hello.size(), 0);
 	hello = "NICK stocazzo\n";
-	send(sock, hello.c_str(), hello.size(), 0);
+	send(SOCK, hello.c_str(), hello.size(), 0);
 	hello = "USER stocazzo\n";
-	send(sock, hello.c_str(), hello.size(), 0);
-	hello = "LIST\n";
-	send(sock, hello.c_str(), hello.size(), 0);
-    valread = read( sock , buffer, 10240);
-    printf("%s\n",buffer );
-	hello = "LIST\n";
-	send(sock, hello.c_str(), hello.size(), 0);
-    valread = read( sock , buffer, 10240);
-    printf("%s\n",buffer );
+	send(SOCK, hello.c_str(), hello.size(), 0);
+	std::vector<std::string> chs = get_channnels();
+	for (std::vector<std::string>::iterator it = chs.begin(); it != chs.end(); it++)
+		std::cout << *it << std::endl;
 }
