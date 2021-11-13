@@ -97,6 +97,7 @@ private:
 	int listCmd(std::string);
 	int namesCmd(Channel);
 	int topicCmd(std::string);
+	int motdCmd(std::string);
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own) : 
@@ -223,6 +224,7 @@ void IRC::user_logged()
 	message.append(tmp.str());
 	message.append(" users online, *services and servers to be done*");
 	responder(message, *current_user);
+	motdCmd("");
 }
 
 std::vector<std::string> splitter(std::string raw, char sep)
