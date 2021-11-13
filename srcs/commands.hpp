@@ -1,6 +1,7 @@
 #ifndef COMMANDS_HPP
 #define COMMANDS_HPP
 #include "irc.hpp"
+#include <iostream>
 #include "USER.hpp"
 
 int IRC::initializer(std::vector<std::string> parsed)
@@ -69,6 +70,8 @@ void IRC::commandSelector(std::string raw)
 		topicCmd(params);
 	else if (!parsed[0].compare("MODE"))
 		modeCmd(params);
+	else if(!parsed[0].compare("MOTD"))
+		motdCmd(params);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
@@ -148,6 +151,31 @@ int IRC::pongCmd(std::string raw)
 		message.append(raw);
 	}
 	responder(message, *current_user);
+	return 0;
+}
+
+int IRC::motdCmd(std::string raw)
+{
+	std::ifstream motd;
+	motd.open("MOTD.txt", std::ios::in);
+	if(!motd)
+	{
+		std::string msg = std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_NOMOTD) + " " + current_user->get_nick() + " :No MOTD file";
+		responder(msg, *current_user);
+		return 1;
+	}
+	std::string msg = std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_MOTDSTART) + " " + current_user->get_nick() + " :MOTD message start";
+	responder(msg, *current_user);
+	msg.clear();
+	msg = std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_MOTD) + " " + current_user->get_nick() + " :";
+	std::string tmp;
+	while(std::getline(motd, tmp))
+	{
+		responder(msg + tmp, *current_user);
+	}
+	msg.clear();
+	msg = std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_ENDOFMOTD) + " " + current_user->get_nick() + " :End of /MOTD command";
+	responder(msg, *current_user);
 	return 0;
 }
 
