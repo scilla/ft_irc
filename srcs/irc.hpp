@@ -83,6 +83,8 @@ private:
 	std::map<std::string, Channel *> CHANNEL_MAP;
 	std::map<std::string, int (IRC::*)(std::vector<std::string>)> CMD_MAP;
 
+	User &nick_to_user(std::string nick);
+
 	//commands
 	int userCmd(std::vector<std::string>);
 	int passCmd(std::vector<std::string>);
@@ -94,11 +96,13 @@ private:
 	int quitCmd(std::string);
 	int privmsgCmd(std::string);
 	int whoCmd(std::string);
-	int listCmd(std::string);
 	int namesCmd(Channel);
+	int listCmd(std::string);
 	int topicCmd(std::string);
 	int motdCmd(std::string);
 	int noticeCmd(std::string);
+	int kickCmd(std::string);
+
 
 };
 

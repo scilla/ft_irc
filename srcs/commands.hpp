@@ -74,6 +74,8 @@ void IRC::commandSelector(std::string raw)
 		motdCmd(params);
 	else if(!parsed[0].compare("NOTICE"))
 		noticeCmd(params);
+	else if(!parsed[0].compare("KICK"))
+		kickCmd(params);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
@@ -396,12 +398,6 @@ int IRC::noticeCmd(std::string raw)
 	}
 	return 0;
 }
-
-
-
-
-
-
 
 
 int IRC::partCmd(std::string raw)
@@ -917,5 +913,66 @@ int IRC::whoCmd(std::string raw)
 	}
 	return 0;
 }
+
+int IRC::kickCmd(std::string raw)
+{
+	std::vector<std::string> splitted;
+	std::string toKick;
+	std::string channel;
+	std::string comment;
+
+	splitted = splitter(raw, ' ');
+	toKick = splitted[1];
+	channel = splitted[0];
+	comment = splitted[2];
+
+	if(splitted.size() < 2)
+	{
+		std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_NEEDMOREPARAMS) + current_user->get_nick() + " :Need more params";
+		responder(msg, *current_user);
+		return 1;
+	}
+	else
+	{
+		std::map<std::string, Channel *>::iterator foundchan = CHANNEL_MAP.find(channel);
+		if(foundchan != CHANNEL_MAP.end())
+		{
+			if((*foundchan).second->userIsOp(*current_user))
+			{
+				User *UserToKick = get_user(toKick);
+				if((*foundchan).second->is_in_channel(UserToKick->get_id()))
+				{
+					std::string msg = ":" + (*current_user).get_identifier() + " KICK " + (*foundchan).second->get_name() + " " + UserToKick->get_nick() + " :" + comment;
+					(*foundchan).second->globalUserResponder(msg);
+					(*foundchan).second->userLeft(*UserToKick);
+				}
+				else
+				{
+					//error ERR_NOTONCHANNEL
+					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_NOTONCHANNEL) + " " +current_user->get_nick() + " :Not on channel";
+					responder(msg, *current_user);
+					return 1;
+				}
+			}
+			else
+			{
+				//error ERR_CHANOPRIVSNEEDED
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANOPRIVSNEEDED) + " " + current_user->get_nick() + " :No op right";
+				responder(msg, *current_user);
+				return 1;
+			}
+		}
+		else
+		{
+			//error ERR_NOSUCHCHANNEL
+			std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_NOSUCHCHANNEL) + " " + current_user->get_nick() + " :No such channel";
+			responder(msg, *current_user);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+
 
 #endif /*COMMAND_HPP*/
