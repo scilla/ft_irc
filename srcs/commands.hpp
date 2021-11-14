@@ -368,7 +368,7 @@ int IRC::noticeCmd(std::string raw)
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
 	// splitted.erase(splitted.begin());
-	priv_message = raw.substr(splitted[0].size() + 2, raw.size());
+	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
 	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
 	// {
 	// 	priv_message.append(*it.base());
