@@ -211,20 +211,20 @@ void Channel::userJoin(User &user, std::string pass = "")
 		responder(ERR_BADCHANNELKEY, user);
 		return;
 	}
-	if (modes.has_limit && USER_MAP.size() >= user_limit)
-	{
-		responder(ERR_CHANNELISFULL, user);
-		return;
-	}
-	if (modes.invite)
-	{
-		if (!invited_users.count(user.get_id()))
-		{
-			responder(ERR_INVITEONLYCHAN, user);
-			return;
-		}
-		invited_users.erase(user.get_id()); // todo: delete fd when disconnected
-	}
+	//if (modes.has_limit && USER_MAP.size() >= user_limit)
+	//{
+	//	responder(ERR_CHANNELISFULL, user);
+	//	return;
+	//}
+	//if (modes.invite)
+	//{
+	//	if (!invited_users.count(user.get_id()))
+	//	{
+	//		responder(ERR_INVITEONLYCHAN, user);
+	//		return;
+	//	}
+	//	invited_users.erase(user.get_id()); // todo: delete fd when disconnected
+	//}
 	if (USER_MAP.find(user.get_id()) != USER_MAP.end())
 	{
 		responder(ERR_ALREADYREGISTRED, user);
