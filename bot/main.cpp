@@ -33,11 +33,14 @@ std::string receiver()
 	fd_set fds;
 	int ss;
 	std::string str = "";
-	FD_SET(SOCK, &fds);
-	struct timeval timeout;
-	timeout.tv_usec = 100;
-	select(SOCK + 1, &fds, NULL, NULL, &timeout);
-	char buffer[1024] = {0};
+	// FD_SET(SOCK, &fds);
+	// struct timeval timeout;
+	// timeout.tv_usec = 100;
+	// select(SOCK + 1, &fds, NULL, NULL, &timeout);
+	char buffer[102400] = {0};
+	read(SOCK, buffer, 102400);
+	return str;
+
 	while ((ss = read(SOCK, buffer, 1024)) > 0)
 	{
 		str.append(buffer);
@@ -106,7 +109,7 @@ std::vector<std::string> load_lorem_ipsum()
 int main(int ac, char **av)
 {
 	int pid;
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 100; i++) {
 		sleep(1);
 		pid = fork();
 		if (!pid)
@@ -179,8 +182,10 @@ int main(int ac, char **av)
 	int i = 0;
 	while (++i)
 	{
-		usleep(1000000 + rand() % 2000000);
+		usleep(500000 + rand() % 1000000);
 		cmd = "PRIVMSG #" + channel_to_join[i % channel_to_join.size()] + " :" + lorem_ipsum[rand() % lorem_ipsum.size()];
+		std::cout << "Msgs sent: " << i << std::endl;
 		sender(cmd);
+		receiver();
 	}
 }
