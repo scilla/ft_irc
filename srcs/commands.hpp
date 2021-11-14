@@ -39,6 +39,13 @@ int IRC::initializer(std::vector<std::string> parsed)
 	return 0;
 }
 
+std::string& capitalize(std::string& str) {
+	for (int i = 0; i < str.size(); i++) {
+		str[i] = toupper(str[i]);
+	}
+	return str;
+}
+
 void IRC::commandSelector(std::string raw)
 {
 	std::vector<std::string> parsed;
@@ -47,12 +54,12 @@ void IRC::commandSelector(std::string raw)
 
 	current_user = get_user(connected_fd);
 	parsed = splitter(raw, ' ');
-	command = parsed[0];
+	command = capitalize(parsed[0]);
 	if (parsed.size() > 1 && parsed[1].size())
 		params = raw.substr(command.size() + 1, raw.size());
 	if (!command.compare("PING"))
 		pongCmd(params);
-	else if (!command.compare("JOIN") || !command.compare("join"))
+	else if (!command.compare("JOIN"))
 		joinCmd(params);
 	else if (!command.compare("NICK"))
 		nickCmd(parsed);
@@ -74,6 +81,42 @@ void IRC::commandSelector(std::string raw)
 		motdCmd(params);
 	else if(!parsed[0].compare("NOTICE"))
 		noticeCmd(params);
+	else if(!parsed[0].compare("INVITE"))
+		inviteCmd(params);
+}
+
+void IRC::inviteCmd(std::string raw)
+{
+	std::vector<std::string> parsed = splitter(raw, ' ');
+	if (parsed.size() < 2) {
+		responder(ERR_NEEDMOREPARAMS, connected_fd);
+		return;
+	}
+	User* dest = get_user(parsed[0]);
+	if (!dest) {
+		responder(ERR_NOSUCHNICK, connected_fd);
+		return;
+	}
+	std::map<std::string, Channel *>::iterator chan_it = CHANNEL_MAP.find(parsed[1]);
+	if (chan_it == CHANNEL_MAP.end())
+		return;
+	if (!chan_it->second->is_in_channel(current_user->get_id())) {
+		responder(ERR_NOTONCHANNEL, connected_fd);
+		return;
+	}
+	if (chan_it->second->is_in_channel(dest->get_id())) {
+		responder(ERR_USERONCHANNEL, connected_fd);
+		return;
+	}
+	if (chan_it->second->getModes().invite && !chan_it->second->userIsOp(*current_user)) {
+		responder(ERR_CHANOPRIVSNEEDED, connected_fd);
+		return;
+	}
+	std::string rep = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + RPL_INVITING + " " + current_user->get_nick() + " " + dest->get_nick() + " " + chan_it->second->get_name();
+	responder(rep, *current_user);
+	rep = ":" + current_user->get_identifier() + " INVITE " + dest->get_nick() + " :" + chan_it->second->get_name();
+	responder(rep, *dest);
+	chan_it->second->setUserInvited(dest);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)

@@ -99,6 +99,7 @@ private:
 	int topicCmd(std::string);
 	int motdCmd(std::string);
 	int noticeCmd(std::string);
+	void inviteCmd(std::string);
 
 };
 
