@@ -775,6 +775,28 @@ int IRC::modeCmd(std::string raw)
 						}
 					}
 				}
+				else if (params[1][0] == 'b') {
+					std::string msg;
+					std::string is_op;
+					std::vector<std::string> bans = found->second->get_bans();
+					for (int i = 0; i < bans.size(); i++) /*send ban list*/
+					{
+						// [21:54:04] MODE #x b
+						// [21:54:04] :italia.ircitalia.net 367 scillaaa|2 #x *!*@IRCItalia-7BBFBF6E.business.telecomitalia.it scillaaa|2 1636923235
+						// [21:54:04] :italia.ircitalia.net 368 scillaaa|2 #x :End of Channel Ban List
+						msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " ");
+						msg.append(RPL_BANLIST);
+						msg.append(" " + current_user->get_nick() + " " + found->second->get_name() + " " + bans[i]);
+						responder(msg, *current_user);
+						msg.clear();
+					}
+					/*send endNamelist*/
+					msg.clear();
+					msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " ");
+					msg.append(RPL_ENDOFBANLIST);
+					msg.append(" " + current_user->get_nick() + " " + found->second->get_name() + " :End of Channel Ban List");
+					responder(msg, *current_user);
+				}
 			}
 		}
 		else // user mode

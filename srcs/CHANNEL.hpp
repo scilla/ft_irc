@@ -81,6 +81,7 @@ public:
 	std::string get_name();
 	size_t get_limit();
 	std::vector<size_t> get_users_ids();
+	std::vector<std::string> get_bans();
 	std::string get_creation_time();
 	bool is_invited(size_t);
 	bool is_in_channel(size_t user_id);
@@ -203,6 +204,14 @@ std::vector<size_t> Channel::get_users_ids()
 	return (res);
 }
 
+std::vector<std::string> Channel::get_bans()
+{
+	std::vector<std::string> res;
+	for (std::set<std::string>::iterator it = ban_masks.begin(); it != ban_masks.end(); it++)
+		res.push_back(*it);
+	return (res);
+}
+
 bool banMatch(std::string ident, std::string mask) {
 	std::vector<std::string> nick_split = split_vct(ident, '!');
 	std::vector<std::string> ip_split = split_vct(ident, '@');
@@ -211,7 +220,7 @@ bool banMatch(std::string ident, std::string mask) {
 	if (nick_split.size() < 2 || ip_split.size() < 2 || mask_nick_split.size() < 2 || mask_ip_split.size() < 2) {
 		return false;
 	}
-	if (nick_split[0] == mask_nick_split[0] || ip_split[1] == mask_ip_split[1])
+	if ((nick_split[0] == mask_nick_split[0] || mask_nick_split[0] == "*") && (ip_split[1] == mask_ip_split[1] || mask_ip_split[1] == "*"))
 		return true;
 	return false;
 }

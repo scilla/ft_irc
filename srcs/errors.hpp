@@ -57,6 +57,8 @@
 #define RPL_CHANNELMODEIS		"324"
 #define RPL_NAMREPLY			"353"
 #define RPL_ENDOFNAME			"366"
+#define RPL_BANLIST				"367"
+#define RPL_ENDOFBANLIST		"368"
 #define RPL_WHOREPLY			"352"
 #define RPL_ENDOFWHO			"315"
 #define RPL_NOTOPIC				"331"
