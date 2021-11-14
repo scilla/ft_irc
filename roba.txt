@@ -270,3 +270,10 @@ TOPIC + channel -> mostra topic
 [14:58:05] [][127.0.0.1] 372 wewe :    ██║   ██║   ██║    ██╔══╝     ██║        ██║██╔══██╗██║     
 [14:58:05] [][127.0.0.1] 372 wewe :    ██║   ╚██████╔╝    ██║        ██║███████╗██║██║  ██║╚██████╗
 [14:58:05] [][127.0.0.1] 372 wewe :    ╚═╝    ╚═════╝     ╚═╝        ╚═╝╚══════╝╚═╝╚═╝  ╚═╝ ╚═════╝
+
+
+
+15:06:16] KICK #cacca scillaaa|2 :cammello
+[15:06:16] :newbie68!kvirc@IRCItalia-7BBFBF6E.business.telecomitalia.it KICK #cacca scillaaa|2 :cammello
+
+:newbie68!kvirc@IRCItalia-7BBFBF6E.business.telecomitalia.it KICK #cacca scillaaa|2 :cammello
