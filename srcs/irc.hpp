@@ -23,6 +23,7 @@ struct in_addr ipAddr;
 #include "CHANNEL.hpp"
 #include "netinet/in.h"
 #include "networking/server/Server.hpp"
+#include "networking/socket/ConnectingSocket.hpp"
 #include "errors.hpp"
 #include "utils.hpp"
 
@@ -43,6 +44,7 @@ public:
 	bool is_user(int fd);
 	std::list<Channel> get_channels();
 	Channel &get_channel(std::string channelname);
+	ConnectingSocket *remoteServer;
 
 	void launch();
 	void check_connection(void);
@@ -117,6 +119,8 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 {
 	current_user = NULL;
 	//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
+	if(!own)
+		remoteServer = new ConnectingSocket(AF_INET, SOCK_STREAM, 0, net_pt, INADDR_ANY);
 };
 
 void IRC::accepter()
