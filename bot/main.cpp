@@ -11,6 +11,7 @@
 #include <random>
 #include <time.h>
 #include <fstream>
+#include <pthread.h>
 #define SSTR(x) static_cast<std::ostringstream &>((std::ostringstream() << std::dec << x)).str()
 
 int SOCK;
@@ -104,6 +105,13 @@ std::vector<std::string> load_lorem_ipsum()
 
 int main(int ac, char **av)
 {
+	int pid;
+	for (int i = 0; i < 100; i++) {
+		sleep(1);
+		pid = fork();
+		if (!pid)
+			break;
+	}
 	srand(time(NULL));
 	SOCK = 0;
 	int valread;
@@ -128,6 +136,7 @@ int main(int ac, char **av)
 	n_pass = av[3];
 	n_port = atoi(av[2]);
 
+	
 	if ((SOCK = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n Socket creation error \n");
