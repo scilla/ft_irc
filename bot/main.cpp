@@ -109,8 +109,10 @@ std::vector<std::string> load_lorem_ipsum()
 int main(int ac, char **av)
 {
 	int pid;
-	for (int i = 0; i < 100; i++) {
-		sleep(1);
+	int i;
+	char str[10];
+	for (i = 0; i < 100; i++) {
+		usleep(500000);
 		pid = fork();
 		if (!pid)
 			break;
@@ -129,8 +131,10 @@ int main(int ac, char **av)
 	std::string nick = "BoT";
 	std::vector<std::string> lorem_ipsum = load_lorem_ipsum();
 
-	for (int i = 0; i < 5; i++)
-		nick.push_back("0123456789"[rand() % 10]);
+	// for (int i = 0; i < 5; i++)
+	// 	nick.push_back("0123456789"[rand() % 10]);+
+	sprintf(str, "%d", i);
+	nick.append(str);
 
 	if (ac != 4)
 	{
@@ -179,12 +183,14 @@ int main(int ac, char **av)
 		cmd = "JOIN #" + *it;
 		sender(cmd);
 	}
-	int i = 0;
-	while (++i)
+	int n = 0;
+	
+	while (++n)
 	{
+
 		usleep(500000 + rand() % 1000000);
-		cmd = "PRIVMSG #" + channel_to_join[i % channel_to_join.size()] + " :" + lorem_ipsum[rand() % lorem_ipsum.size()];
-		std::cout << "Msgs sent: " << i << std::endl;
+		cmd = "PRIVMSG #" + channel_to_join[n % channel_to_join.size()] + " :" + lorem_ipsum[rand() % lorem_ipsum.size()];
+		// std::cout << "Msgs sent: " << k++ << std::endl;
 		sender(cmd);
 		receiver();
 	}
