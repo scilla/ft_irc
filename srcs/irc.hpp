@@ -98,6 +98,8 @@ private:
 	int namesCmd(Channel);
 	int topicCmd(std::string);
 	int motdCmd(std::string);
+	int noticeCmd(std::string);
+
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own) : 

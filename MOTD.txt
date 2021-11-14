@@ -20,7 +20,7 @@
         > NICK				> LIST
         > JOIN				> PART
         > MODE				> QUIT
-        > PRIVMSG			> BAN
+        > PRIVMSG				> BAN
         > KICK				> PING
 
     The the channel mode supports the following flags [+/-]:

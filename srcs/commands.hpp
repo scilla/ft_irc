@@ -72,6 +72,8 @@ void IRC::commandSelector(std::string raw)
 		modeCmd(params);
 	else if(!parsed[0].compare("MOTD"))
 		motdCmd(params);
+	else if(!parsed[0].compare("NOTICE"))
+		noticeCmd(params);
 }
 
 int IRC::passCmd(std::vector<std::string> parsed)
@@ -356,6 +358,51 @@ int IRC::privmsgCmd(std::string raw)
 	}
 	return 0;
 }
+
+int IRC::noticeCmd(std::string raw)
+{
+	std::vector<std::string> splitted;
+	std::vector<std::string> receivers;
+	std::string priv_message;
+
+	splitted = splitter(raw, ' ');
+	receivers = splitter(splitted[0], ',');
+	// splitted.erase(splitted.begin());
+	priv_message = raw.substr(splitted[0].size() + 2, raw.size());
+	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
+	// {
+	// 	priv_message.append(*it.base());
+	// 	if(it != (splitted.end() - 1))
+	// 		priv_message.append(" ");
+	// }
+
+	std::map<std::string, Channel *>::iterator res;
+	bool found = false;
+
+	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
+	{
+		found = false;
+		for (std::map<size_t, User>::iterator ite = USER_MAP.begin(); ite != USER_MAP.end(); ite++)
+		{
+			if (!(*ite).second.get_nick().compare((*it)))
+			{
+				std::string tmp = ":" + current_user->get_identifier() + " NOTICE " + *it + " :" + priv_message;
+				responder(tmp, (*ite).second);
+				found = true;
+				break;
+			}
+		}
+
+	}
+	return 0;
+}
+
+
+
+
+
+
+
 
 int IRC::partCmd(std::string raw)
 {
