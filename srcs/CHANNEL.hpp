@@ -66,6 +66,7 @@ public:
 	void setPrivate(bool, User *);
 	void setSecret(bool, User *);
 	void setInviteOnly(bool, User *);
+	void setUserInvited(User *);
 	void setNoOpTopic(bool, User *);
 	void setNoExternalMessages(bool, User *);
 	void setModerated(bool, User *);
@@ -115,7 +116,6 @@ size_t Channel::get_limit()
 	return user_limit;
 }
 
-
 /*
 	o - give/take channel operator privileges;
 	-p - private channel flag;
@@ -156,8 +156,10 @@ std::string Channel::get_modes_str(std::string prepend_str = "[", std::string ap
 std::string Channel::get_modes_user_str(User &user)
 {
 	std::string res = "+";
-	if (!USER_MAP.count(user.get_id())) {
-		std::cout << "User not found\n" << std::endl;
+	if (!USER_MAP.count(user.get_id()))
+	{
+		std::cout << "User not found\n"
+				  << std::endl;
 		return "";
 	}
 	t_user_status user_modes = USER_MAP[user.get_id()];
@@ -170,25 +172,25 @@ std::string Channel::get_modes_user_str(User &user)
 
 bool Channel::is_invited(size_t user_id)
 {
-	for(std::set<size_t>::iterator it = invited_users.begin(); it != invited_users.end(); it++)
+	for (std::set<size_t>::iterator it = invited_users.begin(); it != invited_users.end(); it++)
 	{
-		if((*it) == user_id)
+		if ((*it) == user_id)
 		{
 			invited_users.erase(user_id);
-			return(true);
+			return (true);
 		}
 	}
-	return(false);
+	return (false);
 }
 
 bool Channel::is_in_channel(size_t user_id)
 {
-	for(std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
+	for (std::map<size_t, t_user_status>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 	{
-		if((*it).first == user_id)
-			return(true);
+		if ((*it).first == user_id)
+			return (true);
 	}
-	return(false);
+	return (false);
 }
 
 std::string Channel::get_topic() { return (_topic); }
@@ -324,7 +326,7 @@ void Channel::setBanMask(std::string banMask, User *op)
 
 void Channel::setTopic(std::string topic, User *op)
 {
-	if (!userIsOp(*op) && !modes.no_op_topic) 
+	if (!userIsOp(*op) && !modes.no_op_topic)
 		return;
 	_topic = topic;
 }
@@ -350,6 +352,13 @@ void Channel::setVoice(bool on, User *op, User *user)
 	std::string sign = on ? " +v " : " -v ";
 	std::string rep = ":" + op->get_identifier() + " MODE " + _name + sign + user->get_nick();
 	globalUserResponder(rep);
+}
+
+void Channel::setUserInvited(User *usr)
+{
+	if (!modes.invite)
+		return;
+	invited_users.insert(usr->get_id());
 }
 
 void Channel::setSecret(bool b, User *op)

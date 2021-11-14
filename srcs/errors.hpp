@@ -61,6 +61,7 @@
 #define RPL_ENDOFWHO			"315"
 #define RPL_NOTOPIC				"331"
 #define RPL_TOPIC				"332"
+#define RPL_INVITING			"341"
 #define RPL_MOTDSTART			"375"
 #define RPL_MOTD				"372"
 #define RPL_ENDOFMOTD			"376"
