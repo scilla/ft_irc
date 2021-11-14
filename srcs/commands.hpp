@@ -618,7 +618,7 @@ int IRC::modeCmd(std::string raw)
 	params = splitter(raw, ' ');
 	if (params.size() > 1)
 	{
-		if (params[0].compare(params[0].size(), 1, "#")) // channel mode
+		if (params[0][0] == '#') // channel mode
 		{
 			std::map<std::string, Channel *>::iterator found;
 			if ((found = CHANNEL_MAP.find(params[0])) != CHANNEL_MAP.end()) // canale trovato
@@ -728,21 +728,75 @@ int IRC::modeCmd(std::string raw)
 				}
 			}
 		}
-		else // user mode
+		else// user mode
 		{
-			
+			if(params[0].compare(current_user->get_nick())) //check if the sender and the name given as parameter are the same
+			{
+				std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_USERSDONTMATCH) + " " + current_user->get_nick() + " :Users does not matches";
+				responder(tmp, *current_user);
+				return 1;
+			}
+			if(params[1][0] == '+')
+			{
+				for (int i = 1; i < params[1].size(); i++)
+				{
+					if(params[1][i] == 'i') 
+						(*current_user)._state.invisible = true;
+					//else if(params[1][i] == 'o' && params[0].compare(current_user->get_nick())) 
+					//	(*current_user)._state.op = true;
+					//autonomous opping is ignored
+					else
+					{
+						std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UMODEUNKNOWNFLAG) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
+						responder(tmp, *current_user);
+					}
+				}
+			}
+			else if(params[1][0] == '-')
+			{
+				for (int i = 1; i < params[1].size(); i++)
+				{
+					if(params[1][i] == 'i')
+						(*current_user)._state.invisible = false;
+					else if(params[1][i] == 'o')
+						(*current_user)._state.op = false;
+					else
+					{
+						std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UMODEUNKNOWNFLAG) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
+						responder(tmp, *current_user);
+					}
+				}
+				return 1;
+			}
 		}
 	}
-	else
+	else if(params[0].size() > 0)
 	{
-		std::map<std::string, Channel *>::iterator found = CHANNEL_MAP.find(params[0]);
-		Channel *ch;
-		if (found != CHANNEL_MAP.end()) // canale trovato
+		if(params[0][0] == '#')
 		{
-			ch = found->second;
-			std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
-			responder(resp + ch->get_modes_str("", ""), *current_user);
+			std::map<std::string, Channel *>::iterator found = CHANNEL_MAP.find(params[0]);
+			Channel *ch;
+			if (found != CHANNEL_MAP.end()) // canale trovato
+			{
+				ch = found->second;
+				std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
+				responder(resp + ch->get_modes_str("", ""), *current_user);
+				return 0;
+			}
 		}
+		else
+		{
+			if(!current_user->get_nick().compare(params[0]))
+			{
+				std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_UMODEIS) + " " + current_user->get_nick() + " ";
+				responder(resp + current_user->get_user_modes(), *current_user);
+				return 0;
+			}
+		
+		}
+	}
+	else{
+		
 	}
 	// error ERR_NEEDMOREPARAMS
 	return 1;

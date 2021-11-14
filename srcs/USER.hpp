@@ -34,6 +34,7 @@ class User
 		std::string				_host;
 		std::string				_domain;
 		std::string				_remote_ip;
+		Roles					_roles;
 	public:
 		User(size_t);
 		~User();
@@ -56,7 +57,7 @@ class User
 		void set_host(std::string host);
 		void set_domain(std::string domain);
 		void set_remote_ip(std::string ip);
-		int						get_roles;
+		Roles get_roles();
 		t_state					_state;
 };
 
@@ -81,7 +82,10 @@ std::string User::get_altnick() const
 	return _altnick;
 }
 
-
+Roles User::get_roles()
+{
+	return _roles;
+}
 
 std::string User::get_username() const{
 	return _username;
