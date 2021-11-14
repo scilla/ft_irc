@@ -42,14 +42,14 @@ private:
 	std::set<size_t> invited_users;
 	size_t user_limit;
 	t_channel_modes modes;
-	std::vector<std::string> ban_masks;
+	std::set<std::string> ban_masks;
 	time_t creation_time;
 
 public:
 	Channel(std::string);
 	~Channel();
 
-	void userJoin(User &, std::string);
+	int userJoin(User &, std::string);
 	void userLeft(User &);
 	void userBan(User &);
 	void userOp(User &);
@@ -73,7 +73,7 @@ public:
 	void setVoice(bool, User *, User *);
 	void setUserLimit(bool, User *, size_t);
 	void setKey(bool, User *, std::string);
-	void setBanMask(std::string, User *);
+	void setBanMask(bool, std::string, User *);
 	std::string get_user_nb();
 	std::string get_modes_str(std::string, std::string);
 	std::string get_modes_user_str(User &user);
@@ -203,13 +203,40 @@ std::vector<size_t> Channel::get_users_ids()
 	return (res);
 }
 
-void Channel::userJoin(User &user, std::string pass = "")
+bool banMatch(std::string ident, std::string mask) {
+	std::vector<std::string> nick_split = split_vct(ident, '!');
+	std::vector<std::string> ip_split = split_vct(ident, '@');
+	std::vector<std::string> mask_nick_split = split_vct(mask, '!');
+	std::vector<std::string> mask_ip_split = split_vct(mask, '@');
+	if (nick_split.size() < 2 || ip_split.size() < 2 || mask_nick_split.size() < 2 || mask_ip_split.size() < 2) {
+		return false;
+	}
+	if (nick_split[0] == mask_nick_split[0] || ip_split[1] == mask_ip_split[1])
+		return true;
+	return false;
+}
+
+bool vectorBanMatch(User* user, std::set<std::string> vect) {
+	for (std::set<std::string>::iterator it = vect.begin(); it != vect.end(); it++) {
+		if (banMatch(user->get_identifier(), *it))
+			return true;
+	}
+	return false;
+}
+
+int Channel::userJoin(User &user, std::string pass = "")
 {
 	t_user_status stat((t_user_status){false, false});
+	if (vectorBanMatch(&user, ban_masks)) {
+		//:italia.ircitalia.net 474 newbie #x :Cannot join channel (+b)
+		std::string msg = ":127.0.0.1 " + std::string(ERR_BANNEDFROMCHAN) + " " + user.get_nick() + " " + get_name() + " :Cannot join the channel (+b)";
+		responder(msg, user);
+		return 1;
+	}
 	if (modes.has_key && pass != _key)
 	{
 		responder(ERR_BADCHANNELKEY, user);
-		return;
+		return 1;
 	}
 	//if (modes.has_limit && USER_MAP.size() >= user_limit)
 	//{
@@ -228,7 +255,7 @@ void Channel::userJoin(User &user, std::string pass = "")
 	if (USER_MAP.find(user.get_id()) != USER_MAP.end())
 	{
 		responder(ERR_ALREADYREGISTRED, user);
-		return;
+		return 1;
 	}
 	if (!USER_MAP.size())
 		stat.admin = true;
@@ -242,6 +269,7 @@ void Channel::userJoin(User &user, std::string pass = "")
 	}
 	// todo: RPL_TOPIC
 	// todo: RPL_NAMREPLY list users including me
+	return 0;
 }
 
 void Channel::globalUserResponder(std::string message, size_t skip = 0)
@@ -317,11 +345,21 @@ std::string Channel::get_creation_time()
 	return SSTR(creation_time);
 }
 
-void Channel::setBanMask(std::string banMask, User *op)
+void Channel::setBanMask(bool b, std::string banMask, User *op)
 {
 	if (!userIsOp(*op))
 		return;
-	ban_masks.push_back(banMask);
+	if (b) {
+		if (split_vct(banMask, '!').size() < 2)
+			banMask.append("!*@*");
+		ban_masks.insert(banMask);
+	} else {
+		if (split_vct(banMask, '!').size() < 2)
+			banMask.append("!*@*");
+		if (ban_masks.find(banMask) != ban_masks.end()) {
+			ban_masks.erase(banMask);
+		}
+	}
 }
 
 void Channel::setTopic(std::string topic, User *op)

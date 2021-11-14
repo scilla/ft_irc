@@ -59,4 +59,15 @@ void responder(std::string message, User &ux)
 	responder(message, ux.get_id());
 }
 
+std::vector<std::string> split_vct(std::string str, char delim)
+{
+	std::vector<std::string> tmp_vct;
+	std::stringstream stream(str);
+	std::string temp_str;
+
+	while (std::getline(stream, temp_str, delim))
+		tmp_vct.push_back(temp_str);
+	return (tmp_vct);
+}
+
 #endif /* UTILS_HPP */

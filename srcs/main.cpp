@@ -23,17 +23,6 @@ bool isNumber(const char *str)
     return true;
 }
 
-std::vector<std::string> split_vct(std::string str, char delim)
-{
-	std::vector<std::string> tmp_vct;
-	std::stringstream stream(str);
-	std::string temp_str;
-	
-	while(std::getline(stream, temp_str, delim))
-		tmp_vct.push_back(temp_str);
-	return (tmp_vct);
-}
-
 void check_args(char **av)
 {
 	std::vector<std::string> tmp;
