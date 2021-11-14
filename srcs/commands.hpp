@@ -253,15 +253,15 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size())
 		{
-			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id())) //only invide mode is checked and use is searched in invite list
-			{
-				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
-				responder(msg, *current_user);
-				continue;
-			}
 			if(current_channel->getModes().has_limit && current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
 			{
 				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANNELISFULL) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				continue;
+			}
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id())) //only invide mode is checked and user is searched in invite list
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
 				responder(msg, *current_user);
 				continue;
 			}
@@ -270,15 +270,15 @@ int IRC::joinCmd(std::string raw)
 		}
 		else
 		{
-			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
-			{
-				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + " " +current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
-				responder(msg, *current_user);
-				continue;
-			}
 			if(current_channel->getModes().has_limit && current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
 			{
 				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANNELISFULL) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
+				responder(msg, *current_user);
+				continue;
+			}
+			if(current_channel->getModes().invite && !current_channel->is_invited(current_user->get_id()))
+			{
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_INVITEONLYCHAN) + " " +current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
 				responder(msg, *current_user);
 				continue;
 			}
