@@ -37,8 +37,8 @@ std::string receiver()
 	// struct timeval timeout;
 	// timeout.tv_usec = 100;
 	// select(SOCK + 1, &fds, NULL, NULL, &timeout);
-	char buffer[102400] = {0};
-	read(SOCK, buffer, 102400);
+	char buffer[1024000] = {0};
+	read(SOCK, buffer, 1024000);
 	return str;
 
 	while ((ss = read(SOCK, buffer, 1024)) > 0)
@@ -111,7 +111,7 @@ int main(int ac, char **av)
 	int pid;
 	int i;
 	char str[10];
-	for (i = 0; i < 100; i++) {
+	for (i = 0; i < 500; i++) {
 		usleep(500000);
 		pid = fork();
 		if (!pid)

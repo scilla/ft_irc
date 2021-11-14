@@ -18,6 +18,7 @@ class Socket
         Socket();
 		~Socket() {};
         Socket(int domain, int service, int protocol, int serverPort, u_long interface);
+		Socket(int domain, int service, int protocol, int serverPort, u_long interface, char *ip);
         virtual int netConnection(int hSocket, struct sockaddr_in remote) = 0;
         int testConnection(int toTest);
         int getSocket();
@@ -36,8 +37,22 @@ Socket::Socket(int domain, int service, int protocol, int serverPort, u_long int
 	this->remote.sin_addr.s_addr = htonl(interface);
 	// socket(AF_INET, SOCK_STREAM, 0);
 	this->hSocket = socket(domain, service, protocol);
+	std::cout << hSocket << std::endl;
 	this->testConnection(hSocket);
 }
+
+Socket::Socket(int domain, int service, int protocol, int serverPort, u_long interface, char *ip){
+	std::cout << "Create the socket" << std::endl;
+	// The htons function converts a u_short from host to TCP/IP network byte order (which is big-endian).
+	inet_pton(AF_INET, ip, &(remote.sin_addr));
+	this->remote.sin_family = domain;
+	this->remote.sin_port = serverPort;
+	// socket(AF_INET, SOCK_STREAM, 0);
+	this->hSocket = socket(domain, service, protocol);
+	std::cout << hSocket << std::endl;
+	this->testConnection(hSocket);
+}
+
 
 int Socket::testConnection(int toTest){
 	if(toTest < 0){
