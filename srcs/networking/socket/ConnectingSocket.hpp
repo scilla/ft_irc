@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONNECTINGSOCKET_HPP
+#define CONNECTINGSOCKET_HPP
 #include "Socket.hpp"
 
 class ConnectingSocket: public Socket
@@ -22,3 +23,6 @@ ConnectingSocket::~ConnectingSocket(){}
 int ConnectingSocket::netConnection(int hSocket, struct sockaddr_in remote){
 	return connect(hSocket, (struct sockaddr *)&remote, sizeof(remote));
 }
+
+
+#endif /* CONNECTINGSOCKET_HPP */
