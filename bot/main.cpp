@@ -106,7 +106,7 @@ std::vector<std::string> load_lorem_ipsum()
 int main(int ac, char **av)
 {
 	int pid;
-	for (int i = 0; i < 30; i++) {
+	for (int i = 0; i < 10; i++) {
 		sleep(1);
 		pid = fork();
 		if (!pid)
@@ -179,7 +179,7 @@ int main(int ac, char **av)
 	int i = 0;
 	while (++i)
 	{
-		usleep(1000 + rand() % 2000);
+		usleep(1000000 + rand() % 2000000);
 		cmd = "PRIVMSG #" + channel_to_join[i % channel_to_join.size()] + " :" + lorem_ipsum[rand() % lorem_ipsum.size()];
 		sender(cmd);
 	}
