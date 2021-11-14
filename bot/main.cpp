@@ -112,6 +112,8 @@ int main(int ac, char **av)
 		if (!pid)
 			break;
 	}
+	if (pid)
+		sleep(2);
 	srand(time(NULL));
 	SOCK = 0;
 	int valread;
@@ -177,7 +179,7 @@ int main(int ac, char **av)
 	int i = 0;
 	while (++i)
 	{
-		sleep(1);
+		usleep(1000 + rand() % 2000);
 		cmd = "PRIVMSG #" + channel_to_join[i % channel_to_join.size()] + " :" + lorem_ipsum[rand() % lorem_ipsum.size()];
 		sender(cmd);
 	}
