@@ -78,6 +78,10 @@ int main(int ac, char **av)
 		}
 	}
 
+	if (l_port < 1024 || l_port > 65535) {
+		printf("\n Port out of range [1024-65535] \n");
+		return -1;
+	}
 	IRC server(n_host, n_port, n_psw, l_port, l_psw, type_bool);
 	server.launch();
 
