@@ -113,7 +113,7 @@ int main(int ac, char **av)
 	int pid;
 	int i;
 	char str[10];
-	for (i = 0; i < 100; i++)
+	for (i = 0; i < 10; i++)
 	{
 		usleep(500000);
 		pid = fork();

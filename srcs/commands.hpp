@@ -291,6 +291,7 @@ int IRC::joinCmd(std::string raw)
 			if (!current_channel->userJoin(*current_user))
 				namesCmd(*current_channel);
 		}
+		topicCmd(current_channel->get_name());
 	}
 	return 0;
 }
@@ -345,14 +346,8 @@ int IRC::privmsgCmd(std::string raw)
 
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
-	// splitted.erase(splitted.begin());
-	priv_message = raw.substr(splitted[0].size() + 2, raw.size());
-	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
-	// {
-	// 	priv_message.append(*it.base());
-	// 	if(it != (splitted.end() - 1))
-	// 		priv_message.append(" ");
-	// }
+	if (splitted.size() > 1)
+		priv_message = raw.substr(splitted[0].size() + 2, raw.size());
 
 	std::map<std::string, Channel *>::iterator res;
 	bool found = false;
@@ -418,14 +413,8 @@ int IRC::noticeCmd(std::string raw)
 
 	splitted = splitter(raw, ' ');
 	receivers = splitter(splitted[0], ',');
-	// splitted.erase(splitted.begin());
-	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
-	// for(std::vector<std::string>::iterator it = splitted.begin(); it != splitted.end(); it++)
-	// {
-	// 	priv_message.append(*it.base());
-	// 	if(it != (splitted.end() - 1))
-	// 		priv_message.append(" ");
-	// }
+	if (splitted.size() > 1)
+		priv_message = raw.substr(splitted[0].size() + 1, raw.size());
 
 	std::map<std::string, Channel *>::iterator res;
 	bool found = false;
@@ -501,7 +490,7 @@ int IRC::listCmd(std::string raw)
 				responder(msg, *current_user);
 			}
 			else
-				responder(msg /* + (*it).second->get_modes_str() + " "*/ + (*it).second->get_topic(), *current_user);
+				responder(msg + (*it).second->get_topic(), *current_user);
 		}
 	}
 	/*end list message*/
@@ -523,17 +512,19 @@ int IRC::topicCmd(std::string raw)
 		{
 			if (!channel_name.compare((*it).first))
 			{
-				if ((!(*it).second->getModes().topic) || ((*it).second->getModes().topic && (*it).second->userIsOp(*current_user)))
+				if ((!(*it).second->getModes().no_op_topic) || ((*it).second->getModes().no_op_topic && (*it).second->userIsOp(*current_user)))
 				{
 					(*it).second->setTopic(topic.substr(1, topic.size()), current_user);
 					std::string msg = ":" + current_user->get_identifier() + " TOPIC " + (*it).first + " :" + (*it).second->get_topic();
-					responder(msg, *current_user);
+					//responder(msg, *current_user);
+					(*it).second->globalUserResponder(msg);
 					break;
 				}
 				else
 				{
 					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + std::string(ERR_CHANOPRIVSNEEDED) + " " + current_user->get_nick() + " " + channel_name + " :You're not channel operator";
-					responder(msg, *current_user);
+					//responder(msg, *current_user);
+					(*it).second->globalUserResponder(msg);
 					break;
 				}
 			}
@@ -546,31 +537,29 @@ int IRC::topicCmd(std::string raw)
 			if (!channel_name.compare((*it).first)) // find the channel
 			{
 				std::vector<size_t> tmp = (*it).second->get_users_ids();
+				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " ";
 				for (std::vector<size_t>::iterator ite = tmp.begin(); ite != tmp.end(); ite++) // search the user in the channel
 				{
-					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " ";
-					if (*ite.base() == current_user->get_id() && (*it).second->get_topic().size()) // user in the channel found and topic is set
+					if (*ite == current_user->get_id() && (*it).second->get_topic().size()) // user in the channel found and topic is set
 					{
 						msg.append(RPL_TOPIC);
-						msg.append(" " + channel_name + " :" + (*it).second->get_topic());
+						msg.append(" " + current_user->get_nick() + " " + (*it).second->get_name() + " :" + (*it).second->get_topic());
 						responder(msg, *current_user);
 						return 0;
 					}
-					else if (*ite.base() == current_user->get_id() && !(*it).second->get_topic().size()) // user found but no topic is set
+					else if (*ite == current_user->get_id() && !(*it).second->get_topic().size()) // user found but no topic is set
 					{
 						msg.clear();
 						msg.append(RPL_NOTOPIC);
 						responder(msg, *current_user);
 						return 1;
 					}
-					else // user in the channel not found
-					{
-						msg.clear();
-						msg.append(ERR_NOTONCHANNEL);
-						responder(msg, *current_user);
-						return 1;
-					}
+					continue;
 				}
+				msg.clear();
+				msg.append(ERR_NOTONCHANNEL);
+				responder(msg, *current_user);
+				return 1;
 				return 1;
 			}
 		}
@@ -732,11 +721,12 @@ int IRC::modeCmd(std::string raw)
 					if (old_modes != new_modes)
 					{
 						Channel *ch;
+						std::string if_limit = found->second->getModes().has_limit ? SSTR(found->second->get_limit()) : "";
 						if (found != CHANNEL_MAP.end()) // canale trovato
 						{
 							ch = found->second;
 							std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
-							ch->globalUserResponder(resp + ch->get_modes_str("", ""));
+							ch->globalUserResponder(resp + ch->get_modes_str("", "") + " " + if_limit);
 							return 0;
 						}
 					}
@@ -1051,7 +1041,7 @@ int IRC::kickCmd(std::string raw)
 			if ((*foundchan).second->userIsOp(*current_user))
 			{
 				User *UserToKick = get_user(toKick);
-				if ((*foundchan).second->is_in_channel(UserToKick->get_id()))
+				if (UserToKick && (*foundchan).second->is_in_channel(UserToKick->get_id()))
 				{
 					std::string msg = ":" + (*current_user).get_identifier() + " KICK " + (*foundchan).second->get_name() + " " + UserToKick->get_nick() + " " + comment;
 					(*foundchan).second->globalUserResponder(msg);

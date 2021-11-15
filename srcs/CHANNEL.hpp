@@ -93,7 +93,7 @@ Channel::Channel(std::string channel_name)
 	_key = "";
 	_topic = "";
 	user_limit = 0;
-	modes = (t_channel_modes){false, false, false, true, true, false, false, true};
+	modes = (t_channel_modes){false, false, false, true, true, false, false, false, false, true};
 	creation_time = std::time(NULL);
 };
 
@@ -148,7 +148,7 @@ std::string Channel::get_modes_str(std::string prepend_str = "[", std::string ap
 		res.append("p");
 	if (modes.secret)
 		res.append("s");
-	if (modes.topic)
+	if (modes.no_op_topic)
 		res.append("t");
 	res.append(append_str);
 	return (res);
@@ -426,7 +426,7 @@ void Channel::setNoOpTopic(bool b, User *op)
 {
 	if (!userIsOp(*op))
 		return;
-	modes.topic = b;
+	modes.no_op_topic = b;
 }
 
 void Channel::setNoExternalMessages(bool b, User *op)
