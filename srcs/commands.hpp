@@ -657,6 +657,8 @@ MODE #Finnish +o Kilroy         ; Gives 'chanop' privileges to Kilroy on
 int IRC::modeCmd(std::string raw)
 {
 	std::vector<std::string> params;
+	std::string old_modes;
+	std::string new_modes;
 	params = splitter(raw, ' ');
 	if (params.size() > 1)
 	{
@@ -667,6 +669,7 @@ int IRC::modeCmd(std::string raw)
 			{
 				if (params[1][0] == '+')
 				{
+					old_modes = found->second->get_modes_str("", "");
 					for (int i = 1; i < params[1].size(); i++)
 					{
 						if (params[1][i] == 'o')
@@ -725,9 +728,21 @@ int IRC::modeCmd(std::string raw)
 							responder(tmp, *current_user);
 						}
 					}
+					new_modes = found->second->get_modes_str("", "");
+					if (old_modes != new_modes) {
+						Channel *ch;
+						if (found != CHANNEL_MAP.end()) // canale trovato
+						{
+							ch = found->second;
+							std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
+							ch->globalUserResponder(resp + ch->get_modes_str("", ""));
+							return 0;
+						}
+					}
 				}
 				else if (params[1][0] == '-')
 				{
+					old_modes = found->second->get_modes_str("", "");
 					for (int i = 1; i < params[1].size(); i++)
 					{
 						if (params[1][i] == 'o')
@@ -772,6 +787,22 @@ int IRC::modeCmd(std::string raw)
 							//:italia.ircitalia.net 472 Buonve 2 :is unknown mode char to me
 							std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UNKNOWNMODE) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
 							responder(tmp, *current_user);
+						}
+					}
+					new_modes = found->second->get_modes_str("", "");
+					std::string diff_modes;
+					for (int i = 0; i < old_modes.size(); i++) {
+						if (new_modes.find(old_modes[i]) == std::string::npos)
+							diff_modes.push_back(old_modes[i]);
+					}
+					if (old_modes != new_modes) {
+						Channel *ch;
+						if (found != CHANNEL_MAP.end()) // canale trovato
+						{
+							ch = found->second;
+							std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_CHANNELMODEIS) + " " + current_user->get_nick() + " " + found->second->get_name() + " ";
+							ch->globalUserResponder(resp + "-" + diff_modes);
+							return 0;
 						}
 					}
 				}

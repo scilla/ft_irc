@@ -114,8 +114,8 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 	_network_port(net_pt),
 	_network_password(net_psw),
 	_port(pt),
-	_password(psw)
-	//Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
+	_password(psw),
+	Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
 {
 	current_user = NULL;
 	//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
