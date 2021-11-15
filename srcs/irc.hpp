@@ -114,13 +114,38 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 	_network_port(net_pt),
 	_network_password(net_psw),
 	_port(pt),
-	_password(psw),
-	Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
+	_password(psw)
+	//Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
 {
 	current_user = NULL;
 	//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
 	if(!own)
-		remoteServer = new ConnectingSocket(AF_INET, SOCK_STREAM, 0, net_pt, INADDR_ANY);
+	{
+		struct hostent *he;
+		struct in_addr **addr_list;
+		char *ip;
+		he = gethostbyname(_host.c_str());
+		addr_list = (struct in_addr **) he->h_addr_list;
+		ip = inet_ntoa(**addr_list);
+		std::cout << ip << std::endl;
+		std::cout << inet_addr(ip) << std::endl;
+		std::cout << htonl( inet_addr(ip)) << std::endl;
+
+		remoteServer = new ConnectingSocket(AF_INET, SOCK_STREAM, 0, net_pt, inet_addr(ip));
+		std::cout << remoteServer->getConnection() << std::endl;
+		std::string MSG;
+		char remotebuff[500];
+		while(true)
+		{
+			std::cin >> MSG;
+			write(4, MSG.c_str(), MSG.length());
+			MSG.clear();
+			MSG = recv(4, remotebuff, 500, 0);
+			std::cout << remotebuff << std::endl;
+			sleep(1);
+		}
+
+	}
 };
 
 void IRC::accepter()
@@ -302,7 +327,7 @@ std::string IRC::receiver()
 
 void IRC::launch()
 {
-	signal(SIGPIPE, SIG_IGN);
+	//signal(SIGPIPE, SIG_IGN);
 	char str[INET_ADDRSTRLEN];
 	current_user = NULL;
 	remote = getServerSocket()->getRemote();
