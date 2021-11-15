@@ -132,6 +132,7 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 		std::cout << htonl( inet_addr(ip)) << std::endl;
 
 		remoteServer = new ConnectingSocket(AF_INET, SOCK_STREAM, 0, net_pt, inet_addr(ip));
+		remoteServer->setConnection
 		std::cout << remoteServer->getConnection() << std::endl;
 		std::string MSG;
 		char remotebuff[500];
@@ -144,7 +145,6 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 			std::cout << remotebuff << std::endl;
 			sleep(1);
 		}
-
 	}
 };
 
