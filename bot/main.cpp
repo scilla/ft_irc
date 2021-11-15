@@ -66,6 +66,13 @@ bool isNumber(const char *str)
 	return true;
 }
 
+
+void check_args(char **av)
+{
+	if (!isNumber(av[2]))
+		exit_err();
+}
+
 std::vector<std::string> split_vct(std::string str, char delim)
 {
 	std::vector<std::string> tmp_vct;
@@ -77,28 +84,32 @@ std::vector<std::string> split_vct(std::string str, char delim)
 	return (tmp_vct);
 }
 
-void check_args(char **av)
-{
-	if (!isNumber(av[2]))
-		exit_err();
-}
-
 std::vector<std::string> get_channnels()
 {
 	sender("LIST");
 	return split_vct(receiver(), '\n');
 }
 
+// int count_char(std::string str, char c) {
+// 	int i = 0;
+// 	for (int n = 0; n < str.size(); n++)
+// 		if (str[n] == c)
+// 			i++;
+// 	return i;
+// }
+
 std::vector<std::string> load_lorem_ipsum()
 {
 	std::set<std::string> res;
 	std::string line;
-	std::ifstream myfile("lorem_ipsum.txt");
+	std::ifstream myfile("chat.txt");
 	if (myfile.is_open())
 	{
 		while (getline(myfile, line))
 		{
-			res.insert(line);
+			if (split_vct(line, ':').size() != 3)
+				continue;
+			res.insert(split_vct(line, ':')[2]);
 		}
 		myfile.close();
 	}
