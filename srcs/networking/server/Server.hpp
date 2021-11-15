@@ -11,7 +11,7 @@ private:
     virtual void handler(int) = 0;
     //virtual void responder(std::string, int) = 0;
 protected:
-    ListeningSocket * socket;
+    ListeningSocket * Socket;
 public:
     Server();
     Server(int domain, int service, int protocol, int serverPort, u_long interface, int backlog);
@@ -24,13 +24,13 @@ Server::Server(){}
 
 Server::Server(int domain, int service, int protocol, int serverPort, u_long interface, int backlog)
 {
-	socket = new ListeningSocket(domain, service, protocol, serverPort, interface, backlog);
+	Socket = new ListeningSocket(domain, service, protocol, serverPort, interface, backlog);
 }
 	
 Server::~Server(){
-	delete socket;
+	delete Socket;
 }
 
 ListeningSocket * Server::getServerSocket(){
-	return socket;
+	return Socket;
 }
