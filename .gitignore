@@ -36,4 +36,5 @@
 ircserv
 *.dSYM
 bot/bot
+bircd/bircd
 bot/chat.txt

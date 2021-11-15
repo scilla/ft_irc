@@ -1,4 +1,5 @@
 #include <vector>
+#include <set>
 #include <iostream>
 #include <cctype>
 #include <algorithm>
@@ -99,7 +100,7 @@ std::vector<std::string> get_channnels()
 
 std::vector<std::string> load_lorem_ipsum()
 {
-	std::vector<std::string> res;
+	std::set<std::string> res;
 	std::string line;
 	std::ifstream myfile("chat.txt");
 	if (myfile.is_open())
@@ -108,13 +109,14 @@ std::vector<std::string> load_lorem_ipsum()
 		{
 			if (split_vct(line, ':').size() != 3)
 				continue;
-			res.push_back(split_vct(line, ':')[2]);
+			res.insert(split_vct(line, ':')[2]);
 		}
 		myfile.close();
 	}
 	else
 		std::cout << "Unable to open file";
-	return res;
+	std::vector<std::string> ret(res.begin(), res.end());
+	return ret;
 }
 
 int main(int ac, char **av)
@@ -130,7 +132,7 @@ int main(int ac, char **av)
 	}
 	if (pid)
 		sleep(2);
-	srand(time(NULL));
+	srand(time(NULL) + i);
 	SOCK = 0;
 	int valread;
 	struct sockaddr_in serv_addr;
@@ -146,6 +148,7 @@ int main(int ac, char **av)
 	// 	nick.push_back("0123456789"[rand() % 10]);+
 	sprintf(str, "%d", i);
 	nick.append(str);
+	std::cout << "Connecting client with nick " << nick << std::endl;
 
 	if (ac != 4)
 	{

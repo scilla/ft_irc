@@ -114,13 +114,64 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 	_network_port(net_pt),
 	_network_password(net_psw),
 	_port(pt),
-	_password(psw),
-	Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
+	_password(psw)
+	//Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
 {
 	current_user = NULL;
 	//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
 	if(!own)
-		remoteServer = new ConnectingSocket(AF_INET, SOCK_STREAM, 0, net_pt, INADDR_ANY);
+	{
+
+
+		struct sockaddr_in remoteaddr;
+        struct hostent *remotehost;
+		bzero((char *) &remoteaddr, sizeof(remoteaddr));
+		remotehost = gethostbyname(_host.c_str());
+		remoteaddr.sin_addr.s_addr = *(unsigned long*)remotehost->h_addr;
+        remoteaddr.sin_family = AF_INET;
+        remoteaddr.sin_port = htons((unsigned short)_port);
+
+        int sockd = socket(AF_INET, SOCK_STREAM, 0);
+		std::cout << sockd << std::endl;
+		if(connect(sockd, (struct sockaddr *)&remoteaddr, sizeof(remoteaddr)) < 0)
+			std::cout << "Connection failed: " + std::string(strerror(errno)) << std::endl; 
+		std::cout << "Connecting to: " << _host << std::endl;
+		std::string MSG = "NICK ft_irc\r\n";
+        send(sockd, MSG.c_str(), MSG.size(), 0); // Converts nick string to c-array and sends it to server
+		std::cout << "Sent: " << MSG << " to server" << std::endl;
+        MSG.clear();
+		MSG = "USER ft_irc 0 " + _host + ": connessione\r\n";
+        send(sockd, MSG.c_str(), MSG.size(), 0); // Converts user string to c-array and sends it to server
+        std::cout << "sent: " << MSG << " to server" << std::endl;
+		char sockbuff[4096]; // array to hold the incoming socket data
+		int connected = 0;
+        while (connected < 1) { 
+                memset(&sockbuff, '\0', sizeof(sockbuff)); // make sure sockbuff[] is empty
+                recv(sockd, sockbuff, 4096, 0); // Recieve all the data from server to sockbuff[]
+                std::cout << sockbuff << std::endl;;
+				sleep(1);
+        }
+		//addr_list = (struct in_addr **) he->h_addr_list;
+		//ip = inet_ntoa(**addr_list);
+		//std::cout << ip << std::endl;
+		//std::cout << inet_addr(ip) << std::endl;
+		//std::cout << htonl( inet_addr(ip)) << std::endl;
+
+		//remoteServer = new ConnectingSocket(AF_INET, SOCK_STREAM, 0, net_pt, inet_addr(ip));
+		//std::cout << remoteServer->getConnection() << std::endl;
+		//int sockfd = 
+		
+		//char remotebuff[500];
+		//while(true)
+		//{
+		//	std::cin >> MSG;
+		//	write(4, MSG.c_str(), MSG.length());
+		//	MSG.clear();
+		//	MSG = recv(4, remotebuff, 500, 0);
+		//	std::cout << remotebuff << std::endl;
+		//	sleep(1);
+		//}
+	}
 };
 
 void IRC::accepter()
@@ -302,7 +353,7 @@ std::string IRC::receiver()
 
 void IRC::launch()
 {
-	signal(SIGPIPE, SIG_IGN);
+	//signal(SIGPIPE, SIG_IGN);
 	char str[INET_ADDRSTRLEN];
 	current_user = NULL;
 	remote = getServerSocket()->getRemote();
