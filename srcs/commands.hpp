@@ -729,7 +729,8 @@ int IRC::modeCmd(std::string raw)
 						}
 					}
 					new_modes = found->second->get_modes_str("", "");
-					if (old_modes != new_modes) {
+					if (old_modes != new_modes)
+					{
 						Channel *ch;
 						if (found != CHANNEL_MAP.end()) // canale trovato
 						{
@@ -791,11 +792,13 @@ int IRC::modeCmd(std::string raw)
 					}
 					new_modes = found->second->get_modes_str("", "");
 					std::string diff_modes;
-					for (int i = 0; i < old_modes.size(); i++) {
+					for (int i = 0; i < old_modes.size(); i++)
+					{
 						if (new_modes.find(old_modes[i]) == std::string::npos)
 							diff_modes.push_back(old_modes[i]);
 					}
-					if (old_modes != new_modes) {
+					if (old_modes != new_modes)
+					{
 						Channel *ch;
 						if (found != CHANNEL_MAP.end()) // canale trovato
 						{
@@ -806,7 +809,8 @@ int IRC::modeCmd(std::string raw)
 						}
 					}
 				}
-				else if (params[1][0] == 'b') {
+				else if (params[1][0] == 'b')
+				{
 					std::string msg;
 					std::string is_op;
 					std::vector<std::string> bans = found->second->get_bans();
@@ -1027,9 +1031,11 @@ int IRC::kickCmd(std::string raw)
 	std::string comment;
 
 	splitted = splitter(raw, ' ');
-	toKick = splitted[1];
 	channel = splitted[0];
-	comment = raw.substr(splitted[0].size() + splitted[1].size() + 2, raw.size());
+	if (splitted.size() > 1)
+		toKick = splitted[1];
+	if (splitted.size() > 2)
+		comment = raw.substr(splitted[0].size() + splitted[1].size() + 2, raw.size());
 
 	if (splitted.size() < 2)
 	{
