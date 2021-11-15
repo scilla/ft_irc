@@ -353,7 +353,7 @@ std::string IRC::receiver()
 
 void IRC::launch()
 {
-	//signal(SIGPIPE, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 	char str[INET_ADDRSTRLEN];
 	current_user = NULL;
 	remote = getServerSocket()->getRemote();
@@ -367,11 +367,8 @@ void IRC::launch()
 
 	fd_set fds; //fess d sort
 
-	// int nonepossibilecheesiste = 0;
 	while (true)
 	{
-		// nonepossibilecheesiste++;
-		// std::cout << "count " << nonepossibilecheesiste << std::endl;
 		max = getServerSocket()->getSocket() + 1;
 		FD_ZERO(&fds);
 		FD_SET(getServerSocket()->getSocket(), &fds);

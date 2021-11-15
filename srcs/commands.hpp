@@ -1029,7 +1029,7 @@ int IRC::kickCmd(std::string raw)
 	splitted = splitter(raw, ' ');
 	toKick = splitted[1];
 	channel = splitted[0];
-	comment = splitted[2];
+	comment = raw.substr(splitted[0].size() + splitted[1].size() + 2, raw.size());
 
 	if (splitted.size() < 2)
 	{
@@ -1047,7 +1047,7 @@ int IRC::kickCmd(std::string raw)
 				User *UserToKick = get_user(toKick);
 				if ((*foundchan).second->is_in_channel(UserToKick->get_id()))
 				{
-					std::string msg = ":" + (*current_user).get_identifier() + " KICK " + (*foundchan).second->get_name() + " " + UserToKick->get_nick() + " :" + comment;
+					std::string msg = ":" + (*current_user).get_identifier() + " KICK " + (*foundchan).second->get_name() + " " + UserToKick->get_nick() + " " + comment;
 					(*foundchan).second->globalUserResponder(msg);
 					(*foundchan).second->userLeft(*UserToKick);
 				}

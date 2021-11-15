@@ -20,7 +20,7 @@ int SOCK;
 void exit_err()
 {
 	std::cout << "*** ERROR ***" << std::endl;
-	std::cout << "USAGE: ./ircserv <host> <port> <password>" << std::endl;
+	std::cout << "USAGE: ./bot <host> <port> <password>" << std::endl;
 	exit(1);
 }
 
@@ -114,7 +114,7 @@ std::vector<std::string> load_lorem_ipsum()
 		myfile.close();
 	}
 	else
-		std::cout << "Unable to open file";
+	std::cout << "Unable to open file";
 	std::vector<std::string> ret(res.begin(), res.end());
 	return ret;
 }
