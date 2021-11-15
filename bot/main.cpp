@@ -66,7 +66,6 @@ bool isNumber(const char *str)
 	return true;
 }
 
-
 void check_args(char **av)
 {
 	if (!isNumber(av[2]))
@@ -90,31 +89,21 @@ std::vector<std::string> get_channnels()
 	return split_vct(receiver(), '\n');
 }
 
-// int count_char(std::string str, char c) {
-// 	int i = 0;
-// 	for (int n = 0; n < str.size(); n++)
-// 		if (str[n] == c)
-// 			i++;
-// 	return i;
-// }
-
 std::vector<std::string> load_lorem_ipsum()
 {
 	std::set<std::string> res;
 	std::string line;
-	std::ifstream myfile("chat.txt");
+	std::ifstream myfile("lorem_ipsum.txt");
 	if (myfile.is_open())
 	{
 		while (getline(myfile, line))
 		{
-			if (split_vct(line, ':').size() != 3)
-				continue;
-			res.insert(split_vct(line, ':')[2]);
+			res.insert(line);
 		}
 		myfile.close();
 	}
 	else
-	std::cout << "Unable to open file";
+		std::cout << "Unable to open file";
 	std::vector<std::string> ret(res.begin(), res.end());
 	return ret;
 }
@@ -124,7 +113,8 @@ int main(int ac, char **av)
 	int pid;
 	int i;
 	char str[10];
-	for (i = 0; i < 100; i++) {
+	for (i = 0; i < 100; i++)
+	{
 		usleep(500000);
 		pid = fork();
 		if (!pid)
@@ -159,7 +149,6 @@ int main(int ac, char **av)
 	n_pass = av[3];
 	n_port = atoi(av[2]);
 
-	
 	if ((SOCK = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n Socket creation error \n");
@@ -198,7 +187,7 @@ int main(int ac, char **av)
 		sender(cmd);
 	}
 	int n = 0;
-	
+
 	while (++n)
 	{
 
