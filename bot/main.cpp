@@ -1,4 +1,5 @@
 #include <vector>
+#include <set>
 #include <iostream>
 #include <cctype>
 #include <algorithm>
@@ -90,20 +91,21 @@ std::vector<std::string> get_channnels()
 
 std::vector<std::string> load_lorem_ipsum()
 {
-	std::vector<std::string> res;
+	std::set<std::string> res;
 	std::string line;
 	std::ifstream myfile("lorem_ipsum.txt");
 	if (myfile.is_open())
 	{
 		while (getline(myfile, line))
 		{
-			res.push_back(line);
+			res.insert(line);
 		}
 		myfile.close();
 	}
 	else
 		std::cout << "Unable to open file";
-	return res;
+	std::vector<std::string> ret(res.begin(), res.end());
+	return ret;
 }
 
 int main(int ac, char **av)
@@ -119,7 +121,7 @@ int main(int ac, char **av)
 	}
 	if (pid)
 		sleep(2);
-	srand(time(NULL));
+	srand(time(NULL) + i);
 	SOCK = 0;
 	int valread;
 	struct sockaddr_in serv_addr;
@@ -135,6 +137,7 @@ int main(int ac, char **av)
 	// 	nick.push_back("0123456789"[rand() % 10]);+
 	sprintf(str, "%d", i);
 	nick.append(str);
+	std::cout << "Connecting client with nick " << nick << std::endl;
 
 	if (ac != 4)
 	{
