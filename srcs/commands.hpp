@@ -174,6 +174,12 @@ int IRC::nickCmd(std::vector<std::string> parsed)
 			return 1;
 		}
 	}
+	for (std::map<std::string, Channel *>::iterator it = CHANNEL_MAP.begin(); it != CHANNEL_MAP.end(); it++) {
+		if (it->second->is_in_channel(current_user->get_id())) {
+			std::string msg = ":" + current_user->get_identifier() + " NICK :" + parsed[1];
+			it->second->globalUserResponder(msg);
+		}
+	}
 	current_user->set_nick(parsed[1]);
 	return 0;
 }

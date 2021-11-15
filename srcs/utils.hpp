@@ -44,19 +44,17 @@ void print_prompt(int sig, std::string ipstr, std::string message) //sig == 0 se
 }
 
 
-void responder(std::string message, unsigned long fd)
+void responder(std::string message, unsigned long fd, std::string ipstr = "127.0.0.1")
 {
 	static int count = 0;
 	count++;
-	std::cout << "Total msgs fd__: " << count << std::endl;
-	//if (count < 60000)
-		send(fd, (message + "\n").c_str(), message.size() + 1, MSG_DONTWAIT);
-	print_prompt(0, "USER_IP", message);
+	send(fd, (message + "\n").c_str(), message.size() + 1, MSG_DONTWAIT);
+	print_prompt(0, ipstr, message);
 }
 
 void responder(std::string message, User &ux)
 {
-	responder(message, ux.get_id());
+	responder(message, ux.get_id(), ux.get_remote_ip());
 }
 
 std::vector<std::string> split_vct(std::string str, char delim)

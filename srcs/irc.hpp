@@ -177,7 +177,6 @@ void IRC::check_connection(void)
 {
 	if (!buff[0])
 	{
-		std::cout << "No buffer! > " << connected_fd << std::endl;
 		for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 		{
 			if (connected_fd == (*it).second.get_id())
@@ -195,7 +194,6 @@ void IRC::check_connection(void)
 void IRC::user_logged()
 {
 	char str[100];
-	// current_user->set_remote_ip(inet_ntop( AF_INET, &remote.sin_addr.s_addr, str, INET_ADDRSTRLEN ));
 	std::string message(RPL_WELCOME);
 	message.append(" ");
 	message.append(current_user->get_nick());

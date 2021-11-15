@@ -46,7 +46,6 @@ class User
 		std::string get_realname() const;
 		std::string get_full_address() const;
 		std::string get_identifier() const;
-		std::string get_ip_str();
 		std::string get_user_modes();
 		std::string get_remote_ip() const;
 		size_t		get_user_nb();
