@@ -68,7 +68,7 @@ private:
 	// fd_set 			*writefds;
 	std::set<int> readfds;
 	std::set<int> writefds;
-	int connected_fd;
+	size_t connected_fd;
 	User *current_user;
 	struct sockaddr_in remote;
 	char hostname[_SC_HOST_NAME_MAX];
@@ -109,13 +109,13 @@ private:
 };
 
 IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own) : 
+	Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496),
 	_own(own),
 	_host(host),
 	_network_port(net_pt),
 	_network_password(net_psw),
 	_port(pt),
-	_password(psw),
-	Server(AF_INET, SOCK_STREAM, 0, pt, INADDR_ANY, 10496)
+	_password(psw)
 {
 	current_user = NULL;
 	//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
@@ -252,10 +252,7 @@ void IRC::parse(std::string raw)
 	std::vector<std::string> parsed;
 	std::string command;
 	std::string tmp = raw;
-	int args = 0;
-	int prev_pos = 0;
 	int start;
-	int stop;
 
 	start = 0;
 	std::vector<std::string> tokens;
@@ -284,6 +281,7 @@ void IRC::handler(int connected_fd)
 		parse(token);
 	}
 	bzero(buff, sizeof(buff));
+	(void)connected_fd;
 }
 
 std::string IRC::receiver()

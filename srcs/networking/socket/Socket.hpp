@@ -9,11 +9,9 @@
 class Socket
 {
     private:
-        int serverPort;
         int hSocket;
         int connection;
         struct sockaddr_in remote;
-        u_long interface;
     public:
         Socket();
 		~Socket() {};

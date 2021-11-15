@@ -25,15 +25,6 @@ void replace_substr(std::string &haystack, std::string needle)
 
 void print_prompt(int sig, std::string ipstr, std::string message) //sig == 0 sending; sig == 1 reciving
 {
-	char str[INET_ADDRSTRLEN];
-	//char *ipstr_c = const_cast<char*>(ipstr.c_str());
-	//getnameinfo( (struct sockaddr *)&remote /* type cast sockaddr_in to sockaddr */, sizeof(remote), str, 64, NULL, 0, 0); //get the hostname non so se mantenerlo o meno
-
-	// if(!sig)
-	// 	std::cout << "[" << inet_ntop( AF_INET, ipstr_c, str, INET_ADDRSTRLEN ) << "]" << " << " << message << std::endl;
-	// else
-	// 	std::cout << "[" << inet_ntop( AF_INET, ipstr_c, str, INET_ADDRSTRLEN ) << "]" << " >> " << message << std::endl;;
-
 	if (!sig)
 		std::cout << "[" << ipstr << "]"
 				  << " << " << message << std::endl;

@@ -51,9 +51,6 @@ public:
 
 	int userJoin(User &, std::string);
 	void userLeft(User &);
-	void userBan(User &);
-	void userOp(User &);
-	void userKick(User &);
 
 	bool userIsOp(User &);
 	bool userHasVoice(User &);
@@ -302,14 +299,6 @@ void Channel::userLeft(User &user)
 	}
 }
 
-void Channel::userBan(User &user)
-{
-}
-
-void Channel::userOp(User &user)
-{
-}
-
 void Channel::setOp(bool on, User *op, User *user)
 {
 	if (!userIsOp(*op))
@@ -319,15 +308,10 @@ void Channel::setOp(bool on, User *op, User *user)
 		responder(ERR_NOSUCHNICK, *op);
 		return;
 	}
-	t_user_status current_status = USER_MAP[user->get_id()];
 	USER_MAP[user->get_id()].admin = on;
 	std::string sign = on ? " +o " : " -o ";
 	std::string rep = ":" + op->get_identifier() + " MODE " + _name + sign + user->get_nick();
 	globalUserResponder(rep);
-}
-
-void Channel::userKick(User &user)
-{
 }
 
 bool Channel::userIsOp(User &user)
@@ -394,7 +378,6 @@ void Channel::setVoice(bool on, User *op, User *user)
 		responder(ERR_NOSUCHNICK, *op);
 		return;
 	}
-	t_user_status current_status = USER_MAP[user->get_id()];
 	USER_MAP[user->get_id()].voice = on;
 	std::string sign = on ? " +v " : " -v ";
 	std::string rep = ":" + op->get_identifier() + " MODE " + _name + sign + user->get_nick();

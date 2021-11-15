@@ -41,7 +41,7 @@ int IRC::initializer(std::vector<std::string> parsed)
 
 std::string &capitalize(std::string &str)
 {
-	for (int i = 0; i < str.size(); i++)
+	for (size_t i = 0; i < str.size(); i++)
 	{
 		str[i] = toupper(str[i]);
 	}
@@ -217,6 +217,7 @@ int IRC::pongCmd(std::string raw)
 int IRC::motdCmd(std::string raw)
 {
 	std::ifstream motd;
+	(void)raw;
 	motd.open("MOTD.txt", std::ios::in);
 	if (!motd)
 	{
@@ -255,7 +256,7 @@ int IRC::joinCmd(std::string raw)
 	channels = splitter(params[0], ',');
 	if (params.size() > 1)
 		keys = splitter(params[1], ',');
-	for (int i = 0; i < channels.size(); i++)
+	for (size_t i = 0; i < channels.size(); i++)
 	{
 		if (channels[i][0] != '#')
 		{
@@ -265,7 +266,7 @@ int IRC::joinCmd(std::string raw)
 		current_channel = &get_channel(channels[i]);
 		if (i < keys.size())
 		{
-			if (current_channel->getModes().has_limit && current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
+			if (current_channel->getModes().has_limit && (int)current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
 			{
 				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANNELISFULL) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
 				responder(msg, *current_user);
@@ -282,7 +283,7 @@ int IRC::joinCmd(std::string raw)
 		}
 		else
 		{
-			if (current_channel->getModes().has_limit && current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
+			if (current_channel->getModes().has_limit && (int)current_channel->get_limit() == atoi(current_channel->get_user_nb().c_str())) //userlimit is set and full capacity reached
 			{
 				std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_CHANNELISFULL) + current_channel->get_name() + " :Cannot join the channel " + current_channel->get_modes_str("(", ")");
 				responder(msg, *current_user);
@@ -453,7 +454,6 @@ int IRC::partCmd(std::string raw)
 	priv_message = raw.substr(splitted[0].size() + 1, raw.size());
 
 	std::map<std::string, Channel *>::iterator res;
-	bool found = false;
 
 	for (std::vector<std::string>::iterator it = receivers.begin(); it != receivers.end(); it++)
 	{
@@ -481,6 +481,7 @@ int IRC::listCmd(std::string raw)
 {
 	/*start list message*/
 	std::string msg;
+	(void)raw;
 	msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(RPL_LISTSTART) + " " + current_user->get_nick() + " Channel :Users  Name");
 	responder(msg, *current_user);
 	/*send actual list*/
@@ -665,7 +666,7 @@ int IRC::modeCmd(std::string raw)
 				if (params[1][0] == '+')
 				{
 					old_modes = found->second->get_modes_str("", "");
-					for (int i = 1; i < params[1].size(); i++)
+					for (size_t i = 1; i < params[1].size(); i++)
 					{
 						if (params[1][i] == 'o')
 						{
@@ -740,7 +741,7 @@ int IRC::modeCmd(std::string raw)
 				else if (params[1][0] == '-')
 				{
 					old_modes = found->second->get_modes_str("", "");
-					for (int i = 1; i < params[1].size(); i++)
+					for (size_t i = 1; i < params[1].size(); i++)
 					{
 						if (params[1][i] == 'o')
 						{
@@ -788,7 +789,7 @@ int IRC::modeCmd(std::string raw)
 					}
 					new_modes = found->second->get_modes_str("", "");
 					std::string diff_modes;
-					for (int i = 0; i < old_modes.size(); i++)
+					for (size_t i = 0; i < old_modes.size(); i++)
 					{
 						if (new_modes.find(old_modes[i]) == std::string::npos)
 							diff_modes.push_back(old_modes[i]);
@@ -810,7 +811,7 @@ int IRC::modeCmd(std::string raw)
 					std::string msg;
 					std::string is_op;
 					std::vector<std::string> bans = found->second->get_bans();
-					for (int i = 0; i < bans.size(); i++) /*send ban list*/
+					for (size_t i = 0; i < bans.size(); i++) /*send ban list*/
 					{
 						// [21:54:04] MODE #x b
 						// [21:54:04] :italia.ircitalia.net 367 scillaaa|2 #x *!*@IRCItalia-7BBFBF6E.business.telecomitalia.it scillaaa|2 1636923235
@@ -840,7 +841,7 @@ int IRC::modeCmd(std::string raw)
 			}
 			if (params[1][0] == '+')
 			{
-				for (int i = 1; i < params[1].size(); i++)
+				for (size_t i = 1; i < params[1].size(); i++)
 				{
 					if (params[1][i] == 'i')
 						(*current_user)._state.invisible = true;
@@ -856,7 +857,7 @@ int IRC::modeCmd(std::string raw)
 			}
 			else if (params[1][0] == '-')
 			{
-				for (int i = 1; i < params[1].size(); i++)
+				for (size_t i = 1; i < params[1].size(); i++)
 				{
 					if (params[1][i] == 'i')
 						(*current_user)._state.invisible = false;
@@ -949,7 +950,7 @@ int IRC::namesCmd(Channel curr_channel)
 	std::string msg;
 	std::string is_op;
 	std::vector<size_t> whoInTheChann = curr_channel.get_users_ids();
-	for (int i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
+	for (size_t i = 0; i < whoInTheChann.size(); i++) /*send Namelist*/
 	{
 		msg.append(":" + current_user->get_remote_ip() + " ");
 		msg.append(RPL_NAMREPLY);
@@ -984,7 +985,7 @@ int IRC::whoCmd(std::string raw)
 				{
 					std::string msg;
 					std::vector<size_t> whoInTheChann = (*it).second->get_users_ids();
-					for (int i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
+					for (size_t i = 0; i < whoInTheChann.size(); i++) /*send channel wholist*/
 					{
 						msg.append(":" + current_user->get_remote_ip() + " ");
 						msg.append(RPL_WHOREPLY);

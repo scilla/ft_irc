@@ -31,13 +31,8 @@ void sender(std::string str)
 
 std::string receiver()
 {
-	fd_set fds;
 	int ss;
 	std::string str = "";
-	// FD_SET(SOCK, &fds);
-	// struct timeval timeout;
-	// timeout.tv_usec = 100;
-	// select(SOCK + 1, &fds, NULL, NULL, &timeout);
 	char buffer[102400] = {0};
 	read(SOCK, buffer, 102400);
 	return str;
@@ -124,10 +119,8 @@ int main(int ac, char **av)
 		sleep(2);
 	srand(time(NULL) + i);
 	SOCK = 0;
-	int valread;
 	struct sockaddr_in serv_addr;
 	std::vector<std::string> network;
-	bool type_bool;
 	std::string n_host;
 	std::string n_pass;
 	size_t n_port;
