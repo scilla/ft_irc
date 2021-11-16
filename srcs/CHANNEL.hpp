@@ -34,7 +34,6 @@ typedef struct s_user_status
 class Channel
 {
 private:
-	// size_t					_id;
 	std::string _name;
 	std::string _key;
 	std::string _topic;
@@ -234,7 +233,6 @@ int Channel::userJoin(User &user, std::string pass = "")
 {
 	t_user_status stat((t_user_status){false, false});
 	if (vectorBanMatch(&user, ban_masks)) {
-		//:italia.ircitalia.net 474 newbie #x :Cannot join channel (+b)
 		std::string msg = ":127.0.0.1 " + std::string(ERR_BANNEDFROMCHAN) + " " + user.get_nick() + " " + get_name() + " :Cannot join the channel (+b)";
 		responder(msg, user);
 		return 1;
@@ -244,20 +242,6 @@ int Channel::userJoin(User &user, std::string pass = "")
 		responder(ERR_BADCHANNELKEY, user);
 		return 1;
 	}
-	//if (modes.has_limit && USER_MAP.size() >= user_limit)
-	//{
-	//	responder(ERR_CHANNELISFULL, user);
-	//	return;
-	//}
-	//if (modes.invite)
-	//{
-	//	if (!invited_users.count(user.get_id()))
-	//	{
-	//		responder(ERR_INVITEONLYCHAN, user);
-	//		return;
-	//	}
-	//	invited_users.erase(user.get_id()); // todo: delete fd when disconnected
-	//}
 	if (USER_MAP.find(user.get_id()) != USER_MAP.end())
 	{
 		responder(ERR_ALREADYREGISTRED, user);
@@ -273,8 +257,6 @@ int Channel::userJoin(User &user, std::string pass = "")
 		responder(":" + user.get_identifier() + " JOIN " + this->_name, (*it).first);
 		std::cout << "[SENT JOIN MESSAGE TO]: " << (*it).first << " Size: " << USER_MAP.size() << std::endl;
 	}
-	// todo: RPL_TOPIC
-	// todo: RPL_NAMREPLY list users including me
 	return 0;
 }
 

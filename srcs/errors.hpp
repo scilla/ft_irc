@@ -43,7 +43,6 @@
 #define ERR_UMODEUNKNOWNFLAG	"501"
 #define ERR_USERSDONTMATCH		"502"
 
-//:italia.ircitalia.net 473 newbie88 #x :Cannot join channel (+i)
 
 #define RPL_WELCOME 			"001"
 #define RPL_YOURHOST			"002"

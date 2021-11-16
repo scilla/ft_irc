@@ -30,14 +30,8 @@ struct in_addr ipAddr;
 class IRC : public Server
 {
 public:
-	//IRC() {};
 	IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::string psw, bool own);
 	~IRC(){};
-
-	// bool 					is_own();
-	// size_t 					get_netPort();
-	// std::string 			get_netPsw();
-	// size_t 					get_port();
 	bool check_psw(std::string psw);
 	User *get_user(std::string nickname);
 	User *get_user(int fd);
@@ -45,17 +39,14 @@ public:
 	std::list<Channel> get_channels();
 	Channel &get_channel(std::string channelname);
 	ConnectingSocket *remoteServer;
-
 	void launch();
 	void check_connection(void);
 	int initializer(std::vector<std::string> parsed);
 	void commandSelector(std::string parsed);
-
 	void user_creator();
 	void user_logged();
-
 	void parse(std::string raw);
-	//void elab_parsed(std::vector<std::string> parsed);
+
 private:
 	bool _own;
 	std::string _host;
@@ -64,29 +55,23 @@ private:
 	size_t _port;		   //local server port
 	std::string _password; //local server psw
 	std::string own_ip;
-	// fd_set 			*readfds;
-	// fd_set 			*writefds;
 	std::set<int> readfds;
 	std::set<int> writefds;
 	size_t connected_fd;
 	User *current_user;
 	struct sockaddr_in remote;
 	char hostname[_SC_HOST_NAME_MAX];
-
 	char buff[300000];
 	int newSocket;
 	void accepter();
 	void handler(int connected_fd);
 	std::string receiver();
 	std::string psw;
-
 	std::map<size_t, User> USER_MAP;
 	std::map<std::string, size_t> FD_MAP;
 	std::map<std::string, Channel *> CHANNEL_MAP;
 	std::map<std::string, int (IRC::*)(std::vector<std::string>)> CMD_MAP;
-
 	User &nick_to_user(std::string nick);
-
 	//commands
 	int userCmd(std::vector<std::string>);
 	int passCmd(std::vector<std::string>);
@@ -118,7 +103,6 @@ IRC::IRC(std::string host, size_t net_pt, std::string net_psw, size_t pt, std::s
 	_password(psw)
 {
 	current_user = NULL;
-	//CMD_MAP.insert(std::pair<std::string, void(IRC::*)(std::string)>("ciao", &IRC::parse));
 };
 
 void IRC::accepter()
@@ -261,8 +245,6 @@ void IRC::parse(std::string raw)
 	parsed = splitter(raw, ' ');
 	if (!(parsed.size()))
 		return;
-	// for(std::vector<std::string>::iterator it = parsed.begin(); it != parsed.end(); it++)
-	// 	std::cout << *it << " " << std::endl;
 	int res;
 	if ((res = initializer(parsed)) == 1)
 		return;
@@ -339,11 +321,6 @@ void IRC::launch()
 				break;
 			}
 		}
-		// i++;
-		// if (i > 10)
-		// 	break;
-		//accepter();
-		//responder();
 	}
 }
 #endif /* IRC_HPP */

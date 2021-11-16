@@ -134,7 +134,6 @@ int IRC::passCmd(std::vector<std::string> parsed)
 	{
 		std::cout << "User sent no pass" << std::endl;
 		responder(ERR_NEEDMOREPARAMS, connected_fd);
-		// abort_connection(connected_fd);
 		close(connected_fd);
 		readfds.erase(connected_fd);
 		return (1);
@@ -144,7 +143,6 @@ int IRC::passCmd(std::vector<std::string> parsed)
 		std::cout << "User sent wrong pass" << std::endl;
 		responder(ERR_PASSWDMISMATCH, connected_fd);
 		bzero(buff, sizeof(buff));
-		// abort_connection(connected_fd);
 		close(connected_fd);
 		readfds.erase(connected_fd);
 		return (1);
@@ -247,7 +245,6 @@ int IRC::joinCmd(std::string raw)
 	std::vector<std::string> keys;
 	Channel *current_channel;
 
-	// :italia.ircitalia.net 471 Buonve|2 #cacca :Cannot join channel (+l)
 	if (!params.size())
 	{
 		responder(ERR_NEEDMOREPARAMS, *current_user);
@@ -329,10 +326,8 @@ int IRC::quitCmd(std::string raw)
 			it++;
 	}
 
-	//if(readfds.find(current_user->get_id()) != readfds.end())
 	readfds.erase(readfds.find(current_user->get_id()));
 	close(current_user->get_id());
-	//if(USER_MAP.find(current_user->get_id()) != USER_MAP.end())
 	USER_MAP.erase(USER_MAP.find(current_user->get_id()));
 	for (std::map<size_t, User>::iterator it = USER_MAP.begin(); it != USER_MAP.end(); it++)
 	{
@@ -523,14 +518,12 @@ int IRC::topicCmd(std::string raw)
 				{
 					(*it).second->setTopic(topic.substr(1, topic.size()), current_user);
 					std::string msg = ":" + current_user->get_identifier() + " TOPIC " + (*it).first + " :" + (*it).second->get_topic();
-					//responder(msg, *current_user);
 					(*it).second->globalUserResponder(msg);
 					break;
 				}
 				else
 				{
 					std::string msg = ":" + std::string(inet_ntoa(remote.sin_addr)) + std::string(ERR_CHANOPRIVSNEEDED) + " " + current_user->get_nick() + " " + channel_name + " :You're not channel operator";
-					//responder(msg, *current_user);
 					(*it).second->globalUserResponder(msg);
 					break;
 				}
@@ -719,7 +712,6 @@ int IRC::modeCmd(std::string raw)
 						}
 						else
 						{
-							//:italia.ircitalia.net 472 Buonve 2 :is unknown mode char to me
 							std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UNKNOWNMODE) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
 							responder(tmp, *current_user);
 						}
@@ -782,7 +774,6 @@ int IRC::modeCmd(std::string raw)
 							(*found).second->setKey(false, current_user);
 						else
 						{
-							//:italia.ircitalia.net 472 Buonve 2 :is unknown mode char to me
 							std::string tmp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_UNKNOWNMODE) + " " + current_user->get_nick() + " " + params[1][i] + " :Unknown mode char";
 							responder(tmp, *current_user);
 						}
@@ -813,9 +804,6 @@ int IRC::modeCmd(std::string raw)
 					std::vector<std::string> bans = found->second->get_bans();
 					for (size_t i = 0; i < bans.size(); i++) /*send ban list*/
 					{
-						// [21:54:04] MODE #x b
-						// [21:54:04] :italia.ircitalia.net 367 scillaaa|2 #x *!*@IRCItalia-7BBFBF6E.business.telecomitalia.it scillaaa|2 1636923235
-						// [21:54:04] :italia.ircitalia.net 368 scillaaa|2 #x :End of Channel Ban List
 						msg.append(":" + std::string(inet_ntoa(remote.sin_addr)) + " ");
 						msg.append(RPL_BANLIST);
 						msg.append(" " + current_user->get_nick() + " " + found->second->get_name() + " " + bans[i]);
@@ -845,8 +833,6 @@ int IRC::modeCmd(std::string raw)
 				{
 					if (params[1][i] == 'i')
 						(*current_user)._state.invisible = true;
-					//else if(params[1][i] == 'o' && params[0].compare(current_user->get_nick()))
-					//	(*current_user)._state.op = true;
 					//autonomous opping is ignored
 					else
 					{
@@ -899,8 +885,9 @@ int IRC::modeCmd(std::string raw)
 	}
 	else
 	{
+		std::string resp = ":" + std::string(inet_ntoa(remote.sin_addr)) + " " + std::string(ERR_NEEDMOREPARAMS) + " " + current_user->get_nick() + " ";
+		responder(resp, *current_user);
 	}
-	// error ERR_NEEDMOREPARAMS
 	return 1;
 }
 
@@ -992,7 +979,6 @@ int IRC::whoCmd(std::string raw)
 						std::map<size_t, User>::iterator found = USER_MAP.find(whoInTheChann[i]);
 						if (!(*found).second._state.invisible && current_user->get_id() != (*found).first)
 						{
-							// is_op = it->second->userIsOp(found->second) ? "@" : "";
 							is_op = it->second->userIsOp(found->second) ? "@" : it->second->userHasVoice(found->second) ? "+"
 																														: "";
 							msg.append(" " + current_user->get_nick() + " " + (*it).first + " " + (*found).second.get_username() + " " + (*found).second.get_remote_ip() + " " + (*found).second.get_nick() + " H" + is_op + " :0" + (*found).second.get_realname());

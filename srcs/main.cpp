@@ -62,7 +62,6 @@ int main(int ac, char **av)
 		l_port = atol(network[3].c_str());
 		l_psw = (std::string)network[4].c_str();
 		type_bool = false;
-		//IRC server((std::string)network[0].c_str(), atol(network[1].c_str()), (std::string)network[2].c_str(), atol(network[3].c_str()), (std::string)network[4].c_str(), false);
 	} 
 	else
 	{

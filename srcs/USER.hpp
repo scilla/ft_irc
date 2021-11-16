@@ -18,7 +18,6 @@ typedef struct s_state{
 	
 }				t_state;
 
-
 class User
 {
 	private:
@@ -27,7 +26,6 @@ class User
 		std::string				_altnick;
 		std::string 			_username;
 		std::string				_realname;
-		//std::map<int, Roles>	channels;
 		int						_fdread;
 		int						_fdwrite;
 		int						_last_activity;
